@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="4as-b9-O8x">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="BgC-j2-P2h">
+            <objects>
+                <navigationController id="4as-b9-O8x" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="XeI-Pd-Pg3">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="4OU-EE-Bog" kind="relationship" relationship="rootViewController" id="w6a-I0-65h"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NZD-hs-GA9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-310" y="398"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="SeT-mh-lQJ">
+            <objects>
+                <viewController id="4OU-EE-Bog" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="3j2-Ky-ObR"/>
+                        <viewControllerLayoutGuide type="bottom" id="mcN-Sw-bJE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="lZ2-m3-cNT">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TZV-bJ-Lo8">
+                                <rect key="frame" x="49" y="99" width="150" height="94"/>
+                                <state key="normal" image="cassette-yellow">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="5ak-Kt-zlZ" kind="show" id="fqP-oy-Hod"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="n3r-ts-6vN">
+                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="add" id="vIF-zz-BjH"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SxM-lU-3aY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="366" y="394"/>
+        </scene>
+        <!--ProjectView-->
+        <scene sceneID="dT4-ZZ-Oo7">
+            <objects>
+                <viewController title="ProjectView" id="5ak-Kt-zlZ" customClass="ProjectViewController" customModule="TapeRecorder" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="snc-tU-n9g"/>
+                        <viewControllerLayoutGuide type="bottom" id="Wj5-tP-0rN"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="24X-S4-mSZ" customClass="DrawView" customModule="TapeRecorder" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="dQF-aN-RrG">
+                        <nil key="title"/>
+                        <barButtonItem key="backBarButtonItem" title="h" id="5i2-eI-0hR"/>
+                        <barButtonItem key="rightBarButtonItem" style="plain" id="yuB-f5-Rdy">
+                            <view key="customView" contentMode="scaleToFill" id="LZ7-cK-932">
+                                <rect key="frame" x="320" y="128" width="190" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XSF-iY-ZUp">
+                                        <rect key="frame" x="137" y="7" width="46" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="Add">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="addTrack:" destination="5ak-Kt-zlZ" eventType="touchUpInside" id="BAB-Mi-Pob"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W3D-ri-8Ig">
+                                        <rect key="frame" x="50" y="7" width="57" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="Select">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </view>
+                            <color key="tintColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="drawView" destination="24X-S4-mSZ" id="Gne-zU-GRo"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ddk-rg-QVy" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1041" y="394"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="cassette-yellow" width="150" height="94"/>
+    </resources>
+</document>
