@@ -13,54 +13,74 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="4OU-EE-Bog" kind="relationship" relationship="rootViewController" id="w6a-I0-65h"/>
+                        <segue destination="RAX-jM-LFL" kind="relationship" relationship="rootViewController" id="BH2-1W-I5Y"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NZD-hs-GA9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-310" y="398"/>
         </scene>
-        <!--View Controller-->
-        <scene sceneID="SeT-mh-lQJ">
+        <!--Tracks-->
+        <scene sceneID="aZD-rh-omM">
             <objects>
-                <viewController id="4OU-EE-Bog" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="3j2-Ky-ObR"/>
-                        <viewControllerLayoutGuide type="bottom" id="mcN-Sw-bJE"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="lZ2-m3-cNT">
+                <tableViewController id="RAX-jM-LFL" customClass="SelectProjectTableViewController" customModule="Tracks" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" sectionHeaderHeight="22" sectionFooterHeight="22" id="cce-qc-mri">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TZV-bJ-Lo8">
-                                <rect key="frame" x="49" y="99" width="150" height="94"/>
-                                <state key="normal" image="cassette-yellow">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="5ak-Kt-zlZ" kind="show" id="fqP-oy-Hod"/>
-                                </connections>
-                            </button>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="n3r-ts-6vN">
-                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="add" id="vIF-zz-BjH"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="projectCell" rowHeight="55" id="Tua-JO-rjm" customClass="ProjectCellTableViewCell" customModule="Tracks" customModuleProvider="target">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Tua-JO-rjm" id="OP7-2W-c0A">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="cq5-1b-2Fh">
+                                            <rect key="frame" x="14" y="7" width="385" height="30"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                            <textInputTraits key="textInputTraits"/>
+                                        </textField>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="12/31/91" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3v8-85-Ewf">
+                                            <rect key="frame" x="14" y="31" width="57" height="21"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="textColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="projectDate" destination="3v8-85-Ewf" id="Ig5-qV-Dmz"/>
+                                    <outlet property="projectName" destination="cq5-1b-2Fh" id="fM0-5q-JZn"/>
+                                    <segue destination="5ak-Kt-zlZ" kind="show" identifier="passInfo" id="DKV-z9-bCi"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="RAX-jM-LFL" id="D8W-Yt-TA2"/>
+                            <outlet property="delegate" destination="RAX-jM-LFL" id="txI-Y9-LLI"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Tracks" id="rWK-vf-90U">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="xdF-YA-TL3">
+                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                            <connections>
+                                <action selector="addProject:" destination="RAX-jM-LFL" id="w13-9S-62P"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="SxM-lU-3aY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Nae-6Q-HHh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="366" y="394"/>
+            <point key="canvasLocation" x="382" y="391"/>
         </scene>
         <!--ProjectView-->
         <scene sceneID="dT4-ZZ-Oo7">
             <objects>
-                <viewController title="ProjectView" id="5ak-Kt-zlZ" customClass="ProjectViewController" customModule="TapeRecorder" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="ProjectView" id="5ak-Kt-zlZ" customClass="ProjectViewController" customModule="Tracks" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="snc-tU-n9g"/>
                         <viewControllerLayoutGuide type="bottom" id="Wj5-tP-0rN"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="24X-S4-mSZ" customClass="DrawView" customModule="TapeRecorder" customModuleProvider="target">
+                    <view key="view" contentMode="scaleToFill" id="24X-S4-mSZ" customClass="DrawView" customModule="Tracks" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -78,6 +98,7 @@
                                         <rect key="frame" x="137" y="7" width="46" height="30"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <state key="normal" title="Add">
+                                            <color key="titleColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -88,6 +109,7 @@
                                         <rect key="frame" x="50" y="7" width="57" height="30"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <state key="normal" title="Select">
+                                            <color key="titleColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                     </button>
@@ -106,7 +128,5 @@
             <point key="canvasLocation" x="1041" y="394"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="cassette-yellow" width="150" height="94"/>
-    </resources>
+    <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
 </document>

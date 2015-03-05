@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Line {
+class Line: NSObject {
     var start: CGPoint
     var end: CGPoint
     
@@ -16,4 +16,14 @@ class Line {
         start = _start
         end = _end
     }
+    
+    required convenience init(coder aDecoder: NSCoder) {
+        self.init(start: aDecoder.decodeCGPointForKey("start"), end: aDecoder.decodeCGPointForKey("end"))
+    }
+    
+    func encodeWithCoder(aCoder: NSCoder) {
+        aCoder.encodeCGPoint(self.start, forKey: "start")
+        aCoder.encodeCGPoint(self.end, forKey: "end")
+    }
+    
 }

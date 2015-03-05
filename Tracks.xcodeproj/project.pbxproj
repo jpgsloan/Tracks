@@ -8,11 +8,25 @@
 
 /* Begin PBXBuildFile section */
 		11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AC61A9EB13900E09069 /* AppDelegate.swift */; };
-		11493AC91A9EB13900E09069 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AC81A9EB13900E09069 /* ViewController.swift */; };
-		11493ACC1A9EB13900E09069 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACA1A9EB13900E09069 /* Main.storyboard */; };
 		11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACD1A9EB13900E09069 /* Images.xcassets */; };
 		11493AD11A9EB13900E09069 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACF1A9EB13900E09069 /* LaunchScreen.xib */; };
 		11493ADD1A9EB13900E09069 /* TracksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493ADC1A9EB13900E09069 /* TracksTests.swift */; };
+		11493AED1A9EB19800E09069 /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AE61A9EB19800E09069 /* Line.swift */; };
+		11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AE71A9EB19800E09069 /* ProjectViewController.swift */; };
+		11493AEF1A9EB19800E09069 /* RecordedAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AE81A9EB19800E09069 /* RecordedAudio.swift */; };
+		11493AF01A9EB19800E09069 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AE91A9EB19800E09069 /* Track.swift */; };
+		11493AF11A9EB19800E09069 /* TrackColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEA1A9EB19800E09069 /* TrackColorPicker.swift */; };
+		11493AF21A9EB19800E09069 /* WaveFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEC1A9EB19800E09069 /* WaveFormView.swift */; };
+		11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AF31A9EB1B000E09069 /* DrawView.swift */; };
+		11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11493AF51A9EB96F00E09069 /* Main.storyboard */; };
+		1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */; };
+		1162B37D1AA69D9D0066A52E /* ProjectEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B37C1AA69D9D0066A52E /* ProjectEntity.swift */; };
+		1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3801AA6EBB10066A52E /* TrackEntity.swift */; };
+		11DC217A1AA8F9E000471052 /* DrawViewEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DC21791AA8F9E000471052 /* DrawViewEntity.swift */; };
+		11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */; };
+		11E391141AA7C54C00257DE2 /* ProjectCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */; };
+		11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */; };
+		B82C0A99A676B1A859871BB0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F0EFB2F40011E4A9B70B6F4 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,13 +43,30 @@
 		11493AC11A9EB13900E09069 /* Tracks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11493AC51A9EB13900E09069 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		11493AC61A9EB13900E09069 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		11493AC81A9EB13900E09069 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		11493ACB1A9EB13900E09069 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		11493ACD1A9EB13900E09069 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		11493AD01A9EB13900E09069 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		11493AD61A9EB13900E09069 /* TracksTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TracksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		11493ADB1A9EB13900E09069 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		11493ADC1A9EB13900E09069 /* TracksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksTests.swift; sourceTree = "<group>"; };
+		11493AE61A9EB19800E09069 /* Line.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
+		11493AE71A9EB19800E09069 /* ProjectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
+		11493AE81A9EB19800E09069 /* RecordedAudio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordedAudio.swift; sourceTree = "<group>"; };
+		11493AE91A9EB19800E09069 /* Track.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		11493AEA1A9EB19800E09069 /* TrackColorPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackColorPicker.swift; sourceTree = "<group>"; };
+		11493AEC1A9EB19800E09069 /* WaveFormView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveFormView.swift; sourceTree = "<group>"; };
+		11493AF31A9EB1B000E09069 /* DrawView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawView.swift; sourceTree = "<group>"; };
+		11493AF51A9EB96F00E09069 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TracksDataModel.xcdatamodel; sourceTree = "<group>"; };
+		1162B37C1AA69D9D0066A52E /* ProjectEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectEntity.swift; sourceTree = "<group>"; };
+		1162B3801AA6EBB10066A52E /* TrackEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TrackEntity.swift; path = ../TrackEntity.swift; sourceTree = "<group>"; };
+		11C7FF3B1A9EC0320055879C /* Tracks-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tracks-Bridging-Header.h"; sourceTree = "<group>"; };
+		11DC21791AA8F9E000471052 /* DrawViewEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawViewEntity.swift; sourceTree = "<group>"; };
+		11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SelectProjectTableViewController.swift; path = ../SelectProjectTableViewController.swift; sourceTree = "<group>"; };
+		11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectCellTableViewCell.swift; sourceTree = "<group>"; };
+		11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewDataEntity.swift; sourceTree = "<group>"; };
+		3AD75F2E0A8E254275688B01 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		4F0EFB2F40011E4A9B70B6F4 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		B73C169CBD4E32C05F39A9F4 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B82C0A99A676B1A859871BB0 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +94,8 @@
 				11493AC31A9EB13900E09069 /* Tracks */,
 				11493AD91A9EB13900E09069 /* TracksTests */,
 				11493AC21A9EB13900E09069 /* Products */,
+				69980F29F0D3F5582F8B2EEC /* Pods */,
+				21D8B0B044E5734AEE645CD3 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -78,9 +112,23 @@
 			isa = PBXGroup;
 			children = (
 				11493AC61A9EB13900E09069 /* AppDelegate.swift */,
-				11493AC81A9EB13900E09069 /* ViewController.swift */,
-				11493ACA1A9EB13900E09069 /* Main.storyboard */,
+				11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */,
+				11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */,
+				11493AE71A9EB19800E09069 /* ProjectViewController.swift */,
+				11493AF31A9EB1B000E09069 /* DrawView.swift */,
+				11493AE61A9EB19800E09069 /* Line.swift */,
+				11493AE91A9EB19800E09069 /* Track.swift */,
+				11493AE81A9EB19800E09069 /* RecordedAudio.swift */,
+				11493AEA1A9EB19800E09069 /* TrackColorPicker.swift */,
+				11493AEC1A9EB19800E09069 /* WaveFormView.swift */,
+				1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */,
+				11DC21791AA8F9E000471052 /* DrawViewEntity.swift */,
+				11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */,
+				1162B3801AA6EBB10066A52E /* TrackEntity.swift */,
+				1162B37C1AA69D9D0066A52E /* ProjectEntity.swift */,
 				11493ACD1A9EB13900E09069 /* Images.xcassets */,
+				11C7FF3B1A9EC0320055879C /* Tracks-Bridging-Header.h */,
+				11493AF51A9EB96F00E09069 /* Main.storyboard */,
 				11493ACF1A9EB13900E09069 /* LaunchScreen.xib */,
 				11493AC41A9EB13900E09069 /* Supporting Files */,
 			);
@@ -112,6 +160,23 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		21D8B0B044E5734AEE645CD3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4F0EFB2F40011E4A9B70B6F4 /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		69980F29F0D3F5582F8B2EEC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				B73C169CBD4E32C05F39A9F4 /* Pods.debug.xcconfig */,
+				3AD75F2E0A8E254275688B01 /* Pods.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -119,9 +184,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 11493AE01A9EB13900E09069 /* Build configuration list for PBXNativeTarget "Tracks" */;
 			buildPhases = (
+				67C80E153FAD5982EEDB9B62 /* Check Pods Manifest.lock */,
 				11493ABD1A9EB13900E09069 /* Sources */,
 				11493ABE1A9EB13900E09069 /* Frameworks */,
 				11493ABF1A9EB13900E09069 /* Resources */,
+				A9D968CE1D764937BEBD588F /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -192,9 +259,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11493ACC1A9EB13900E09069 /* Main.storyboard in Resources */,
 				11493AD11A9EB13900E09069 /* LaunchScreen.xib in Resources */,
 				11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */,
+				11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,13 +274,59 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		67C80E153FAD5982EEDB9B62 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		A9D968CE1D764937BEBD588F /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		11493ABD1A9EB13900E09069 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11493AC91A9EB13900E09069 /* ViewController.swift in Sources */,
+				11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */,
+				11493AF11A9EB19800E09069 /* TrackColorPicker.swift in Sources */,
+				11E391141AA7C54C00257DE2 /* ProjectCellTableViewCell.swift in Sources */,
+				11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */,
+				11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */,
+				1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */,
+				11493AED1A9EB19800E09069 /* Line.swift in Sources */,
 				11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */,
+				1162B37D1AA69D9D0066A52E /* ProjectEntity.swift in Sources */,
+				11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */,
+				11493AEF1A9EB19800E09069 /* RecordedAudio.swift in Sources */,
+				1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */,
+				11493AF01A9EB19800E09069 /* Track.swift in Sources */,
+				11DC217A1AA8F9E000471052 /* DrawViewEntity.swift in Sources */,
+				11493AF21A9EB19800E09069 /* WaveFormView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,14 +349,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		11493ACA1A9EB13900E09069 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				11493ACB1A9EB13900E09069 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		11493ACF1A9EB13900E09069 /* LaunchScreen.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -336,21 +441,28 @@
 		};
 		11493AE11A9EB13900E09069 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B73C169CBD4E32C05F39A9F4 /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Tracks/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tracks/Tracks-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		11493AE21A9EB13900E09069 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3AD75F2E0A8E254275688B01 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = Tracks/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tracks/Tracks-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -407,6 +519,7 @@
 				11493AE21A9EB13900E09069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		11493AE31A9EB13900E09069 /* Build configuration list for PBXNativeTarget "TracksTests" */ = {
 			isa = XCConfigurationList;
@@ -415,8 +528,22 @@
 				11493AE51A9EB13900E09069 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */,
+			);
+			currentVersion = 1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */;
+			path = TracksDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 11493AB91A9EB13900E09069 /* Project object */;
 }
