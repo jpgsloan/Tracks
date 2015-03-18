@@ -25,7 +25,11 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     var labelDate: UILabel!
     var labelDuration: UILabel!
     var textFieldName: UITextField!
+    var progressView: UIView!
+    var isInEditMode: Bool = false
 
+    var recordButton: UIView!
+    
     var audioPlot: EZAudioPlot!
     var audioFile: EZAudioFile!
     
@@ -49,7 +53,9 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         } else {
             var audioFileUrl = projectDirectory.stringByAppendingPathComponent(trackName)
             self.init(frame: bounds)
-        
+            
+            recordButton.removeFromSuperview()
+            
             recordedAudio.filePathUrl = NSURL(fileURLWithPath: audioFileUrl)
             recordedAudio.title = recordedAudio.filePathUrl.lastPathComponent
             hasStartedRecording = true
@@ -74,6 +80,11 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.projectDirectory = projectDirectory
         self.center = aDecoder.decodeCGPointForKey("center")
         self.trackID = aDecoder.decodeObjectForKey("trackID") as String
+
+        self.addSubview(audioPlot)
+        self.addSubview(labelName)
+        self.addSubview(labelDate)
+        self.addSubview(labelDuration)
     }
     
     override func encodeWithCoder(aCoder: NSCoder) {
@@ -98,11 +109,17 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.appDel = UIApplication.sharedApplication().delegate as AppDelegate
         self.context = appDel.managedObjectContext!
         self.layer.cornerRadius = 12
-    
+        self.clipsToBounds = true
+        
         if self.backgroundColor == nil {
             println("picking color")
             self.backgroundColor = pickColor()
         }
+        
+        //set progressView 
+        progressView = UIView(frame: CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 1, height: self.bounds.height))
+        progressView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        progressView.layer.cornerRadius = 2
         
         //Set the track id
         if self.trackID.isEmpty {
@@ -125,7 +142,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         audioPlot.color = UIColor.whiteColor()
         audioPlot.shouldFill   = false
         audioPlot.shouldMirror = true
-        self.addSubview(audioPlot)
         
         //Add label for file name
         labelName = UILabel(frame: CGRect(x: originX + 5, y: originY, width: trackWidth - 10, height: trackHeight/4.2))
@@ -138,7 +154,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         longPress.minimumPressDuration = 0.75;  // Seconds
         longPress.numberOfTapsRequired = 0;
         labelName.addGestureRecognizer(longPress)
-        self.addSubview(labelName)
+        
         
         //Create text field that will accept input on long press
         textFieldName = UITextField(frame: CGRect(x: originX, y: originY + 1, width: trackWidth, height: trackHeight/4.2))
@@ -153,12 +169,12 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         var dateFormatter:NSDateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "MM/dd/yy"
         var dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
-        labelDate = UILabel(frame: CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth, height: trackHeight * 1.4 / 7.0))
+        labelDate = UILabel(frame: CGRect(x: originX + (trackWidth / 12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth, height: trackHeight * 1.4 / 7.0))
         labelDate.textAlignment = NSTextAlignment.Left
         labelDate.textColor = UIColor.whiteColor()
         labelDate.text = dateInFormat
         labelDate.font = UIFont(name: labelDate.font.fontName, size: 10)
-        self.addSubview(labelDate)
+        
         
         //Add label for duration (0:00:00 until audio is recorded)
         labelDuration = UILabel(frame: CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth - (trackWidth * 2.0 / 12.0) , height: trackHeight * 1.4 / 7.0))
@@ -166,14 +182,15 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         labelDuration.textColor = UIColor.whiteColor()
         labelDuration.text = "0:00:00"
         labelDuration.font = UIFont(name: labelDuration.font.fontName, size: 10)
-        self.addSubview(labelDuration)
-
-        /* USE WHEN RECORD IMAGE IS READY */
-        /*var image = UIImage(named: "record")
-        var imageView = UIImageView(image: image)
-        imageView.frame = self.bounds
-        self.addSubview(imageView)
-        */
+        
+    
+        //Add record button (as UIView)
+        recordButton = UIView(frame: CGRect(x: originX + trackWidth / 4, y:     originY + trackHeight / 4, width: trackWidth / 2, height: trackHeight / 2))
+        recordButton.layer.cornerRadius = recordButton.bounds.width / 2
+        recordButton.layer.borderWidth = 3
+        recordButton.layer.borderColor = UIColor.whiteColor().CGColor
+        recordButton.backgroundColor = UIColor.lightGrayColor()
+        self.addSubview(recordButton)
     }
     
     //Activated when file name label is longpressed. Adds input textView.
@@ -214,25 +231,33 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
         var touch: UITouch = touches.anyObject() as UITouch
         startLoc = touch.locationInView(self)
-        self.superview?.bringSubviewToFront(self)
+        if !isInEditMode {
+            self.superview?.bringSubviewToFront(self)
+        }
     }
     
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
         if (!wasDragged) {
             if (!hasStartedRecording) {
                 println("started recording")
-                /*for view in self.subviews {
-                    view.removeFromSuperview()
-                }
                 
-                var image = UIImage(named: "stop")
-                var imageView = UIImageView(image: image)
-                imageView.frame = self.bounds
-                //imageView.center = self.center
-                self.addSubview(imageView)*/
+                var originX = self.bounds.origin.x
+                var originY = self.bounds.origin.y
+                var trackHeight = self.bounds.height
+                var trackWidth = self.bounds.width
                 
+                var animation = CABasicAnimation(keyPath: "cornerRadius")
+                animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+                animation.fromValue = recordButton.bounds.width / 2
+                animation.toValue = 6.0
+                animation.duration = 0.5
+                self.recordButton.layer.cornerRadius = 6
+                self.recordButton.layer.addAnimation(animation, forKey: "cornerRadius")
                 
-            
+                Track.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                    self.recordButton.transform = CGAffineTransformMakeScale(0.9, 0.9)
+                 }, completion: nil )
+                
                 let currentDateTime = NSDate()
                 let formatter = NSDateFormatter()
                 formatter.dateFormat = "ddMMyyyy-HHmmss-SSS"
@@ -242,7 +267,9 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             
                 var session = AVAudioSession.sharedInstance()
                 session.setCategory(AVAudioSessionCategoryPlayAndRecord, error: nil)
-            
+                session.overrideOutputAudioPort(AVAudioSessionPortOverride.Speaker,
+                     error:nil)
+                
                 audioRecorder = AVAudioRecorder(URL: filePath, settings: nil, error: nil)
                 audioRecorder.delegate = self
                 audioRecorder.meteringEnabled = true
@@ -253,15 +280,15 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 hasStoppedRecording = false
             } else if (!hasStoppedRecording) {
                 println("stopped recording")
-                //TODO: store file recorded.
-                /*for view in self.subviews {
-                    view.removeFromSuperview()
-                }
-                
-                var image = UIImage(named: "cassette-yellow")
-                var imageView = UIImageView(image: image)
-                imageView.frame = self.bounds
-                self.addSubview(imageView)*/
+                Track.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                    self.recordButton.transform = CGAffineTransformMakeScale(0.01, 0.01)
+                    }, completion: { (Bool) -> Void in
+                        self.recordButton.removeFromSuperview()
+                        self.addSubview(self.audioPlot)
+                        self.addSubview(self.labelName)
+                        self.addSubview(self.labelDate)
+                        self.addSubview(self.labelDuration)
+                })
                 
                 audioRecorder.stop()
                 var audioSession = AVAudioSession.sharedInstance()
@@ -277,23 +304,45 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         }
     }
     
+    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+        if !isInEditMode {
+            wasDragged = true
+            var touch: UITouch = touches.anyObject() as UITouch
+            var touchLoc: CGPoint = touch.locationInView(self)
+        
+            //move the track node relative to the starting location.
+            Track.animateWithDuration(0.01, delay: 0.01, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                    self.frame.origin.x += touchLoc.x - self.startLoc.x;
+                    self.frame.origin.y += touchLoc.y - self.startLoc.y;
+                }, completion: nil )
+        }
+    }
+    
     func playAudio() {
         println("playing")
+        
         self.audioPlayer.stop()
         self.audioPlayer.currentTime = 0.0
         self.audioPlayer.play()
-    }
-    
-    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
-        wasDragged = true
-        var touch: UITouch = touches.anyObject() as UITouch
-        var touchLoc: CGPoint = touch.locationInView(self)
         
-        //move the track node relative to the starting location.
-        Track.animateWithDuration(0.01, delay: 0.01, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-            self.frame.origin.x += touchLoc.x - self.startLoc.x;
-            self.frame.origin.y += touchLoc.y - self.startLoc.y;
-            }, completion: nil )
+        UIView.animateWithDuration(0.001, delay: 0.0, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveLinear, animations: { () -> Void in
+                self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
+            }, completion: nil)
+        
+        self.progressView = UIView(frame: CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 1, height: self.bounds.height))
+        self.progressView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        self.progressView.layer.cornerRadius = 2
+        
+        self.addSubview(self.progressView)
+        self.bringSubviewToFront(self.labelName)
+        self.bringSubviewToFront(self.labelDuration)
+        self.bringSubviewToFront(self.labelDate)
+        
+        UIView.animateWithDuration(self.audioPlayer.duration, delay: 0.1, options:UIViewAnimationOptions.CurveLinear|UIViewAnimationOptions.BeginFromCurrentState, animations: { () -> Void in
+                var tmpFrame: CGRect = self.progressView.frame
+                tmpFrame.origin.x += self.bounds.width + 1
+                self.progressView.frame = tmpFrame
+            }, completion: nil)
     }
     
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
@@ -325,6 +374,85 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         audioFile.getWaveformDataWithCompletionBlock(
             { (waveformData: UnsafeMutablePointer<Float>, length: UInt32) in
                 self.audioPlot.updateBuffer(waveformData, withBufferSize:length);
+        })
+    }
+    
+    func editMode() {
+        println("SHOW Edit Mode")
+        self.isInEditMode = true
+        
+        UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+            var newFrame = self.superview!.frame
+            self.frame = newFrame
+           
+            //Frequently reused bounds values
+            var originX = self.bounds.origin.x
+            var originY = self.bounds.origin.y
+            var trackHeight = self.bounds.height
+            var trackWidth = self.bounds.width
+            
+            //Resize label for file name
+            self.labelName.frame = CGRect(x: originX + 5, y: originY, width: trackWidth - 10, height: trackHeight/4.2)
+            
+            //Resize label for date
+            self.labelDate.frame = CGRect(x: originX + (trackWidth / 12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth, height: trackHeight * 1.4 / 7.0)
+            
+            //Resize label for duration
+            self.labelDuration.frame = CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth - (trackWidth * 2.0 / 12.0) , height: trackHeight * 1.4 / 7.0)
+            
+            //Resize waveform plot
+            self.audioPlot.frame = CGRect(x: originX - 1, y: originY + trackHeight/4.2, width: trackWidth + 2, height: trackHeight - trackHeight/4.2 - (trackHeight * 1.4 / 7.0))
+            self.drawWaveform()
+            self.audioPlot.layer.borderWidth = 1
+            self.audioPlot.layer.borderColor = UIColor.whiteColor().CGColor
+            
+            //Resize progress bar
+            self.progressView.frame = CGRect(x: self.bounds.width + 1, y: self.bounds.origin.y, width: 1, height: self.bounds.height)
+        
+            }, completion: { (bool:Bool) -> Void in
+                var animation = CABasicAnimation(keyPath: "cornerRadius")
+                animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+                animation.fromValue = 12.0
+                animation.toValue = 0.0
+                animation.duration = 0.3
+                self.layer.cornerRadius = 0
+                self.layer.addAnimation(animation, forKey: "cornerRadius")
+        })
+        
+        
+    }
+    
+    func exitEditMode(frame: CGRect) {
+        self.isInEditMode = false
+        
+        UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+            
+            self.frame = frame
+            self.layer.cornerRadius = 12
+            //Frequently reused bounds values
+            var originX = self.bounds.origin.x
+            var originY = self.bounds.origin.y
+            var trackHeight = self.bounds.height
+            var trackWidth = self.bounds.width
+            
+            //Resize label for file name
+            self.labelName.frame = CGRect(x: originX + 5, y: originY, width: trackWidth - 10, height: trackHeight/4.2)
+            
+            //Resize label for date
+            self.labelDate.frame = CGRect(x: originX + (trackWidth / 12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth, height: trackHeight * 1.4 / 7.0)
+            
+            //Resize label for duration
+            self.labelDuration.frame = CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth - (trackWidth * 2.0 / 12.0) , height: trackHeight * 1.4 / 7.0)
+            
+            //Resize waveform plot
+            self.audioPlot.frame = CGRect(x: originX, y: originY + trackHeight/4.2, width: trackWidth, height: trackHeight - trackHeight/4.2 - (trackHeight * 1.4 / 7.0))
+            self.drawWaveform()
+            self.audioPlot.layer.borderWidth = 0
+            
+            //Resize progress bar
+            self.progressView.frame = CGRect(x: self.bounds.width + 1, y: self.bounds.origin.y, width: 1, height: self.bounds.height)
+            }, completion: { (bool:Bool) -> Void in
+                
         })
     }
     

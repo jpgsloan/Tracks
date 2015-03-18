@@ -61,8 +61,11 @@ class DrawView: UIView {
     }
     
     func undoDraw() {
-        allPaths.removeLast()
-        self.setNeedsDisplay()
+        if !allPaths.isEmpty {
+            allPaths.removeLast()
+            self.updateAllPaths()
+            self.setNeedsDisplay()
+        }
     }
     
     func updateAllPaths() {

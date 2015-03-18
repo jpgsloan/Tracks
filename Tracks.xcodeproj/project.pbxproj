@@ -19,6 +19,7 @@
 		11493AF21A9EB19800E09069 /* WaveFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEC1A9EB19800E09069 /* WaveFormView.swift */; };
 		11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AF31A9EB1B000E09069 /* DrawView.swift */; };
 		11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11493AF51A9EB96F00E09069 /* Main.storyboard */; };
+		11584D2D1AB5EEA60035F715 /* NotesTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11584D2C1AB5EEA60035F715 /* NotesTextView.swift */; };
 		1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */; };
 		1162B37D1AA69D9D0066A52E /* ProjectEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B37C1AA69D9D0066A52E /* ProjectEntity.swift */; };
 		1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3801AA6EBB10066A52E /* TrackEntity.swift */; };
@@ -56,12 +57,13 @@
 		11493AEC1A9EB19800E09069 /* WaveFormView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveFormView.swift; sourceTree = "<group>"; };
 		11493AF31A9EB1B000E09069 /* DrawView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawView.swift; sourceTree = "<group>"; };
 		11493AF51A9EB96F00E09069 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		11584D2C1AB5EEA60035F715 /* NotesTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesTextView.swift; sourceTree = "<group>"; };
 		1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TracksDataModel.xcdatamodel; sourceTree = "<group>"; };
 		1162B37C1AA69D9D0066A52E /* ProjectEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectEntity.swift; sourceTree = "<group>"; };
-		1162B3801AA6EBB10066A52E /* TrackEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TrackEntity.swift; path = ../TrackEntity.swift; sourceTree = "<group>"; };
+		1162B3801AA6EBB10066A52E /* TrackEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
 		11C7FF3B1A9EC0320055879C /* Tracks-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tracks-Bridging-Header.h"; sourceTree = "<group>"; };
 		11DC21791AA8F9E000471052 /* DrawViewEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawViewEntity.swift; sourceTree = "<group>"; };
-		11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SelectProjectTableViewController.swift; path = ../SelectProjectTableViewController.swift; sourceTree = "<group>"; };
+		11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectProjectTableViewController.swift; sourceTree = "<group>"; };
 		11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectCellTableViewCell.swift; sourceTree = "<group>"; };
 		11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewDataEntity.swift; sourceTree = "<group>"; };
 		3AD75F2E0A8E254275688B01 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */,
 				11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */,
 				11493AE71A9EB19800E09069 /* ProjectViewController.swift */,
+				11584D2C1AB5EEA60035F715 /* NotesTextView.swift */,
 				11493AF31A9EB1B000E09069 /* DrawView.swift */,
 				11493AE61A9EB19800E09069 /* Line.swift */,
 				11493AE91A9EB19800E09069 /* Track.swift */,
@@ -228,6 +231,7 @@
 				TargetAttributes = {
 					11493AC01A9EB13900E09069 = {
 						CreatedOnToolsVersion = 6.1.1;
+						DevelopmentTeam = 5KSSF865MZ;
 					};
 					11493AD51A9EB13900E09069 = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -319,6 +323,7 @@
 				11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */,
 				1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */,
 				11493AED1A9EB19800E09069 /* Line.swift in Sources */,
+				11584D2D1AB5EEA60035F715 /* NotesTextView.swift in Sources */,
 				11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */,
 				1162B37D1AA69D9D0066A52E /* ProjectEntity.swift in Sources */,
 				11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */,
@@ -445,6 +450,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: John Patrick Sloan (DK4NPNX66N)";
 				INFOPLIST_FILE = Tracks/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -459,6 +465,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: John Patrick Sloan (DK4NPNX66N)";
 				INFOPLIST_FILE = Tracks/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";

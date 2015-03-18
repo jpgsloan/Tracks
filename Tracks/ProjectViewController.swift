@@ -10,7 +10,7 @@ import UIKit
 import QuartzCore
 import CoreData
 
-class ProjectViewController: UIViewController {
+class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var labelCounter = 0
     var filemanager = NSFileManager.defaultManager()
@@ -21,6 +21,12 @@ class ProjectViewController: UIViewController {
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
     
+    var notesView: UITextView!
+    var notesExpanded: Bool!
+    
+    var exitEditModeButton: UIButton!
+    var trackInEditMode: Track!
+    var trackToEditInProgress: Bool = false
     //@IBOutlet weak var toolbar: UIToolbar!
     
     @IBOutlet weak var drawView: DrawView!
@@ -28,7 +34,14 @@ class ProjectViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.navigationController?.setToolbarHidden(false, animated: true)
+        self.navigationController?.interactivePopGestureRecognizer.delegate = self
+        
         self.view.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
+        
+        //Create notesView
+        notesView = NotesTextView(frame: CGRect(x: 0, y: self.view.bounds.height, width: self.view.bounds.width, height: 0.0))
+        notesExpanded = false
         
         //Check if project folder already exists
         let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String
@@ -75,6 +88,11 @@ class ProjectViewController: UIViewController {
         }
         
         self.loadTracks()
+        self.view.addSubview(notesView)
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        self.navigationController?.setToolbarHidden(true, animated: true)
     }
     
     override func didReceiveMemoryWarning() {
@@ -94,7 +112,7 @@ class ProjectViewController: UIViewController {
             button.center.y + delta_y);
     }
     
-    @IBAction func addTrack(sender: UIButton) {
+    @IBAction func addTrack(sender: UIBarButtonItem) {
         //Create new Track and set project directory where sound files will be stored.
         var newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
         newTrack.projectDirectory = self.projectDirectory
@@ -104,13 +122,66 @@ class ProjectViewController: UIViewController {
         newTrack.setLabelNameText("untitled " + labelCounter.description)
         labelCounter++
         newTrack.saveTrackCoreData(self.projectEntity)
+        
+        //Add long press gesture for selecting track edit mode
+        var longPressEdit = UILongPressGestureRecognizer(target: self, action: "changeTrackToEditMode:")
+        longPressEdit.numberOfTapsRequired = 0
+        newTrack.addGestureRecognizer(longPressEdit)
+        
         self.view.addSubview(newTrack)
     }
-
-    @IBAction func undoDraw(sender: UIButton) {
-        println("UNDOING")
+    
+    func changeTrackToEditMode(gestureRecognizer:UIGestureRecognizer) {
+        if !trackToEditInProgress {
+            trackToEditInProgress = true
+            println("CHANGING TO EDIT ")
+            self.navigationController?.setToolbarHidden(true, animated: true)
+            self.navigationController?.setNavigationBarHidden(true, animated: true)
+            var track = gestureRecognizer.view as Track
+            track.editMode()
+            self.trackInEditMode = track
+            exitEditModeButton = UIButton(frame: CGRect(x: self.view.bounds.origin.x + 15, y: self.view.bounds.origin.y + 20, width: 50, height: 50))
+            var image = UIImage(named: "exit")
+            exitEditModeButton.setImage(image, forState: UIControlState.Normal)
+            exitEditModeButton.addTarget(self, action: "exitTrackFromEditMode:", forControlEvents: UIControlEvents.TouchUpInside)
+            self.view.addSubview(exitEditModeButton)
+        }
+    }
+    
+    func exitTrackFromEditMode(sender: UIButton) {
+        self.navigationController?.setToolbarHidden(false, animated: true)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+        self.trackInEditMode.exitEditMode(CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
+        sender.removeFromSuperview()
+        trackToEditInProgress = false
+    }
+    
+    @IBAction func undoDraw(sender: UIBarButtonItem) {
         drawView.undoDraw()
-        
+    }
+    
+    @IBAction func toggleNotes(sender: UIBarButtonItem) {
+        self.view.bringSubviewToFront(notesView)
+        if notesExpanded! {
+            var tmpFrame: CGRect = notesView.frame
+            tmpFrame.size.height = 0
+            tmpFrame.origin.y = self.view.bounds.height
+            UIView.beginAnimations("", context: nil)
+            UIView.setAnimationDuration(0.2)
+            notesView.frame = tmpFrame
+            UIView.commitAnimations()
+            notesExpanded = false
+        } else {
+            var tmpFrame: CGRect = notesView.frame
+            tmpFrame.size.height = 400
+            tmpFrame.origin.y = self.view.bounds.height - 400
+            UIView.beginAnimations("", context: nil)
+            UIView.setAnimationDuration(0.2)
+            notesView.frame = tmpFrame
+            UIView.commitAnimations()
+            notesExpanded = true
+        }
+
     }
     
     func loadTracks() {
@@ -124,10 +195,21 @@ class ProjectViewController: UIViewController {
             for track in res.track {
                 var trackEntity = track as TrackEntity
                 var trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as Track
+                //Add long press gesture for selecting track edit mode
+                var longPressEdit = UILongPressGestureRecognizer(target: self, action: "changeTrackToEditMode:")
+                longPressEdit.numberOfTapsRequired = 0
+                trackToAdd.addGestureRecognizer(longPressEdit)
                 self.view.addSubview(trackToAdd)
             }
         }
     }
     
-   
+    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer is UILongPressGestureRecognizer {
+            return true
+        } else {
+            return false
+        }
+    }
+    
 }

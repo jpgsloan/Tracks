@@ -47,6 +47,7 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
+                                <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
                                     <outlet property="projectDate" destination="3v8-85-Ewf" id="Ig5-qV-Dmz"/>
                                     <outlet property="projectName" destination="cq5-1b-2Fh" id="fM0-5q-JZn"/>
@@ -67,6 +68,7 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <nil key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Nae-6Q-HHh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -77,50 +79,51 @@
             <objects>
                 <viewController title="ProjectView" id="5ak-Kt-zlZ" customClass="ProjectViewController" customModule="Tracks" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="snc-tU-n9g"/>
-                        <viewControllerLayoutGuide type="bottom" id="Wj5-tP-0rN"/>
+                        <viewControllerLayoutGuide type="top" id="kYK-hk-a7B"/>
+                        <viewControllerLayoutGuide type="bottom" id="6Ek-Ig-Rst"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="24X-S4-mSZ" customClass="DrawView" customModule="Tracks" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <view key="view" contentMode="scaleToFill" id="ev3-3Q-cBN" customClass="DrawView" customModule="Tracks" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="556"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <toolbarItems/>
+                    <toolbarItems>
+                        <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="6DV-WV-chC"/>
+                        <barButtonItem title="Simul" id="Gm0-t7-HaQ">
+                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="VFP-r7-y2V"/>
+                        <barButtonItem title="Seq" id="wMk-qk-wcM">
+                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="PYF-Na-GVh"/>
+                        <barButtonItem title="Notes" id="YsX-fk-Tbx">
+                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                            <connections>
+                                <action selector="toggleNotes:" destination="5ak-Kt-zlZ" id="DRt-rt-udG"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="Ajd-nG-LqN"/>
+                        <barButtonItem systemItem="undo" id="yAt-q3-dgZ">
+                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                            <connections>
+                                <action selector="undoDraw:" destination="5ak-Kt-zlZ" id="mac-0r-GjX"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="YvN-3Q-Cuz"/>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" id="dQF-aN-RrG">
                         <nil key="title"/>
                         <barButtonItem key="backBarButtonItem" title="h" id="5i2-eI-0hR"/>
-                        <barButtonItem key="rightBarButtonItem" style="plain" id="yuB-f5-Rdy">
-                            <view key="customView" contentMode="scaleToFill" id="LZ7-cK-932">
-                                <rect key="frame" x="320" y="128" width="190" height="41"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XSF-iY-ZUp">
-                                        <rect key="frame" x="137" y="7" width="46" height="30"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <state key="normal" title="Add">
-                                            <color key="titleColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="addTrack:" destination="5ak-Kt-zlZ" eventType="touchUpInside" id="BAB-Mi-Pob"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W3D-ri-8Ig">
-                                        <rect key="frame" x="50" y="7" width="57" height="30"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <state key="normal" title="Select">
-                                            <color key="titleColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
-                                </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                            </view>
-                            <color key="tintColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="hZx-XN-7pT">
+                            <connections>
+                                <action selector="addTrack:" destination="5ak-Kt-zlZ" id="djj-gw-Swe"/>
+                            </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <connections>
-                        <outlet property="drawView" destination="24X-S4-mSZ" id="Gne-zU-GRo"/>
+                        <outlet property="drawView" destination="ev3-3Q-cBN" id="dSw-hB-vch"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ddk-rg-QVy" userLabel="First Responder" sceneMemberID="firstResponder"/>
