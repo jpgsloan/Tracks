@@ -15,7 +15,7 @@
 		11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AE71A9EB19800E09069 /* ProjectViewController.swift */; };
 		11493AEF1A9EB19800E09069 /* RecordedAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AE81A9EB19800E09069 /* RecordedAudio.swift */; };
 		11493AF01A9EB19800E09069 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AE91A9EB19800E09069 /* Track.swift */; };
-		11493AF11A9EB19800E09069 /* TrackColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEA1A9EB19800E09069 /* TrackColorPicker.swift */; };
+		11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEA1A9EB19800E09069 /* TrackColors.swift */; };
 		11493AF21A9EB19800E09069 /* WaveFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEC1A9EB19800E09069 /* WaveFormView.swift */; };
 		11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AF31A9EB1B000E09069 /* DrawView.swift */; };
 		11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11493AF51A9EB96F00E09069 /* Main.storyboard */; };
@@ -53,7 +53,7 @@
 		11493AE71A9EB19800E09069 /* ProjectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectViewController.swift; sourceTree = "<group>"; };
 		11493AE81A9EB19800E09069 /* RecordedAudio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordedAudio.swift; sourceTree = "<group>"; };
 		11493AE91A9EB19800E09069 /* Track.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
-		11493AEA1A9EB19800E09069 /* TrackColorPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackColorPicker.swift; sourceTree = "<group>"; };
+		11493AEA1A9EB19800E09069 /* TrackColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackColors.swift; sourceTree = "<group>"; };
 		11493AEC1A9EB19800E09069 /* WaveFormView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveFormView.swift; sourceTree = "<group>"; };
 		11493AF31A9EB1B000E09069 /* DrawView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawView.swift; sourceTree = "<group>"; };
 		11493AF51A9EB96F00E09069 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -122,7 +122,7 @@
 				11493AE61A9EB19800E09069 /* Line.swift */,
 				11493AE91A9EB19800E09069 /* Track.swift */,
 				11493AE81A9EB19800E09069 /* RecordedAudio.swift */,
-				11493AEA1A9EB19800E09069 /* TrackColorPicker.swift */,
+				11493AEA1A9EB19800E09069 /* TrackColors.swift */,
 				11493AEC1A9EB19800E09069 /* WaveFormView.swift */,
 				1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */,
 				11DC21791AA8F9E000471052 /* DrawViewEntity.swift */,
@@ -317,7 +317,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */,
-				11493AF11A9EB19800E09069 /* TrackColorPicker.swift in Sources */,
+				11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */,
 				11E391141AA7C54C00257DE2 /* ProjectCellTableViewCell.swift in Sources */,
 				11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */,
 				11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */,

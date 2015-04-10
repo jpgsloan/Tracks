@@ -20,7 +20,7 @@
             </objects>
             <point key="canvasLocation" x="-310" y="398"/>
         </scene>
-        <!--Tracks-->
+        <!--Select Project Table View Controller-->
         <scene sceneID="aZD-rh-omM">
             <objects>
                 <tableViewController id="RAX-jM-LFL" customClass="SelectProjectTableViewController" customModule="Tracks" customModuleProvider="target" sceneMemberID="viewController">
@@ -60,7 +60,7 @@
                             <outlet property="delegate" destination="RAX-jM-LFL" id="txI-Y9-LLI"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Tracks" id="rWK-vf-90U">
+                    <navigationItem key="navigationItem" id="rWK-vf-90U">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="xdF-YA-TL3">
                             <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>

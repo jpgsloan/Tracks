@@ -16,7 +16,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
     var filemanager = NSFileManager.defaultManager()
     var projectDirectory: String!
     var createProjectFolder = true
-    var projectID: String!
+    var projectID: String = ""
     var projectEntity: ProjectEntity!
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
@@ -27,7 +27,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
     var exitEditModeButton: UIButton!
     var trackInEditMode: Track!
     var trackToEditInProgress: Bool = false
-    //@IBOutlet weak var toolbar: UIToolbar!
     
     @IBOutlet weak var drawView: DrawView!
     
@@ -80,7 +79,9 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
         if results.count < 1 {
             self.projectEntity =  NSEntityDescription.insertNewObjectForEntityForName("ProjectEntity", inManagedObjectContext: self.context) as ProjectEntity
             self.projectEntity.projectID = self.projectID
-            self.drawView.saveAllPaths(self.projectEntity)
+            if self.drawView != nil {
+                self.drawView.saveAllPaths(self.projectEntity)
+            }
         } else {
             self.projectEntity = results[0] as ProjectEntity
             self.drawView.projectEntity = self.projectEntity
@@ -116,6 +117,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
         //Create new Track and set project directory where sound files will be stored.
         var newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
         newTrack.projectDirectory = self.projectDirectory
+        newTrack.projectViewController = self
         
         //Center and add the new track node.
         newTrack.center = self.view.center
@@ -138,20 +140,25 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
             self.navigationController?.setToolbarHidden(true, animated: true)
             self.navigationController?.setNavigationBarHidden(true, animated: true)
             var track = gestureRecognizer.view as Track
-            track.editMode()
             self.trackInEditMode = track
-            exitEditModeButton = UIButton(frame: CGRect(x: self.view.bounds.origin.x + 15, y: self.view.bounds.origin.y + 20, width: 50, height: 50))
-            var image = UIImage(named: "exit")
+            exitEditModeButton = UIButton(frame: CGRect(x: self.view.bounds.origin.x + self.view.bounds.width / 16.5, y: self.view.bounds.origin.y + self.view.bounds.height / 30.0 + (self.view.bounds.height / 9.0 * 0.25), width: 20, height: 20))
+            
+            var image = UIImage(named: "close-button")
             exitEditModeButton.setImage(image, forState: UIControlState.Normal)
             exitEditModeButton.addTarget(self, action: "exitTrackFromEditMode:", forControlEvents: UIControlEvents.TouchUpInside)
-            self.view.addSubview(exitEditModeButton)
+            exitEditModeButton.adjustsImageWhenHighlighted = true;
+            exitEditModeButton.bounds.size.height = 20.0
+            exitEditModeButton.bounds.size.width = 20.0
+
+            track.addSubview(exitEditModeButton)
+            track.editMode()
         }
     }
     
     func exitTrackFromEditMode(sender: UIButton) {
         self.navigationController?.setToolbarHidden(false, animated: true)
         self.navigationController?.setNavigationBarHidden(false, animated: true)
-        self.trackInEditMode.exitEditMode(CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
+        self.trackInEditMode.exitEditMode()
         sender.removeFromSuperview()
         trackToEditInProgress = false
     }
@@ -195,6 +202,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
             for track in res.track {
                 var trackEntity = track as TrackEntity
                 var trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as Track
+                trackToAdd.projectViewController = self
                 //Add long press gesture for selecting track edit mode
                 var longPressEdit = UILongPressGestureRecognizer(target: self, action: "changeTrackToEditMode:")
                 longPressEdit.numberOfTapsRequired = 0
@@ -202,6 +210,10 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate {
                 self.view.addSubview(trackToAdd)
             }
         }
+    }
+    
+    func deleteTrack(track: Track) {
+        
     }
     
     func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
