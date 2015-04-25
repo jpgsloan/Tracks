@@ -427,7 +427,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.labelName.removeFromSuperview()
         
         //Add button for exiting edit mode
-        exitEditModeButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 10, y: self.bounds.origin.y + 20, width: 20, height: 20))
+        exitEditModeButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 15, y: self.bounds.origin.y + 26, width: 20, height: 20))
         var image = UIImage(named: "close-button")
         exitEditModeButton.setImage(image, forState: UIControlState.Normal)
         exitEditModeButton.addTarget(self, action: "exitEditMode:", forControlEvents: UIControlEvents.TouchUpInside)
@@ -453,9 +453,9 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             self.audioPlot.layer.borderColor = UIColor.whiteColor().CGColor
             
             //Resize label for file name
-            self.textFieldName.frame = CGRect(x: originX + 5, y: originY + trackHeight / 10.6 + trackHeight / 2.4 + 5, width: trackWidth * 2.0 / 3.0, height: 26.0)
+            self.textFieldName.frame = CGRect(x: originX + trackWidth / 4.0, y: originY + 25, width: trackWidth / 2.0, height: 26.0)
             self.textFieldName.font = UIFont(name: "ArialMT", size: 25)
-            self.textFieldName.textAlignment = NSTextAlignment.Left
+            self.textFieldName.textAlignment = NSTextAlignment.Center
             
             //Resize label for duration
             self.labelDuration.frame = CGRect(x: originX + (trackWidth * 2.0 / 3.0), y: originY + trackHeight / 10.6 + trackHeight / 2.4 + 5, width: trackWidth / 3.0 - 5, height: 26.0)
@@ -477,6 +477,22 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 self.layer.addAnimation(animation, forKey: "cornerRadius")
         })
         
+        //Add volume slider and label
+        var volumeSlider = UISlider(frame: CGRect(x: 0, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 3.0 / 9.0 - 4 , width: self.frame.width, height: self.bounds.height / 9.0))
+        volumeSlider.backgroundColor = UIColor.clearColor()
+        volumeSlider.minimumValue = 0.0
+        volumeSlider.maximumValue = 1.0
+        volumeSlider.continuous = true
+        volumeSlider.value = 0.5
+        self.addSubview(volumeSlider)
+            
+        var volumeLabel = UILabel(frame: CGRect(x: self.bounds.origin.x + 5, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 3.5 / 9.0 - 4, width: self.frame.width, height: self.bounds.height / 9.0))
+        volumeLabel.text = "Track Volume"
+        volumeLabel.textAlignment = NSTextAlignment.Left
+        volumeLabel.textColor = UIColor.whiteColor()
+        volumeLabel.font = UIFont(name: volumeLabel.font.fontName, size: 18)
+        self.addSubview(volumeLabel)
+
         //Add color buttons to change track color
         var colorList = colors()
         var i = 0.0
