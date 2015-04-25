@@ -4,6 +4,10 @@
         <attribute name="allLines" optional="YES" attributeType="Binary" syncable="YES"/>
         <relationship name="projectEntity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectEntity" inverseName="drawView" inverseEntity="ProjectEntity" syncable="YES"/>
     </entity>
+    <entity name="LastOpenProjectEntity" representedClassName="LastOpenProjectEntity" syncable="YES">
+        <attribute name="projectID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="projectName" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="ProjectEntity" representedClassName="ProjectEntity" syncable="YES">
         <attribute name="projectID" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="drawView" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DrawViewEntity" inverseName="projectEntity" inverseEntity="DrawViewEntity" syncable="YES"/>
@@ -18,9 +22,10 @@
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectEntity" inverseName="track" inverseEntity="ProjectEntity" syncable="YES"/>
     </entity>
     <elements>
+        <element name="DrawViewEntity" positionX="-126" positionY="-1" width="128" height="73"/>
+        <element name="LastOpenProjectEntity" positionX="-36" positionY="135" width="128" height="75"/>
         <element name="ProjectEntity" positionX="169" positionY="245" width="128" height="88"/>
         <element name="TableViewDataEntity" positionX="108" positionY="-40" width="128" height="58"/>
         <element name="TrackEntity" positionX="-216" positionY="215" width="128" height="88"/>
-        <element name="DrawViewEntity" positionX="-126" positionY="-1" width="128" height="73"/>
     </elements>
 </model>

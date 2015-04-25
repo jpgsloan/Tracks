@@ -1,18 +1,17 @@
 //
-//  ProjectCellTableViewCell.swift
-//  Tracks
+//  ProjectTableViewCell.swift
+//  
 //
-//  Created by John Sloan on 3/4/15.
-//  Copyright (c) 2015 JPGS inc. All rights reserved.
+//  Created by John Sloan on 4/22/15.
+//
 //
 
 import UIKit
 
-class ProjectCellTableViewCell: UITableViewCell {
+class ProjectTableViewCell: UITableViewCell {
+    @IBOutlet weak var projectName: UILabel!
 
-    @IBOutlet weak var projectName: UITextField!
     @IBOutlet weak var projectDate: UILabel!
-    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -23,4 +22,5 @@ class ProjectCellTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
+    
 }

@@ -29,6 +29,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     var progressView: UIView!
     var isInEditMode: Bool = false
     var savedBoundsDuringEdit: CGRect!
+    var exitEditModeButton: UIButton!
 
     var recordButton: UIView!
     
@@ -185,10 +186,16 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         recordButton.backgroundColor = UIColor.lightGrayColor()
         self.addSubview(recordButton)
         
+        //Add long press gesture for selecting track edit mode
+        var longPressEdit = UILongPressGestureRecognizer(target: self, action: "editMode:")
+        longPressEdit.numberOfTapsRequired = 0
+        self.addGestureRecognizer(longPressEdit)
+        
         //Initialize delete alert controller
         self.deleteAlert = UIAlertController(title: "Permanently delete track?", message: "action cannot be undone", preferredStyle: UIAlertControllerStyle.ActionSheet)
         var deleteAction = UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive) { (alertAction: UIAlertAction!) -> Void in
             self.deleteTrackFromCoreData()
+            self.projectViewController.trackToEditInProgress = false
             UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 var curCenter = self.center
                 self.frame = CGRect(x: curCenter.x, y: curCenter.y, width: 0.0, height: 0.0)
@@ -224,7 +231,11 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
 
             })
         }
+        var cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default) { (alertAction: UIAlertAction!) -> Void in
+            
+        }
         self.deleteAlert.addAction(deleteAction)
+        self.deleteAlert.addAction(cancelAction)
     }
     
     //Removes text field when user completes file name edit.
@@ -399,12 +410,12 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         })
     }
     
-    func editMode() {
-        println("SHOW Edit Mode")
+    func editMode(gestureRecognizer: UIGestureRecognizer) {
+        if !self.isInEditMode {
         self.isInEditMode = true
         self.savedBoundsDuringEdit = self.frame
         
-        //Create text field that will accept input on long press
+        //Add text field for allowing track name edits (masks name label)
         self.textFieldName = UITextField(frame: self.labelName.frame)
         self.textFieldName.textAlignment = NSTextAlignment.Center
         self.textFieldName.textColor = UIColor.whiteColor()
@@ -413,9 +424,17 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.textFieldName.delegate = self
         self.textFieldName.text = self.labelName.text
         self.addSubview(self.textFieldName)
-        //self.sendSubviewToBack(self.textFieldName)
-        //self.sendSubviewToBack(self.audioPlot)
         self.labelName.removeFromSuperview()
+        
+        //Add button for exiting edit mode
+        exitEditModeButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 10, y: self.bounds.origin.y + 20, width: 20, height: 20))
+        var image = UIImage(named: "close-button")
+        exitEditModeButton.setImage(image, forState: UIControlState.Normal)
+        exitEditModeButton.addTarget(self, action: "exitEditMode:", forControlEvents: UIControlEvents.TouchUpInside)
+        exitEditModeButton.adjustsImageWhenHighlighted = true;
+        exitEditModeButton.bounds.size.height = 20.0
+        exitEditModeButton.bounds.size.width = 20.0
+        self.addSubview(exitEditModeButton)
         
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             var newFrame = self.superview!.frame
@@ -482,14 +501,16 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         deleteButton.setTitle("Delete Track", forState: UIControlState.Normal)
         deleteButton.addTarget(self, action: "deleteTrack:", forControlEvents: UIControlEvents.TouchUpInside)
         self.addSubview(deleteButton)
+        }
     }
     
-    func exitEditMode() {
+    func exitEditMode(sender: UIButton) {
         self.isInEditMode = false
         self.labelName.frame = self.textFieldName.frame
         self.labelName.text = self.textFieldName.text
         self.addSubview(self.labelName)
         self.textFieldName.removeFromSuperview()
+        self.exitEditModeButton.removeFromSuperview()
         
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             

@@ -1,134 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="4as-b9-O8x">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="3Bq-KN-Jad">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <scenes>
-        <!--Navigation Controller-->
-        <scene sceneID="BgC-j2-P2h">
+        <!--Project Manager View Controller-->
+        <scene sceneID="N9e-KQ-Y5Q">
             <objects>
-                <navigationController id="4as-b9-O8x" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="XeI-Pd-Pg3">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="RAX-jM-LFL" kind="relationship" relationship="rootViewController" id="BH2-1W-I5Y"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="NZD-hs-GA9" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-310" y="398"/>
-        </scene>
-        <!--Select Project Table View Controller-->
-        <scene sceneID="aZD-rh-omM">
-            <objects>
-                <tableViewController id="RAX-jM-LFL" customClass="SelectProjectTableViewController" customModule="Tracks" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" sectionHeaderHeight="22" sectionFooterHeight="22" id="cce-qc-mri">
+                <viewController id="3Bq-KN-Jad" customClass="ProjectManagerViewController" customModule="Tracks" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="oMb-bl-hD3"/>
+                        <viewControllerLayoutGuide type="bottom" id="8Zh-9w-V9t"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="vvx-bS-X1i">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="projectCell" rowHeight="55" id="Tua-JO-rjm" customClass="ProjectCellTableViewCell" customModule="Tracks" customModuleProvider="target">
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Tua-JO-rjm" id="OP7-2W-c0A">
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="cq5-1b-2Fh">
-                                            <rect key="frame" x="14" y="7" width="385" height="30"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                            <textInputTraits key="textInputTraits"/>
-                                        </textField>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="12/31/91" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3v8-85-Ewf">
-                                            <rect key="frame" x="14" y="31" width="57" height="21"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                            <color key="textColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                                <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                                <connections>
-                                    <outlet property="projectDate" destination="3v8-85-Ewf" id="Ig5-qV-Dmz"/>
-                                    <outlet property="projectName" destination="cq5-1b-2Fh" id="fM0-5q-JZn"/>
-                                    <segue destination="5ak-Kt-zlZ" kind="show" identifier="passInfo" id="DKV-z9-bCi"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="RAX-jM-LFL" id="D8W-Yt-TA2"/>
-                            <outlet property="delegate" destination="RAX-jM-LFL" id="txI-Y9-LLI"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" id="rWK-vf-90U">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="xdF-YA-TL3">
-                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                            <connections>
-                                <action selector="addProject:" destination="RAX-jM-LFL" id="w13-9S-62P"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                    <nil key="simulatedBottomBarMetrics"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Nae-6Q-HHh" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="382" y="391"/>
-        </scene>
-        <!--ProjectView-->
-        <scene sceneID="dT4-ZZ-Oo7">
-            <objects>
-                <viewController title="ProjectView" id="5ak-Kt-zlZ" customClass="ProjectViewController" customModule="Tracks" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="kYK-hk-a7B"/>
-                        <viewControllerLayoutGuide type="bottom" id="6Ek-Ig-Rst"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="ev3-3Q-cBN" customClass="DrawView" customModule="Tracks" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="556"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <toolbarItems>
-                        <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="6DV-WV-chC"/>
-                        <barButtonItem title="Simul" id="Gm0-t7-HaQ">
-                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="VFP-r7-y2V"/>
-                        <barButtonItem title="Seq" id="wMk-qk-wcM">
-                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="PYF-Na-GVh"/>
-                        <barButtonItem title="Notes" id="YsX-fk-Tbx">
-                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                            <connections>
-                                <action selector="toggleNotes:" destination="5ak-Kt-zlZ" id="DRt-rt-udG"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="Ajd-nG-LqN"/>
-                        <barButtonItem systemItem="undo" id="yAt-q3-dgZ">
-                            <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
-                            <connections>
-                                <action selector="undoDraw:" destination="5ak-Kt-zlZ" id="mac-0r-GjX"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="YvN-3Q-Cuz"/>
-                    </toolbarItems>
-                    <navigationItem key="navigationItem" id="dQF-aN-RrG">
-                        <nil key="title"/>
-                        <barButtonItem key="backBarButtonItem" title="h" id="5i2-eI-0hR"/>
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="hZx-XN-7pT">
-                            <connections>
-                                <action selector="addTrack:" destination="5ak-Kt-zlZ" id="djj-gw-Swe"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
-                    <connections>
-                        <outlet property="drawView" destination="ev3-3Q-cBN" id="dSw-hB-vch"/>
-                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Ddk-rg-QVy" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="HAB-ig-hPx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1041" y="394"/>
+            <point key="canvasLocation" x="24" y="-290"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>

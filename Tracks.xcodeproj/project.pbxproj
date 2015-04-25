@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11489EC51AE5C6C900FB4B62 /* LastOpenProjectEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */; };
 		11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AC61A9EB13900E09069 /* AppDelegate.swift */; };
 		11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACD1A9EB13900E09069 /* Images.xcassets */; };
 		11493AD11A9EB13900E09069 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACF1A9EB13900E09069 /* LaunchScreen.xib */; };
@@ -23,9 +24,13 @@
 		1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */; };
 		1162B37D1AA69D9D0066A52E /* ProjectEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B37C1AA69D9D0066A52E /* ProjectEntity.swift */; };
 		1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3801AA6EBB10066A52E /* TrackEntity.swift */; };
+		116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */; };
+		116A71371AD8D5D9003CD4C7 /* ProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */; };
+		1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */; };
+		11CEDDD31AE843B30092AE87 /* ProjectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CEDDD11AE843B30092AE87 /* ProjectTableViewCell.swift */; };
+		11CEDDD41AE843B30092AE87 /* ProjectTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11CEDDD21AE843B30092AE87 /* ProjectTableViewCell.xib */; };
 		11DC217A1AA8F9E000471052 /* DrawViewEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DC21791AA8F9E000471052 /* DrawViewEntity.swift */; };
 		11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */; };
-		11E391141AA7C54C00257DE2 /* ProjectCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */; };
 		11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */; };
 		B82C0A99A676B1A859871BB0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F0EFB2F40011E4A9B70B6F4 /* libPods.a */; };
 /* End PBXBuildFile section */
@@ -41,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LastOpenProjectEntity.swift; sourceTree = "<group>"; };
 		11493AC11A9EB13900E09069 /* Tracks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11493AC51A9EB13900E09069 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		11493AC61A9EB13900E09069 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -61,10 +67,14 @@
 		1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TracksDataModel.xcdatamodel; sourceTree = "<group>"; };
 		1162B37C1AA69D9D0066A52E /* ProjectEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectEntity.swift; sourceTree = "<group>"; };
 		1162B3801AA6EBB10066A52E /* TrackEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
+		116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectManagerViewController.swift; sourceTree = "<group>"; };
+		116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ProjectViewController.xib; path = ../ProjectViewController.xib; sourceTree = "<group>"; };
+		1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SelectProjectViewController.xib; sourceTree = "<group>"; };
 		11C7FF3B1A9EC0320055879C /* Tracks-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tracks-Bridging-Header.h"; sourceTree = "<group>"; };
+		11CEDDD11AE843B30092AE87 /* ProjectTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectTableViewCell.swift; sourceTree = "<group>"; };
+		11CEDDD21AE843B30092AE87 /* ProjectTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectTableViewCell.xib; sourceTree = "<group>"; };
 		11DC21791AA8F9E000471052 /* DrawViewEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawViewEntity.swift; sourceTree = "<group>"; };
 		11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectProjectTableViewController.swift; sourceTree = "<group>"; };
-		11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectCellTableViewCell.swift; sourceTree = "<group>"; };
 		11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewDataEntity.swift; sourceTree = "<group>"; };
 		3AD75F2E0A8E254275688B01 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		4F0EFB2F40011E4A9B70B6F4 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,10 +123,14 @@
 		11493AC31A9EB13900E09069 /* Tracks */ = {
 			isa = PBXGroup;
 			children = (
+				11CEDDD11AE843B30092AE87 /* ProjectTableViewCell.swift */,
+				11CEDDD21AE843B30092AE87 /* ProjectTableViewCell.xib */,
 				11493AC61A9EB13900E09069 /* AppDelegate.swift */,
-				11E391121AA7C54C00257DE2 /* ProjectCellTableViewCell.swift */,
 				11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */,
+				1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */,
 				11493AE71A9EB19800E09069 /* ProjectViewController.swift */,
+				116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */,
+				116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */,
 				11584D2C1AB5EEA60035F715 /* NotesTextView.swift */,
 				11493AF31A9EB1B000E09069 /* DrawView.swift */,
 				11493AE61A9EB19800E09069 /* Line.swift */,
@@ -125,6 +139,7 @@
 				11493AEA1A9EB19800E09069 /* TrackColors.swift */,
 				11493AEC1A9EB19800E09069 /* WaveFormView.swift */,
 				1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */,
+				11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */,
 				11DC21791AA8F9E000471052 /* DrawViewEntity.swift */,
 				11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */,
 				1162B3801AA6EBB10066A52E /* TrackEntity.swift */,
@@ -263,9 +278,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				116A71371AD8D5D9003CD4C7 /* ProjectViewController.xib in Resources */,
+				11CEDDD41AE843B30092AE87 /* ProjectTableViewCell.xib in Resources */,
 				11493AD11A9EB13900E09069 /* LaunchScreen.xib in Resources */,
 				11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */,
 				11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */,
+				1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,10 +335,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */,
+				11CEDDD31AE843B30092AE87 /* ProjectTableViewCell.swift in Sources */,
 				11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */,
-				11E391141AA7C54C00257DE2 /* ProjectCellTableViewCell.swift in Sources */,
 				11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */,
 				11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */,
+				116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */,
 				1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */,
 				11493AED1A9EB19800E09069 /* Line.swift in Sources */,
 				11584D2D1AB5EEA60035F715 /* NotesTextView.swift in Sources */,
@@ -329,6 +348,7 @@
 				11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */,
 				11493AEF1A9EB19800E09069 /* RecordedAudio.swift in Sources */,
 				1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */,
+				11489EC51AE5C6C900FB4B62 /* LastOpenProjectEntity.swift in Sources */,
 				11493AF01A9EB19800E09069 /* Track.swift in Sources */,
 				11DC217A1AA8F9E000471052 /* DrawViewEntity.swift in Sources */,
 				11493AF21A9EB19800E09069 /* WaveFormView.swift in Sources */,
