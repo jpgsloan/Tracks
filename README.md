@@ -1,7 +1,7 @@
 # Tracks
 iOS audio recording tool for quickly creating song demos.
 
-STILL VERY MUCH IN DEVELOPMENT, CORE FEATURES ALMOST COMPLETE!
+STILL UNDER DEVELOPMENT, CORE FEATURES ALMOST COMPLETE!
 
 Tracks gives musicians the power to quickly create, organize, and arrange their music recordings into songs. 
   - Import or record live audio into "track" nodes. 
