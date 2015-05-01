@@ -21,3 +21,13 @@ Many more features to come!
  - input monitoring
  - export options
  - maybe audio effects one day.
+
+IMPORTANT CLASSES:
+
+Track - custom UIView for an individual Track. Contains code for recording audio, displaying relevant track data and waveforms, and track editing via long-press gesture recognizer.
+
+ProjectViewController - custom UIViewController specific for an individual project. Contains code for adding new tracks, displaying notes, adding track links.
+
+SelectProjectViewController - custom UIViewController for opening other projects or settings. Contains code for adding new projects, tableView of projects, and settings.
+
+ProjectManagerViewController - custom UIViewController for facillitating transitions between SelectProjectVC and ProjectVC. Contains code for ViewController containment, opening selectProjVC as sidebar and opening projects when selected. 
