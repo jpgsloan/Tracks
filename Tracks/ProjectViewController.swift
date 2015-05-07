@@ -34,7 +34,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     
     var sideBarOpenBackgroundView: UIView!
     
-  
+    var inAddSimulLinkMode: Bool = false
   
     @IBOutlet weak var titleTextField: UITextField!
     
@@ -189,6 +189,20 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             self.sideBarOpenBackgroundView.removeFromSuperview()
         }
     }
+    
+    @IBAction func addSimultaneousLinkMode(sender: UIBarButtonItem) {
+        if !inAddSimulLinkMode {
+            inAddSimulLinkMode = true
+            self.view.backgroundColor = UIColor.darkGrayColor()
+            
+        } else {
+            inAddSimulLinkMode = false
+            self.view.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
+            
+        }
+    
+    }
+    
     
     @IBAction func undoDraw(sender: UIBarButtonItem) {
         drawView.undoDraw()

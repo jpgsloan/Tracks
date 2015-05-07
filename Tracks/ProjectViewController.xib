@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ProjectViewController" customModule="Tracks" customModuleProvider="target">
+            <connections>
+                <outlet property="drawView" destination="VlB-rb-Dnd" id="0lg-7z-2vW"/>
+                <outlet property="navigationBar" destination="sFj-OS-djo" id="HsW-SP-h28"/>
+                <outlet property="titleTextField" destination="OMg-Am-R1n" id="P31-5s-dbF"/>
+                <outlet property="toolbar" destination="9Uf-4O-7Re" id="L2S-b6-KIl"/>
+                <outlet property="view" destination="VlB-rb-Dnd" id="U9p-mm-Rb3"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view autoresizesSubviews="NO" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="VlB-rb-Dnd" customClass="DrawView" customModule="Tracks" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9Uf-4O-7Re">
+                    <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                    <items>
+                        <barButtonItem width="9" style="plain" systemItem="fixedSpace" id="EF0-W4-sht"/>
+                        <barButtonItem title="Simul" id="yG9-O0-7rU">
+                            <connections>
+                                <action selector="addSimultaneousLinkMode:" destination="-1" id="jMr-JZ-7W5"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="yYX-yh-GIG"/>
+                        <barButtonItem title="Seq" id="oOP-Hq-d7d"/>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="ce7-Jg-QMP"/>
+                        <barButtonItem title="Notes" id="syr-4d-kw1">
+                            <connections>
+                                <action selector="toggleNotes:" destination="-1" id="JRC-Ue-X5Y"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="nCa-hR-AYY"/>
+                        <barButtonItem systemItem="undo" id="d4N-H2-Nvq">
+                            <connections>
+                                <action selector="undoDraw:" destination="-1" id="yNq-Ip-6sJ"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem width="9" style="plain" systemItem="fixedSpace" id="4Xi-uR-7ni"/>
+                    </items>
+                    <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                </toolbar>
+                <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sFj-OS-djo">
+                    <rect key="frame" x="0.0" y="19" width="600" height="44"/>
+                    <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <items>
+                        <navigationItem id="HiJ-n2-KnX">
+                            <nil key="title"/>
+                            <barButtonItem key="leftBarButtonItem" systemItem="organize" id="bds-Ba-LVj">
+                                <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="openSideBarVC:" destination="-1" id="zeD-zG-hsD"/>
+                                </connections>
+                            </barButtonItem>
+                            <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="My Project" textAlignment="center" minimumFontSize="17" id="OMg-Am-R1n">
+                                <rect key="frame" x="180" y="7" width="240" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <barButtonItem key="rightBarButtonItem" systemItem="add" id="Phg-tz-chl">
+                                <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="addTrack:" destination="-1" id="YaB-JP-Oux"/>
+                                </connections>
+                            </barButtonItem>
+                        </navigationItem>
+                    </items>
+                </navigationBar>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+            <point key="canvasLocation" x="-1135" y="-2552"/>
+        </view>
+    </objects>
+</document>
