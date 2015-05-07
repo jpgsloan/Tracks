@@ -33,4 +33,4 @@ SelectProjectViewController - custom UIViewController for opening other projects
 ProjectManagerViewController - custom UIViewController for facillitating transitions between SelectProjectVC and ProjectVC. Contains code for ViewController containment, opening selectProjVC as sidebar and opening projects when selected. 
 
 Example snapshot:
-![Alt text](/iOS Simulator Screen Shot May 6, 2015, 6.25.24 PM?raw=true)
+![Alt text](/exampleSnapshot.png?raw=true)
