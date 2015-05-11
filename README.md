@@ -23,7 +23,7 @@ Many more features to come!
  - export options
  - maybe audio effects one day.
 
-IMPORTANT CLASSES:
+**IMPORTANT CLASSES:**
 
 **Track** - custom UIView for an individual Track. Contains code for recording audio, displaying relevant track data and waveforms, and track edit mode via long-press gesture recognizer.
 
