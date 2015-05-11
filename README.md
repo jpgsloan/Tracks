@@ -9,6 +9,7 @@ Tracks gives musicians the power to quickly create, organize, and arrange their 
   - Conncect track nodes together with links to play them simultaneously or sequentially.
   - Save song lyrics or notes about the recordings.
   - Use hand drawing, color-coordination, or dragging to organize tracks into groups.
+  - Unlimited projects auto-saved via CoreData
 
 Tracks is a stripped-down alternative to using Digital Audio Workstations geared towards quickly creating rough demos or beats. 
 There is no timeline the way that traditional DAWs layout tracks. Links are used between tracks to
@@ -31,6 +32,12 @@ ProjectViewController - custom UIViewController specific for an individual proje
 SelectProjectViewController - custom UIViewController for opening other projects or settings. Contains code for adding new projects, tableView of projects, and settings.
 
 ProjectManagerViewController - custom UIViewController for facillitating transitions between SelectProjectVC and ProjectVC. Contains code for ViewController containment, opening selectProjVC as sidebar and opening projects when selected. 
+
+LinkManager - unimplemented. Facilitates adding, deleting, and editing track links.
+
+SimulTrackLink - unimplemented. UIView that sits on top of n track nodes and plays all linked tracks simultaneously.
+
+SeqTrackLink - unimplemented. UIView that sits on top of n track nodes and plays linked tracks sequentially.
 
 Example snapshot:
 
