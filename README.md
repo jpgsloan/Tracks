@@ -1,4 +1,4 @@
-# Tracks
+# **Tracks**
 iOS audio recording tool for quickly creating song demos.
 
 STILL UNDER DEVELOPMENT, CORE FEATURES ALMOST COMPLETE!
@@ -25,20 +25,20 @@ Many more features to come!
 
 IMPORTANT CLASSES:
 
-Track - custom UIView for an individual Track. Contains code for recording audio, displaying relevant track data and waveforms, and track editing via long-press gesture recognizer.
+**Track** - custom UIView for an individual Track. Contains code for recording audio, displaying relevant track data and waveforms, and track edit mode via long-press gesture recognizer.
 
-ProjectViewController - custom UIViewController specific for an individual project. Contains code for adding new tracks, displaying notes, adding track links.
+**ProjectViewController** - custom UIViewController specific for an individual project. Contains code for adding new tracks, displaying notes, adding track links.
 
-SelectProjectViewController - custom UIViewController for opening other projects or settings. Contains code for adding new projects, tableView of projects, and settings.
+**SelectProjectViewController** - custom UIViewController for opening other projects or settings. Contains code for adding new projects, tableView of projects, and settings.
 
-ProjectManagerViewController - custom UIViewController for facillitating transitions between SelectProjectVC and ProjectVC. Contains code for ViewController containment, opening selectProjVC as sidebar and opening projects when selected. 
+**ProjectManagerViewController** - custom UIViewController for facillitating transitions between SelectProjectVC and ProjectVC. Contains code for ViewController containment, opening selectProjVC as sidebar and opening projects when selected. 
 
-LinkManager - unimplemented. Facilitates adding, deleting, and editing track links.
+**LinkManager** - unimplemented. Facilitates adding, deleting, and editing track links.
 
-SimulTrackLink - unimplemented. UIView that sits on top of n track nodes and plays all linked tracks simultaneously.
+**SimulTrackLink** - unimplemented. UIView that sits on top of n track nodes and plays all linked tracks simultaneously.
 
-SeqTrackLink - unimplemented. UIView that sits on top of n track nodes and plays linked tracks sequentially.
+**SeqTrackLink** - unimplemented. UIView that sits on top of n track nodes and plays linked tracks sequentially.
 
-Example snapshot:
+**Example snapshot:**
 
 ![Alt text](/exampleSnapshot.png?raw=true)
