@@ -195,7 +195,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.deleteAlert = UIAlertController(title: "Permanently delete track?", message: "action cannot be undone", preferredStyle: UIAlertControllerStyle.ActionSheet)
         var deleteAction = UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive) { (alertAction: UIAlertAction!) -> Void in
             self.deleteTrackFromCoreData()
-            self.projectViewController.trackToEditInProgress = false
             UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 var curCenter = self.center
                 self.frame = CGRect(x: curCenter.x, y: curCenter.y, width: 0.0, height: 0.0)
@@ -225,10 +224,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 self.progressView.frame = CGRect(x: self.bounds.width + 1, y: self.bounds.origin.y, width: 1, height: self.bounds.height)
                 }, completion: { (bool:Bool) -> Void in
                     self.removeFromSuperview()
-                    self.projectViewController.navigationController?.setToolbarHidden(false, animated: true)
-                    
-                    self.projectViewController.navigationController?.setNavigationBarHidden(false, animated: true)
-
             })
         }
         var cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default) { (alertAction: UIAlertAction!) -> Void in
@@ -260,6 +255,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     }
     
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
+        println("track touched began")
         var touch: UITouch = touches.anyObject() as UITouch
         startLoc = touch.locationInView(self)
         if !isInEditMode {
@@ -267,7 +263,23 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         }
     }
     
+    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+        println("track touched moved")
+        if !isInEditMode {
+            wasDragged = true
+            var touch: UITouch = touches.anyObject() as UITouch
+            var touchLoc: CGPoint = touch.locationInView(self)
+        
+            //move the track node relative to the starting location.
+            Track.animateWithDuration(0.01, delay: 0.01, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+                    self.frame.origin.x += touchLoc.x - self.startLoc.x;
+                    self.frame.origin.y += touchLoc.y - self.startLoc.y;
+                }, completion: nil )
+        }
+    }
+    
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
+        println("track touched ended")
         if (!wasDragged) {
             if (!hasStartedRecording) {
                 println("started recording")
@@ -287,7 +299,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 
                 Track.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
                     self.recordButton.transform = CGAffineTransformMakeScale(0.9, 0.9)
-                 }, completion: nil )
+                    }, completion: nil )
                 
                 let currentDateTime = NSDate()
                 let formatter = NSDateFormatter()
@@ -295,11 +307,11 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 let recordingName = formatter.stringFromDate(currentDateTime) + ".wav"
                 let pathArray = [projectDirectory, recordingName]
                 let filePath = NSURL.fileURLWithPathComponents(pathArray)
-            
+                
                 var session = AVAudioSession.sharedInstance()
                 session.setCategory(AVAudioSessionCategoryPlayAndRecord, error: nil)
                 session.overrideOutputAudioPort(AVAudioSessionPortOverride.Speaker,
-                     error:nil)
+                    error:nil)
                 
                 audioRecorder = AVAudioRecorder(URL: filePath, settings: nil, error: nil)
                 audioRecorder.delegate = self
@@ -328,24 +340,10 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             } else if (readyToPlay) {
                 self.playAudio()
             }
-
+            
         } else {
             self.updateTrackCoreData()
             self.wasDragged = false
-        }
-    }
-    
-    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
-        if !isInEditMode {
-            wasDragged = true
-            var touch: UITouch = touches.anyObject() as UITouch
-            var touchLoc: CGPoint = touch.locationInView(self)
-        
-            //move the track node relative to the starting location.
-            Track.animateWithDuration(0.01, delay: 0.01, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-                    self.frame.origin.x += touchLoc.x - self.startLoc.x;
-                    self.frame.origin.y += touchLoc.y - self.startLoc.y;
-                }, completion: nil )
         }
     }
     

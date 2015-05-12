@@ -26,16 +26,12 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     var notesView: UITextView!
     var notesExpanded: Bool!
     
-    var exitEditModeButton: UIButton!
-    var trackInEditMode: Track!
-    var trackToEditInProgress: Bool = false
-    
     var statusBarBackgroundView: UIView!
     
     var sideBarOpenBackgroundView: UIView!
     
-    var inAddSimulLinkMode: Bool = false
-  
+    var linkManager: LinkManager!
+    
     @IBOutlet weak var titleTextField: UITextField!
     
     @IBOutlet weak var navigationBar: UINavigationBar!
@@ -47,14 +43,14 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 20))
-        self.statusBarBackgroundView.backgroundColor = UIColor.whiteColor()
+        self.statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20))
+        self.statusBarBackgroundView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.9)
         self.view.addSubview(self.statusBarBackgroundView)
         
         self.view.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
         
         //Create notesView
-        notesView = NotesTextView(frame: CGRect(x: 0, y: self.view.bounds.height, width: self.view.frame.width, height: 0.0))
+        notesView = NotesTextView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: 0.0))
         notesExpanded = false
         
         //Check if project folder already exists
@@ -105,6 +101,9 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         
         self.loadTracks()
         self.view.addSubview(notesView)
+        
+        linkManager = LinkManager(frame: self.view.frame)
+        self.view.addSubview(linkManager)
     }
     
     override func viewDidLayoutSubviews() {
@@ -114,12 +113,15 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         titleTextField.textAlignment = NSTextAlignment.Center
         titleTextField.delegate = self
         
-        self.navigationBar.backgroundColor = UIColor.whiteColor()
-        self.navigationBar.frame = CGRect(x: 0, y: 20, width: self.view.bounds.size.width, height: 44)
+        //self.navigationBar.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
+        self.navigationBar.frame = CGRect(x: 0, y: 20, width: self.view.frame.width, height: 44)
         
-        self.toolbar.backgroundColor = UIColor.whiteColor()
-        self.toolbar.frame = CGRect(x: 0, y: self.view.bounds.origin.y + self.view.bounds.size.height - 46, width: self.view.bounds.size.width, height: 46)
+        self.toolbar.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        self.toolbar.frame = CGRect(x: 0, y: self.view.frame.height - 46, width: self.view.frame.width, height: 46)
     
+        //var linkManFrame = CGRect(x: 0, y: self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height, width: self.view.frame.width, height: self.view.frame.height - (self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height) - self.toolbar.frame.height)
+        self.linkManager.frame = self.view.frame
+        linkManager.layer.zPosition = CGFloat(MAXFLOAT)
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -130,19 +132,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    func wasDragged(button: UIButton, event:UIEvent) {
-        var touch: UITouch = event.touchesForView(button)?.anyObject() as UITouch
-        
-        var previousLoc: CGPoint = touch.previousLocationInView(button)
-        var loc: CGPoint = touch.locationInView(button)
-        var delta_x: CGFloat = loc.x - previousLoc.x;
-        var delta_y: CGFloat = loc.y - previousLoc.y;
-        
-        button.center = CGPointMake(button.center.x + delta_x,
-            button.center.y + delta_y);
-    }
-   
     
     @IBAction func addTrack(sender: UIBarButtonItem) {
         //Create new Track and set project directory where sound files will be stored.
@@ -178,6 +167,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
             }, completion: { (bool:Bool) -> Void in
+                self.sideBarOpenBackgroundView.removeFromSuperview()
         })
         (self.parentViewController as ProjectManagerViewController).closeSideBarVC()
     
@@ -191,14 +181,18 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     }
     
     @IBAction func addSimultaneousLinkMode(sender: UIBarButtonItem) {
-        if !inAddSimulLinkMode {
-            inAddSimulLinkMode = true
+        if !self.linkManager.isInAddSimulLinkMode {
             self.view.backgroundColor = UIColor.darkGrayColor()
-            
+            self.linkManager.isInAddSimulLinkMode = true
+            for link in self.linkManager.subviews {
+                (link as SimulTrackLink).isInAddSimulLinkMode = true
+            }
         } else {
-            inAddSimulLinkMode = false
             self.view.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
-            
+            self.linkManager.isInAddSimulLinkMode = false
+            for link in self.linkManager.subviews {
+                (link as SimulTrackLink).isInAddSimulLinkMode = false
+            }
         }
     
     }
@@ -213,7 +207,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         if notesExpanded! {
             var tmpFrame: CGRect = notesView.frame
             tmpFrame.size.height = 0
-            tmpFrame.origin.y = self.view.bounds.height
+            tmpFrame.origin.y = self.view.frame.height
             UIView.beginAnimations("", context: nil)
             UIView.setAnimationDuration(0.2)
             notesView.frame = tmpFrame
@@ -223,7 +217,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             var tmpFrame: CGRect = notesView.frame
             tmpFrame.size.height = 460 - self.toolbar.frame.height
             tmpFrame.size.width = self.view.frame.width
-            tmpFrame.origin.y = self.view.bounds.height - 460
+            tmpFrame.origin.y = self.view.frame.height - 460
             UIView.beginAnimations("", context: nil)
             UIView.setAnimationDuration(0.2)
             notesView.frame = tmpFrame
@@ -234,7 +228,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
-        println("HELLO")
         self.titleTextField.resignFirstResponder()
         var projectName = self.titleTextField.text
         (self.parentViewController as ProjectManagerViewController).updateProjectName(self.projectID, projectName: projectName)

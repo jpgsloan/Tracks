@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		111302FE1AFC8421002EA4B1 /* LinkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111302FD1AFC8421002EA4B1 /* LinkManager.swift */; };
+		111303001AFD7D9F002EA4B1 /* SimulTrackLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111302FF1AFD7D9E002EA4B1 /* SimulTrackLink.swift */; };
+		111303021AFD7DCF002EA4B1 /* SeqTrackLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111303011AFD7DCF002EA4B1 /* SeqTrackLink.swift */; };
 		11489EC51AE5C6C900FB4B62 /* LastOpenProjectEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */; };
 		11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AC61A9EB13900E09069 /* AppDelegate.swift */; };
 		11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACD1A9EB13900E09069 /* Images.xcassets */; };
@@ -29,6 +32,7 @@
 		11CEDDD31AE843B30092AE87 /* ProjectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CEDDD11AE843B30092AE87 /* ProjectTableViewCell.swift */; };
 		11CEDDD41AE843B30092AE87 /* ProjectTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11CEDDD21AE843B30092AE87 /* ProjectTableViewCell.xib */; };
 		11DC217A1AA8F9E000471052 /* DrawViewEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DC21791AA8F9E000471052 /* DrawViewEntity.swift */; };
+		11DCE8C41AFD90750099BFEE /* LinkEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DCE8C31AFD90750099BFEE /* LinkEdge.swift */; };
 		11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */; };
 		11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */; };
 		B82C0A99A676B1A859871BB0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F0EFB2F40011E4A9B70B6F4 /* libPods.a */; };
@@ -45,6 +49,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		111302FD1AFC8421002EA4B1 /* LinkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkManager.swift; sourceTree = "<group>"; };
+		111302FF1AFD7D9E002EA4B1 /* SimulTrackLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimulTrackLink.swift; sourceTree = "<group>"; };
+		111303011AFD7DCF002EA4B1 /* SeqTrackLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeqTrackLink.swift; sourceTree = "<group>"; };
 		11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LastOpenProjectEntity.swift; sourceTree = "<group>"; };
 		11493AC11A9EB13900E09069 /* Tracks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11493AC51A9EB13900E09069 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -72,6 +79,7 @@
 		11CEDDD11AE843B30092AE87 /* ProjectTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectTableViewCell.swift; sourceTree = "<group>"; };
 		11CEDDD21AE843B30092AE87 /* ProjectTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectTableViewCell.xib; sourceTree = "<group>"; };
 		11DC21791AA8F9E000471052 /* DrawViewEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawViewEntity.swift; sourceTree = "<group>"; };
+		11DCE8C31AFD90750099BFEE /* LinkEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkEdge.swift; sourceTree = "<group>"; };
 		11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectProjectTableViewController.swift; sourceTree = "<group>"; };
 		11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewDataEntity.swift; sourceTree = "<group>"; };
 		3AD75F2E0A8E254275688B01 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
@@ -129,6 +137,10 @@
 				11493AE71A9EB19800E09069 /* ProjectViewController.swift */,
 				116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */,
 				116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */,
+				111302FD1AFC8421002EA4B1 /* LinkManager.swift */,
+				111302FF1AFD7D9E002EA4B1 /* SimulTrackLink.swift */,
+				11DCE8C31AFD90750099BFEE /* LinkEdge.swift */,
+				111303011AFD7DCF002EA4B1 /* SeqTrackLink.swift */,
 				11584D2C1AB5EEA60035F715 /* NotesTextView.swift */,
 				11493AF31A9EB1B000E09069 /* DrawView.swift */,
 				11493AE61A9EB19800E09069 /* Line.swift */,
@@ -333,7 +345,11 @@
 			files = (
 				11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */,
 				11CEDDD31AE843B30092AE87 /* ProjectTableViewCell.swift in Sources */,
+				11DCE8C41AFD90750099BFEE /* LinkEdge.swift in Sources */,
 				11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */,
+				111302FE1AFC8421002EA4B1 /* LinkManager.swift in Sources */,
+				111303001AFD7D9F002EA4B1 /* SimulTrackLink.swift in Sources */,
+				111303021AFD7DCF002EA4B1 /* SeqTrackLink.swift in Sources */,
 				11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */,
 				11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */,
 				116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */,

@@ -47,6 +47,7 @@
                 </toolbar>
                 <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sFj-OS-djo">
                     <rect key="frame" x="0.0" y="19" width="600" height="44"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <items>
                         <navigationItem id="HiJ-n2-KnX">
@@ -76,7 +77,7 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-            <point key="canvasLocation" x="-1135" y="-2552"/>
+            <point key="canvasLocation" x="-1401" y="-2305"/>
         </view>
     </objects>
 </document>
