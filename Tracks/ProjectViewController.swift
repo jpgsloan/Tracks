@@ -13,7 +13,6 @@ import CoreData
 
 class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate {
     
-    var labelCounter = 0
     var filemanager = NSFileManager.defaultManager()
     var projectDirectory: String!
     var createProjectFolder = true
@@ -30,24 +29,27 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     
     var sideBarOpenBackgroundView: UIView!
     
-    var linkManager: LinkManager!
+    var drawView: DrawView!
     
     @IBOutlet weak var titleTextField: UITextField!
     
     @IBOutlet weak var navigationBar: UINavigationBar!
     
-    @IBOutlet weak var drawView: DrawView!
+    @IBOutlet weak var linkManager: LinkManager!
     
     @IBOutlet weak var toolbar: UIToolbar!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.drawView = DrawView(frame: self.view.frame)
+        self.drawView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
+        self.view.addSubview(self.drawView)
+        
         self.statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20))
         self.statusBarBackgroundView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.9)
         self.view.addSubview(self.statusBarBackgroundView)
-        
-        self.view.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
         
         //Create notesView
         notesView = NotesTextView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: 0.0))
@@ -102,26 +104,26 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         self.loadTracks()
         self.view.addSubview(notesView)
         
-        linkManager = LinkManager(frame: self.view.frame)
-        self.view.addSubview(linkManager)
+        self.view.bringSubviewToFront(self.statusBarBackgroundView)
+        self.view.bringSubviewToFront(self.navigationBar)
+        self.view.bringSubviewToFront(self.toolbar)
     }
     
     override func viewDidLayoutSubviews() {
         //readjust titleTextField, navigation bar and toolbar frames after storyboard elements are loaded and drawn.
-        titleTextField.frame = CGRect(x: 0, y: 0, width: self.navigationBar.frame.width, height: 20)
-        titleTextField.text = self.projectName
-        titleTextField.textAlignment = NSTextAlignment.Center
-        titleTextField.delegate = self
-        
+
         //self.navigationBar.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
         self.navigationBar.frame = CGRect(x: 0, y: 20, width: self.view.frame.width, height: 44)
         
+        self.titleTextField.frame = CGRect(x: 0, y: 0, width: self.navigationBar.frame.width, height: 20)
+        self.titleTextField.text = self.projectName
+        self.titleTextField.textAlignment = NSTextAlignment.Center
+        self.titleTextField.delegate = self
+        
         self.toolbar.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
         self.toolbar.frame = CGRect(x: 0, y: self.view.frame.height - 46, width: self.view.frame.width, height: 46)
-    
-        //var linkManFrame = CGRect(x: 0, y: self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height, width: self.view.frame.width, height: self.view.frame.height - (self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height) - self.toolbar.frame.height)
-        self.linkManager.frame = self.view.frame
-        linkManager.layer.zPosition = CGFloat(MAXFLOAT)
+        
+        self.drawView.frame = self.view.frame
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -141,8 +143,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         
         //Center and add the new track node.
         newTrack.center = self.view.center
-        newTrack.setLabelNameText("untitled " + labelCounter.description)
-        labelCounter++
+        newTrack.setLabelNameText("untitled")
         newTrack.saveTrackCoreData(self.projectEntity)
         self.view.addSubview(newTrack)
     }
@@ -180,30 +181,36 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         }
     }
     
-    @IBAction func addSimultaneousLinkMode(sender: UIBarButtonItem) {
+    @IBAction func addLinkMode(sender: UIBarButtonItem) {
         if !self.linkManager.isInAddSimulLinkMode {
-            self.view.backgroundColor = UIColor.darkGrayColor()
-            self.linkManager.isInAddSimulLinkMode = true
-            for link in self.linkManager.subviews {
-                (link as SimulTrackLink).isInAddSimulLinkMode = true
-            }
+        self.drawView.backgroundColor = UIColor.darkGrayColor()
+        self.linkManager.isInAddSimulLinkMode = true
+        for link in self.linkManager.allSimulLink {
+            link.isInAddLinkMode = true
+        }
         } else {
-            self.view.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
+            self.drawView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
             self.linkManager.isInAddSimulLinkMode = false
-            for link in self.linkManager.subviews {
-                (link as SimulTrackLink).isInAddSimulLinkMode = false
+            for link in self.linkManager.allSimulLink {
+                link.isInAddLinkMode = false
             }
         }
-    
+        /*UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+            self.navigationBar.frame.origin.y = 0.0 - self.navigationBar.frame.height
+            self.toolbar.frame.origin.y = self.view.frame.height
+            }) { (bool:Bool) -> Void in
+        }*/
     }
     
     
     @IBAction func undoDraw(sender: UIBarButtonItem) {
-        drawView.undoDraw()
+        println("UNDODRAW")
+        self.drawView.undoDraw()
     }
     
     @IBAction func toggleNotes(sender: UIBarButtonItem) {
         self.view.bringSubviewToFront(notesView)
+        self.view.exchangeSubviewAtIndex(self.view.subviews.count - 1, withSubviewAtIndex: self.view.subviews.count - 4)
         if notesExpanded! {
             var tmpFrame: CGRect = notesView.frame
             tmpFrame.size.height = 0
@@ -240,6 +247,18 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         } else {
             return false
         }
+    }
+    
+    override func supportedInterfaceOrientations() -> Int {
+        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    }
+    
+    override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
+        return UIInterfaceOrientation.Portrait
+    }
+    
+    override func shouldAutorotate() -> Bool {
+        return false
     }
     
     func loadTracks() {

@@ -20,7 +20,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     var wasDragged = false
     var startLoc: CGPoint!
     var hasStartedRecording = false
-    var hasStoppedRecording = true
+    var hasStoppedRecording = false
     var readyToPlay = false
     var labelName: UILabel!
     var labelDate: UILabel!
@@ -187,7 +187,8 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.addSubview(recordButton)
         
         //Add long press gesture for selecting track edit mode
-        var longPressEdit = UILongPressGestureRecognizer(target: self, action: "editMode:")
+        var longPressEdit = UITapGestureRecognizer(target: self, action: "editMode:")
+        longPressEdit.numberOfTouchesRequired = 2
         longPressEdit.numberOfTapsRequired = 0
         self.addGestureRecognizer(longPressEdit)
         
@@ -254,16 +255,19 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         labelDuration.text = duration
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
+    func touchBegan(touches: NSSet, withEvent event: UIEvent) {
         println("track touched began")
         var touch: UITouch = touches.anyObject() as UITouch
         startLoc = touch.locationInView(self)
         if !isInEditMode {
-            self.superview?.bringSubviewToFront(self)
+            var supervw = self.superview!
+            supervw.bringSubviewToFront(self)
+            supervw.exchangeSubviewAtIndex(supervw.subviews.count - 1, withSubviewAtIndex: supervw.subviews.count - 4)
+            //supervw.exchangeSubviewAtIndex(supervw.subviews.count - 2, withSubviewAtIndex: supervw.subviews.count - 3)
         }
     }
     
-    override func touchesMoved(touches: NSSet, withEvent event: UIEvent) {
+    func touchMoved(touches: NSSet, withEvent event: UIEvent) {
         println("track touched moved")
         if !isInEditMode {
             wasDragged = true
@@ -278,7 +282,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         }
     }
     
-    override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
+    func touchEnded(touches: NSSet, withEvent event: UIEvent) {
         println("track touched ended")
         if (!wasDragged) {
             if (!hasStartedRecording) {
@@ -322,7 +326,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 hasStartedRecording = true
                 hasStoppedRecording = false
             } else if (!hasStoppedRecording) {
-                println("stopped recording")
+                println("stopping recording")
                 Track.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
                     self.recordButton.transform = CGAffineTransformMakeScale(0.01, 0.01)
                     }, completion: { (Bool) -> Void in
@@ -412,7 +416,9 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         if !self.isInEditMode {
         self.isInEditMode = true
         self.savedBoundsDuringEdit = self.frame
-        
+        var supervw = self.superview!
+        supervw.bringSubviewToFront(self)
+            
         //Add text field for allowing track name edits (masks name label)
         self.textFieldName = UITextField(frame: self.labelName.frame)
         self.textFieldName.textAlignment = NSTextAlignment.Center
@@ -445,7 +451,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             var trackWidth = self.bounds.width
             
             //Resize waveform plot
-            self.audioPlot.frame = CGRect(x: originX - 1, y: originY + trackHeight / 10.6, width: trackWidth + 2, height: trackHeight / 2.4)
+            self.audioPlot.frame = CGRect(x: originX - 1, y: originY + trackHeight / 9.6, width: trackWidth + 2, height: trackHeight / 2.4)
             self.drawWaveform()
             self.audioPlot.layer.borderWidth = 1
             self.audioPlot.layer.borderColor = UIColor.whiteColor().CGColor
@@ -520,6 +526,10 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     
     func exitEditMode(sender: UIButton) {
         self.isInEditMode = false
+        var supervw = self.superview!
+        supervw.bringSubviewToFront(self)
+        supervw.exchangeSubviewAtIndex(supervw.subviews.count - 1, withSubviewAtIndex: supervw.subviews.count - 4)
+        //supervw.exchangeSubviewAtIndex(supervw.subviews.count - 2, withSubviewAtIndex: supervw.subviews.count - 3)
         self.labelName.frame = self.textFieldName.frame
         self.labelName.text = self.textFieldName.text
         self.addSubview(self.labelName)

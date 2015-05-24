@@ -19,7 +19,6 @@ class ProjectManagerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.appDel = UIApplication.sharedApplication().delegate as AppDelegate
         self.context = appDel.managedObjectContext!
         
@@ -100,6 +99,18 @@ class ProjectManagerViewController: UIViewController {
     func updateProjectName(projectID: String, projectName: String) {
         self.sideBarVC.updateProjectName(projectID,projectName: projectName)
         self.updateLastOpenProjectCoreData(projectID, projectName: projectName)
+    }
+    
+    override func supportedInterfaceOrientations() -> Int {
+        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    }
+    
+    override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
+        return UIInterfaceOrientation.Portrait
+    }
+    
+    override func shouldAutorotate() -> Bool {
+        return false
     }
     
     func createNewProject() -> String {

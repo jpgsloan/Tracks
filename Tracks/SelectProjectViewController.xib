@@ -21,13 +21,13 @@
                     <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                 </tableView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QUz-mL-IfH">
-                    <rect key="frame" x="136" y="31" width="57" height="30"/>
+                    <rect key="frame" x="49" y="37" width="57" height="30"/>
                     <state key="normal" title="Settings">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xvk-f7-hho">
-                    <rect key="frame" x="394" y="31" width="84" height="30"/>
+                    <rect key="frame" x="467" y="37" width="84" height="30"/>
                     <state key="normal" title="New Project">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
@@ -38,13 +38,13 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="QUz-mL-IfH" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="136" id="0UI-pG-ZES"/>
-                <constraint firstItem="Xvk-f7-hho" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="31" id="7YF-mN-OWm"/>
-                <constraint firstItem="YvE-SX-GWN" firstAttribute="top" secondItem="QUz-mL-IfH" secondAttribute="bottom" constant="30" id="DzF-ti-yYh"/>
+                <constraint firstItem="QUz-mL-IfH" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="37" id="0mU-VU-OKf"/>
+                <constraint firstItem="Xvk-f7-hho" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="37" id="Ds0-4U-vsm"/>
                 <constraint firstItem="YvE-SX-GWN" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="EBC-0Y-z7R"/>
-                <constraint firstItem="QUz-mL-IfH" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="31" id="NLY-LF-tMm"/>
-                <constraint firstAttribute="trailing" secondItem="Xvk-f7-hho" secondAttribute="trailing" constant="122" id="QNd-ab-ykh"/>
+                <constraint firstAttribute="trailing" secondItem="Xvk-f7-hho" secondAttribute="trailing" constant="49" id="PCm-Jv-BoZ"/>
                 <constraint firstAttribute="trailing" secondItem="YvE-SX-GWN" secondAttribute="trailing" id="Spx-I8-QEI"/>
+                <constraint firstItem="QUz-mL-IfH" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="49" id="WY5-Kc-9Fq"/>
+                <constraint firstItem="YvE-SX-GWN" firstAttribute="top" secondItem="QUz-mL-IfH" secondAttribute="bottom" constant="24" id="izE-so-Jiq"/>
                 <constraint firstAttribute="bottom" secondItem="YvE-SX-GWN" secondAttribute="bottom" id="vWi-3m-NDQ"/>
             </constraints>
             <point key="canvasLocation" x="178" y="38"/>

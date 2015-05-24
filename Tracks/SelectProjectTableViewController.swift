@@ -158,16 +158,17 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         self.updateTableData()
     }
    
-    /*override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "passInfo" {
-            var secondViewController : ProjectViewController = segue.destinationViewController as ProjectViewController
-            var indexPath: NSIndexPath = self.tableView.indexPathForSelectedRow()!
-            secondViewController.projectID = self.tableData[indexPath.row].valueForKey("projectID") as String
-            var projectTitle = self.tableData[indexPath.row].valueForKey("projectName") as? String
-            secondViewController.title = projectTitle
-            
-        }
-    }*/
+    override func supportedInterfaceOrientations() -> Int {
+        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    }
+    
+    override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
+        return UIInterfaceOrientation.Portrait
+    }
+    
+    override func shouldAutorotate() -> Bool {
+        return false
+    }
     
     func loadTableData() {
         var request = NSFetchRequest(entityName: "TableViewDataEntity")
