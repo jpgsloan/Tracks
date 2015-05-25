@@ -15,8 +15,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     var recordedAudio: RecordedAudio = RecordedAudio()
     var audioRecorder:AVAudioRecorder!
     var audioPlayer:AVAudioPlayer!
-    
-    var projectViewController: ProjectViewController!
     var wasDragged = false
     var startLoc: CGPoint!
     var hasStartedRecording = false
@@ -30,23 +28,15 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     var isInEditMode: Bool = false
     var savedBoundsDuringEdit: CGRect!
     var exitEditModeButton: UIButton!
-
     var recordButton: UIView!
-    
     var audioPlot: EZAudioPlot!
     var audioFile: EZAudioFile!
-    
     var projectDirectory: String!
-    
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
-    
     var longPressLock: Bool = false
-    
     var trackID: String = ""
-    
-    var deleteAlert: UIAlertController!
-    
+
     required convenience init(coder aDecoder: NSCoder) {
         var bounds = aDecoder.decodeCGRectForKey("bounds")
         let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String
@@ -191,47 +181,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         longPressEdit.numberOfTouchesRequired = 2
         longPressEdit.numberOfTapsRequired = 0
         self.addGestureRecognizer(longPressEdit)
-        
-        //Initialize delete alert controller
-        self.deleteAlert = UIAlertController(title: "Permanently delete track?", message: "action cannot be undone", preferredStyle: UIAlertControllerStyle.ActionSheet)
-        var deleteAction = UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive) { (alertAction: UIAlertAction!) -> Void in
-            self.deleteTrackFromCoreData()
-            UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                var curCenter = self.center
-                self.frame = CGRect(x: curCenter.x, y: curCenter.y, width: 0.0, height: 0.0)
-                self.layer.cornerRadius = 12
-                //Frequently reused bounds values
-                var originX = self.bounds.origin.x
-                var originY = self.bounds.origin.y
-                var trackHeight = self.bounds.height
-                var trackWidth = self.bounds.width
-                
-                //Resize label for file name
-                self.labelDuration.font = UIFont(name: "ArialMT", size: 10)
-                self.labelName.frame = CGRect(x: originX + 5, y: originY, width: trackWidth - 10, height: trackHeight/4.2)
-                
-                //unhide date label
-                self.labelDate.hidden = false
-                
-                //Resize label for duration
-                self.labelDuration.frame = CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth - (trackWidth * 2.0 / 12.0) , height: trackHeight * 1.4 / 7.0)
-                
-                //Resize waveform plot
-                self.audioPlot.frame = CGRect(x: originX, y: originY + trackHeight/4.2, width: trackWidth, height: trackHeight - trackHeight/4.2 - (trackHeight * 1.4 / 7.0))
-                self.drawWaveform()
-                self.audioPlot.layer.borderWidth = 0
-                
-                //Resize progress bar
-                self.progressView.frame = CGRect(x: self.bounds.width + 1, y: self.bounds.origin.y, width: 1, height: self.bounds.height)
-                }, completion: { (bool:Bool) -> Void in
-                    self.removeFromSuperview()
-            })
-        }
-        var cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default) { (alertAction: UIAlertAction!) -> Void in
-            
-        }
-        self.deleteAlert.addAction(deleteAction)
-        self.deleteAlert.addAction(cancelAction)
     }
     
     //Removes text field when user completes file name edit.
@@ -263,7 +212,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             var supervw = self.superview!
             supervw.bringSubviewToFront(self)
             supervw.exchangeSubviewAtIndex(supervw.subviews.count - 1, withSubviewAtIndex: supervw.subviews.count - 4)
-            //supervw.exchangeSubviewAtIndex(supervw.subviews.count - 2, withSubviewAtIndex: supervw.subviews.count - 3)
         }
     }
     
@@ -275,10 +223,14 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             var touchLoc: CGPoint = touch.locationInView(self)
         
             //move the track node relative to the starting location.
-            Track.animateWithDuration(0.01, delay: 0.01, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-                    self.frame.origin.x += touchLoc.x - self.startLoc.x;
-                    self.frame.origin.y += touchLoc.y - self.startLoc.y;
-                }, completion: nil )
+            var newCenterX = self.center.x + touchLoc.x - self.startLoc.x
+            var newCenterY = self.center.y + touchLoc.y - self.startLoc.y
+            if newCenterX < self.superview?.frame.width && newCenterX > 0 {
+                self.center.x = newCenterX
+            }
+            if newCenterY < self.superview?.frame.height && newCenterY > 30 {
+                self.center.y = newCenterY
+            }
         }
     }
     
@@ -436,8 +388,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         exitEditModeButton.setImage(image, forState: UIControlState.Normal)
         exitEditModeButton.addTarget(self, action: "exitEditMode:", forControlEvents: UIControlEvents.TouchUpInside)
         exitEditModeButton.adjustsImageWhenHighlighted = true;
-        exitEditModeButton.bounds.size.height = 20.0
-        exitEditModeButton.bounds.size.width = 20.0
         self.addSubview(exitEditModeButton)
         
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
@@ -510,17 +460,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             self.addSubview(colorButton)
             i++
         }
-        
-        //Add delete button
-        var deleteButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 2, y: self.bounds.origin.y + self.bounds.height - self.bounds.height / 9.0 - 2, width: self.bounds.width - 4, height: self.bounds.height / 9.0))
-        deleteButton.backgroundColor = UIColor.redColor()
-        deleteButton.layer.borderColor = UIColor.whiteColor().CGColor
-        deleteButton.layer.borderWidth = 1.0
-        deleteButton.layer.cornerRadius = 10.0
-        deleteButton.adjustsImageWhenHighlighted = true
-        deleteButton.setTitle("Delete Track", forState: UIControlState.Normal)
-        deleteButton.addTarget(self, action: "deleteTrack:", forControlEvents: UIControlEvents.TouchUpInside)
-        self.addSubview(deleteButton)
         }
     }
     
@@ -574,9 +513,40 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.updateTrackCoreData()
     }
     
-    func deleteTrack(sender: UIButton) {
+    func deleteTrack() {
         println("DELETE TRACK")
-        self.projectViewController.presentViewController(self.deleteAlert, animated: true, completion: nil)
+        self.deleteTrackFromCoreData()
+        UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+            var curCenter = self.center
+            self.frame = CGRect(x: curCenter.x, y: curCenter.y, width: 0.0, height: 0.0)
+            self.layer.cornerRadius = 12
+            //Frequently reused bounds values
+            var originX = self.bounds.origin.x
+            var originY = self.bounds.origin.y
+            var trackHeight = self.bounds.height
+            var trackWidth = self.bounds.width
+            
+            //Resize label for file name
+            self.labelDuration.font = UIFont(name: "ArialMT", size: 10)
+            self.labelName.frame = CGRect(x: originX + 5, y: originY, width: trackWidth - 10, height: trackHeight/4.2)
+            
+            //unhide date label
+            self.labelDate.hidden = false
+            
+            //Resize label for duration
+            self.labelDuration.frame = CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth - (trackWidth * 2.0 / 12.0) , height: trackHeight * 1.4 / 7.0)
+            
+            //Resize waveform plot
+            self.audioPlot.frame = CGRect(x: originX, y: originY + trackHeight/4.2, width: trackWidth, height: trackHeight - trackHeight/4.2 - (trackHeight * 1.4 / 7.0))
+            self.drawWaveform()
+            self.audioPlot.layer.borderWidth = 0
+
+            //Resize progress bar
+            self.progressView.frame = CGRect(x: self.bounds.width + 1, y: self.bounds.origin.y, width: 1, height: self.bounds.height)
+            }, completion: { (bool:Bool) -> Void in
+                self.removeFromSuperview()
+        })
+
     }
     
     func updateTrackCoreData() {

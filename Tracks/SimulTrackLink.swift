@@ -75,15 +75,15 @@ class SimulTrackLink: UIView {
         if isInAddLinkMode {
             self.curTouchLoc = touchLoc
             self.setNeedsDisplay()
-        } else if touchHitEdge {
-            for track in trackNodes {
-                track.touchMoved(touches, withEvent: event)
+        } else {
+            if touchHitEdge {
+                for track in trackNodes {
+                    track.touchMoved(touches, withEvent: event)
+                }
+            } else {
+                self.curTouchedTrack.touchMoved(touches, withEvent: event)
             }
             self.wasDragged = true
-            self.setNeedsDisplay()
-        } else {
-            self.wasDragged = true
-            self.curTouchedTrack.touchMoved(touches, withEvent: event)
             self.setNeedsDisplay()
         }
     }
@@ -95,10 +95,18 @@ class SimulTrackLink: UIView {
         } else {
             if wasDragged {
                 println("TOUCHED TRACK LINK ENDED")
-                self.wasDragged = false
-                self.curTouchedTrack.touchEnded(touches, withEvent: event)
-                self.curTouchedTrack = nil
-                self.setNeedsDisplay()
+                if touchHitEdge {
+                    for track in trackNodes {
+                        track.touchEnded(touches, withEvent: event)
+                    }
+                    self.wasDragged = false
+                    self.setNeedsDisplay()
+                } else {
+                    self.wasDragged = false
+                    self.curTouchedTrack.touchEnded(touches, withEvent: event)
+                    self.curTouchedTrack = nil
+                    self.setNeedsDisplay()
+                }
             } else {
                 for track in self.trackNodes {
                     track.touchEnded(touches, withEvent: event)
@@ -195,9 +203,21 @@ class SimulTrackLink: UIView {
         }
     }
     
+    func deleteSimulTrackLink() {
+        for track in trackNodes {
+            track.layer.borderWidth = 0
+        }
+        self.removeFromSuperview()
+    }
+    
     override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
         for track in trackNodes {
             if track.frame.contains(point) {
+                return true
+            }
+        }
+        for edge in linkEdges {
+            if edge.containsPoint(point) {
                 return true
             }
         }
@@ -207,6 +227,11 @@ class SimulTrackLink: UIView {
     override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
         for track in trackNodes {
             if track.frame.contains(point) {
+                return self
+            }
+        }
+        for edge in linkEdges {
+            if edge.containsPoint(point) {
                 return self
             }
         }

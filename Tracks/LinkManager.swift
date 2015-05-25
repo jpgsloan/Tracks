@@ -13,6 +13,7 @@ class LinkManager: UIView {
 
     var isInAddSimulLinkMode: Bool = false
     var isInAddSeqLinkMode: Bool = false
+    var isInTrashMode: Bool = false
     var allSimulLink: Array<SimulTrackLink> = [SimulTrackLink]()
     var firstHitSubview = UIView()
     var addLinkStartLoc: CGPoint!
@@ -79,6 +80,14 @@ class LinkManager: UIView {
             } else if firstHitSubview is SeqTrackLink {
                 print("DELETE, MOVE, OR CHANGE TRACK LINK")
             }
+        } else if isInTrashMode {
+            if firstHitSubview is Track {
+                (firstHitSubview as Track).deleteTrack()
+            } else if firstHitSubview is SimulTrackLink {
+                (firstHitSubview as SimulTrackLink).deleteSimulTrackLink()
+            } else if firstHitSubview is DrawView {
+                //firstHitSubview.removeFromSuperview()
+            }
         } else {
             if firstHitSubview is Track {
                 (firstHitSubview as Track).touchBegan(touches, withEvent: event)
@@ -104,6 +113,8 @@ class LinkManager: UIView {
             } else {
                 println("UIVIEW")
             }
+        } else if isInTrashMode {
+            //do nothing
         } else {
             var touch: UITouch = touches.anyObject() as UITouch
             var location: CGPoint = touch.locationInView(self)
@@ -158,6 +169,8 @@ class LinkManager: UIView {
             } else {
                 println("OTHER UIVIEW")
             }
+        } else if isInTrashMode {
+            //do nothing
         } else {
             if self.curSimulLinkAdd != nil {
                 if self.curSimulLinkAdd.queuedTrackForAdding != nil {

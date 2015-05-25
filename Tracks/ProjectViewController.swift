@@ -21,30 +21,25 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     var projectEntity: ProjectEntity!
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
-    
     var notesView: UITextView!
     var notesExpanded: Bool!
-    
     var statusBarBackgroundView: UIView!
-    
     var sideBarOpenBackgroundView: UIView!
-    
     var drawView: DrawView!
-    
     @IBOutlet weak var titleTextField: UITextField!
-    
     @IBOutlet weak var navigationBar: UINavigationBar!
-    
+    @IBOutlet weak var navBarVertConstraint: NSLayoutConstraint!
     @IBOutlet weak var linkManager: LinkManager!
-    
     @IBOutlet weak var toolbar: UIToolbar!
+    @IBOutlet weak var toolBarVertConstraint: NSLayoutConstraint!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.drawView = DrawView(frame: self.view.frame)
-        self.drawView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
+        self.drawView.backgroundColor = UIColor.clearColor()
+        self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
         self.view.addSubview(self.drawView)
         
         self.statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20))
@@ -110,24 +105,11 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     }
     
     override func viewDidLayoutSubviews() {
-        //readjust titleTextField, navigation bar and toolbar frames after storyboard elements are loaded and drawn.
-
-        //self.navigationBar.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
-        self.navigationBar.frame = CGRect(x: 0, y: 20, width: self.view.frame.width, height: 44)
-        
-        self.titleTextField.frame = CGRect(x: 0, y: 0, width: self.navigationBar.frame.width, height: 20)
         self.titleTextField.text = self.projectName
         self.titleTextField.textAlignment = NSTextAlignment.Center
         self.titleTextField.delegate = self
-        
         self.toolbar.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
-        self.toolbar.frame = CGRect(x: 0, y: self.view.frame.height - 46, width: self.view.frame.width, height: 46)
-        
         self.drawView.frame = self.view.frame
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        //self.navigationController?.setToolbarHidden(true, animated: true)
     }
     
     override func didReceiveMemoryWarning() {
@@ -139,7 +121,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         //Create new Track and set project directory where sound files will be stored.
         var newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
         newTrack.projectDirectory = self.projectDirectory
-        newTrack.projectViewController = self
         
         //Center and add the new track node.
         newTrack.center = self.view.center
@@ -183,29 +164,42 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     
     @IBAction func addLinkMode(sender: UIBarButtonItem) {
         if !self.linkManager.isInAddSimulLinkMode {
-        self.drawView.backgroundColor = UIColor.darkGrayColor()
-        self.linkManager.isInAddSimulLinkMode = true
-        for link in self.linkManager.allSimulLink {
-            link.isInAddLinkMode = true
+            self.linkManager.isInAddSimulLinkMode = true
+            for link in self.linkManager.allSimulLink {
+                link.isInAddLinkMode = true
+            }
+            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                self.drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor
+                self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
+                self.toolBarVertConstraint.constant -= self.toolbar.frame.height
+                self.view.layoutIfNeeded()
+                }) { (bool:Bool) -> Void in
+            }
         }
-        } else {
-            self.drawView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
+        var exitTrashModeButton = UIButton(frame: CGRect(x: 20, y: self.view.frame.height - 40, width: 20, height: 20))
+        var image = UIImage(named: "close-button")
+        exitTrashModeButton.setImage(image, forState: UIControlState.Normal)
+        exitTrashModeButton.addTarget(self, action: "exitAddLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
+        exitTrashModeButton.adjustsImageWhenHighlighted = true
+        self.view.addSubview(exitTrashModeButton)
+        self.view.exchangeSubviewAtIndex(self.view.subviews.count - 1, withSubviewAtIndex: self.view.subviews.count - 4)
+    }
+    
+    func exitAddLinkMode(sender: UIButton) {
+        if self.linkManager.isInAddSimulLinkMode {
             self.linkManager.isInAddSimulLinkMode = false
             for link in self.linkManager.allSimulLink {
                 link.isInAddLinkMode = false
             }
+            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
+                self.navBarVertConstraint.constant += self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
+                self.toolBarVertConstraint.constant += self.toolbar.frame.height
+                self.view.layoutIfNeeded()
+                }) { (bool:Bool) -> Void in
+            }
+            sender.removeFromSuperview()
         }
-        /*UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            self.navigationBar.frame.origin.y = 0.0 - self.navigationBar.frame.height
-            self.toolbar.frame.origin.y = self.view.frame.height
-            }) { (bool:Bool) -> Void in
-        }*/
-    }
-    
-    
-    @IBAction func undoDraw(sender: UIBarButtonItem) {
-        println("UNDODRAW")
-        self.drawView.undoDraw()
     }
     
     @IBAction func toggleNotes(sender: UIBarButtonItem) {
@@ -232,6 +226,46 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             notesExpanded = true
         }
 
+    }
+    
+    @IBAction func undoDraw(sender: UIBarButtonItem) {
+        println("UNDODRAW")
+        self.drawView.undoDraw()
+    }
+    
+    
+    @IBAction func trashMode(sender: UIBarButtonItem) {
+        if !self.linkManager.isInTrashMode {
+            self.linkManager.isInTrashMode = true
+            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                    self.drawView.layer.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.5).CGColor
+                    self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
+                    self.toolBarVertConstraint.constant -= self.toolbar.frame.height
+                    self.view.layoutIfNeeded()
+                }) { (bool:Bool) -> Void in
+            }
+            var exitTrashModeButton = UIButton(frame: CGRect(x: self.view.frame.width - 40, y: self.view.frame.height - 40, width: 20, height: 20))
+            var image = UIImage(named: "close-button")
+            exitTrashModeButton.setImage(image, forState: UIControlState.Normal)
+            exitTrashModeButton.addTarget(self, action: "exitTrashMode:", forControlEvents: UIControlEvents.TouchUpInside)
+            exitTrashModeButton.adjustsImageWhenHighlighted = true
+            self.view.addSubview(exitTrashModeButton)
+            self.view.exchangeSubviewAtIndex(self.view.subviews.count - 1, withSubviewAtIndex: self.view.subviews.count - 4)
+        }
+    }
+    
+    func exitTrashMode(sender: UIButton) {
+        if self.linkManager.isInTrashMode {
+            self.linkManager.isInTrashMode = false
+            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
+                self.navBarVertConstraint.constant += self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
+                self.toolBarVertConstraint.constant += self.toolbar.frame.height
+                self.view.layoutIfNeeded()
+                }) { (bool:Bool) -> Void in
+            }
+            sender.removeFromSuperview()
+        }
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
@@ -272,7 +306,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             for track in res.track {
                 var trackEntity = track as TrackEntity
                 var trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as Track
-                trackToAdd.projectViewController = self
                 self.view.addSubview(trackToAdd)
             }
         }
