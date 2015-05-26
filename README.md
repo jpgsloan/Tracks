@@ -33,11 +33,11 @@ Many more features to come!
 
 **ProjectManagerViewController** - custom UIViewController for facillitating transitions between SelectProjectVC and ProjectVC. Contains code for ViewController containment, opening selectProjVC as sidebar and opening projects when selected. 
 
-**LinkManager** - unimplemented. Facilitates adding, deleting, and editing track links.
+**LinkManager** - custom UIView for facilitating the adding of track links as well as the deleting of links and tracks.
 
-**SimulTrackLink** - unimplemented. UIView that sits on top of n track nodes and plays all linked tracks simultaneously.
+**SimulTrackLink** - first iteration. Custom UIView that sits on top of n track nodes and plays all linked tracks simultaneously. Drag from one track to another in Add link mode to add a link! Work to be done: support for n > 2 tracks per link, add to coredata model, and iterate on visuals.
 
-**SeqTrackLink** - unimplemented. UIView that sits on top of n track nodes and plays linked tracks sequentially.
+**SeqTrackLink** - unimplemented. Same as SimulTrackLinks but plays linked tracks sequentially.
 
 **Example snapshot:**
 
