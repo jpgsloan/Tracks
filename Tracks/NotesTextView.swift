@@ -10,9 +10,9 @@ import UIKit
 import QuartzCore
 
 class NotesTextView: UITextView {
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
     
         var imageLayer: CALayer = self.layer
         imageLayer.cornerRadius = 10
@@ -23,10 +23,6 @@ class NotesTextView: UITextView {
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-    }
-    
-    override init(frame: CGRect, textContainer: NSTextContainer?) {
-        super.init(frame: frame, textContainer: textContainer)
     }
     
 }

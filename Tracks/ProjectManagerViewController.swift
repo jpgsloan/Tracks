@@ -19,7 +19,7 @@ class ProjectManagerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.appDel = UIApplication.sharedApplication().delegate as AppDelegate
+        self.appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         self.context = appDel.managedObjectContext!
         
         sideBarVC = SelectProjectTableViewController(nibName: "SelectProjectViewController",bundle: nil)
@@ -39,8 +39,8 @@ class ProjectManagerViewController: UIViewController {
             projectName = "Untitled Project"
             sideBarVC.addProject(projectID,projectName: projectName)
         } else {
-            projectID = project.valueForKey("ProjectID") as String
-            projectName = project.valueForKey("ProjectName") as String
+            projectID = project.valueForKey("ProjectID") as! String
+            projectName = project.valueForKey("ProjectName") as! String
         }
         
         projVC = ProjectViewController(nibName: "ProjectViewController",bundle: nil)
@@ -119,7 +119,7 @@ class ProjectManagerViewController: UIViewController {
         dateFormatter.dateFormat = "MMddyy-HHmmss-SSS"
         var dateInFormat = dateFormatter.stringFromDate(todaysDate)
         
-        var lastOpenProjectEntity = NSEntityDescription.insertNewObjectForEntityForName("LastOpenProjectEntity", inManagedObjectContext: context) as LastOpenProjectEntity
+        var lastOpenProjectEntity = NSEntityDescription.insertNewObjectForEntityForName("LastOpenProjectEntity", inManagedObjectContext: context) as! LastOpenProjectEntity
         
         lastOpenProjectEntity.projectID = dateInFormat
         lastOpenProjectEntity.projectName = "Untitled Project"
@@ -132,7 +132,7 @@ class ProjectManagerViewController: UIViewController {
         request.returnsObjectsAsFaults = false
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
         if (results.count >= 1) {
-            var res = results[0] as LastOpenProjectEntity
+            var res = results[0] as! LastOpenProjectEntity
             var projectInfo = NSMutableDictionary()
             projectInfo.setValue(res.projectID, forKey: "ProjectID")
             projectInfo.setValue(res.projectName, forKey: "ProjectName")
@@ -150,7 +150,7 @@ class ProjectManagerViewController: UIViewController {
         print("HERE: ")
         println(results.count)
         if (results.count == 1) {
-            var res = results[0] as LastOpenProjectEntity
+            var res = results[0] as! LastOpenProjectEntity
             res.projectID = projectID
             res.projectName = projectName
         }

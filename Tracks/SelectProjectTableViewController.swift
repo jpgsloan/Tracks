@@ -20,15 +20,17 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     override func viewDidLoad() {
         super.viewDidLoad()
         println("initializing table view")
-        self.appDel = UIApplication.sharedApplication().delegate as AppDelegate
-        self.context = appDel.managedObjectContext!
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        context = appDel.managedObjectContext!
         
-        self.tableView.registerNib(UINib(nibName: "ProjectTableViewCell", bundle: nil), forCellReuseIdentifier: "selectProjectCell")
-        self.tableView.dataSource = self
-        self.tableView.delegate = self
+        self.view.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
         
-        self.tableView.rowHeight = 55
-        self.tableView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0)
+        tableView.registerNib(UINib(nibName: "ProjectTableViewCell", bundle: nil), forCellReuseIdentifier: "selectProjectCell")
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        tableView.rowHeight = 55
+        tableView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 0.0)
         
         //Checkif stored tableData exists in CoreData
         var request = NSFetchRequest(entityName: "TableViewDataEntity")
@@ -37,15 +39,15 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         
         if results.count == 1 {
             println("loading previous table data")
-            self.loadTableData()
+            loadTableData()
         } else if results.count > 1 {
             println("MEGAPROBLEM: More than 1 tableData objects")
         } else {
             //Save tableData to CoreData for first time
-            var tableDataAsNSData: NSData = NSKeyedArchiver.archivedDataWithRootObject(self.tableData)
-            var tableViewDataEntity = NSEntityDescription.insertNewObjectForEntityForName("TableViewDataEntity", inManagedObjectContext: self.context) as TableViewDataEntity
+            var tableDataAsNSData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tableData)
+            var tableViewDataEntity = NSEntityDescription.insertNewObjectForEntityForName("TableViewDataEntity", inManagedObjectContext: context) as! TableViewDataEntity
             tableViewDataEntity.tableData = tableDataAsNSData
-            self.context.save(nil)
+            context.save(nil)
         }
     }
 
@@ -57,9 +59,9 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("row selected")
         var data = self.tableData[indexPath.row]
-        var projectID = data.valueForKey("projectID") as String
-        var projectName = data.valueForKey("projectName") as String
-        (self.parentViewController as ProjectManagerViewController).openProject(projectID, projectName: projectName)
+        var projectID = data.valueForKey("projectID") as! String
+        var projectName = data.valueForKey("projectName") as! String
+        (self.parentViewController as! ProjectManagerViewController).openProject(projectID, projectName: projectName)
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -74,14 +76,14 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
 
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: ProjectTableViewCell = tableView.dequeueReusableCellWithIdentifier("selectProjectCell") as ProjectTableViewCell
+        let cell: ProjectTableViewCell = tableView.dequeueReusableCellWithIdentifier("selectProjectCell") as! ProjectTableViewCell
         
         var data: NSMutableDictionary = self.tableData[indexPath.row] as NSMutableDictionary
 
-        cell.projectName.text = (data.valueForKey("projectName") as String)
+        cell.projectName.text = (data.valueForKey("projectName") as! String)
         cell.projectName.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
         
-        cell.projectDate.text = (data.valueForKey("projectDate") as String)
+        cell.projectDate.text = (data.valueForKey("projectDate") as! String)
         
         cell.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.3)
 
@@ -149,7 +151,7 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     
     func updateProjectName(projectID: String, projectName: String) {
         for dataEntry in self.tableData {
-            if (dataEntry.valueForKey("projectID") as String) == projectID {
+            if (dataEntry.valueForKey("projectID") as! String) == projectID {
                 dataEntry.setValue(projectName, forKey: "projectName")
                 break
             }
@@ -174,15 +176,15 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         var request = NSFetchRequest(entityName: "TableViewDataEntity")
         request.returnsObjectsAsFaults = false
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
-        var tableViewDataEntity = results[0] as TableViewDataEntity
+        var tableViewDataEntity = results[0] as! TableViewDataEntity
         var tableDataAsNSData = tableViewDataEntity.tableData as NSData
-        self.tableData = NSKeyedUnarchiver.unarchiveObjectWithData(tableDataAsNSData) as Array<NSMutableDictionary>
+        self.tableData = NSKeyedUnarchiver.unarchiveObjectWithData(tableDataAsNSData) as! Array<NSMutableDictionary>
         self.tableView.reloadData()
     }
     
     func updateTableData() {
         for (var i = 0; i < self.tableData.count; i++) {
-            var cell: ProjectTableViewCell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as ProjectTableViewCell
+            var cell: ProjectTableViewCell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as! ProjectTableViewCell
                 
             self.tableData[i].setValue(cell.projectName.text, forKey: "projectName")
             print("inforloop:")
@@ -193,7 +195,7 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         request.returnsObjectsAsFaults = false
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
         if results.count == 1 {
-            var tableViewDataEntity = results[0] as TableViewDataEntity
+            var tableViewDataEntity = results[0] as! TableViewDataEntity
             var newTableDataAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.tableData)
             tableViewDataEntity.tableData = newTableDataAsNSData
             self.context.save(nil)

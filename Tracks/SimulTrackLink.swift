@@ -14,7 +14,7 @@ class SimulTrackLink: UIView {
     var trackNodes: Array<Track> = [Track]()
     var linkEdges: Array<LinkEdge> = [LinkEdge]()
     var curTouchedTrack: Track!
-    var isInAddLinkMode: Bool = true
+    var mode: String = ""
     var startTrackNode: Track!
     var queuedTrackForAdding: Track!
     var wasDragged: Bool = false
@@ -25,7 +25,6 @@ class SimulTrackLink: UIView {
         super.init(frame: frame)
         self.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
         trackNodes.append(track)
-        startTrackNode = track
         self.setNeedsDisplay()
     }
 
@@ -35,15 +34,16 @@ class SimulTrackLink: UIView {
 
     func touchBegan(touches: NSSet, withEvent event: UIEvent) {
         println("TOUCHED TRACK LINK!")
-        var touch: UITouch = touches.anyObject() as UITouch
+        var touch: UITouch = touches.anyObject() as! UITouch
         var touchLoc: CGPoint = touch.locationInView(self)
         
-        if isInAddLinkMode {
+        if mode == "ADD_SIMUL_LINK" {
             for track in trackNodes {
                 if track.frame.contains(touchLoc) {
-                    self.curTouchedTrack = track
+                    curTouchedTrack = track
                 }
             }
+            startTrackNode = curTouchedTrack
             self.curTouchLoc = touchLoc
         } else {
             var didTouchTrack = false
@@ -62,17 +62,16 @@ class SimulTrackLink: UIView {
                 self.curTouchedTrack.touchBegan(touches, withEvent: event)
             }
             var supervw = self.superview!
-            supervw.bringSubviewToFront(self)
-            supervw.exchangeSubviewAtIndex(supervw.subviews.count - 1,withSubviewAtIndex: supervw.subviews.count - 4)
+            supervw.insertSubview(self, atIndex: supervw.subviews.count - 4)
         }
     }
 
     func touchMoved(touches: NSSet, withEvent event: UIEvent) {
         println("TOUCHED TRACKLINK MOVED")
-        var touch: UITouch = touches.anyObject() as UITouch
+        var touch: UITouch = touches.anyObject() as! UITouch
         var touchLoc: CGPoint = touch.locationInView(self)
 
-        if isInAddLinkMode {
+        if mode == "ADD_SIMUL_LINK" {
             self.curTouchLoc = touchLoc
             self.setNeedsDisplay()
         } else {
@@ -89,7 +88,7 @@ class SimulTrackLink: UIView {
     }
     
     func touchEnded(touches: NSSet, withEvent event: UIEvent) {
-        if isInAddLinkMode {
+        if mode == "ADD_SIMUL_LINK" {
             self.curTouchLoc = nil
             self.curTouchedTrack = nil
         } else {
@@ -146,7 +145,7 @@ class SimulTrackLink: UIView {
     override func drawRect(rect: CGRect) {
         drawLinkEdges()
         drawTrackNodeOutlines()
-        if isInAddLinkMode && self.curTouchedTrack != nil {
+        if mode == "ADD_SIMUL_LINK" && self.curTouchedTrack != nil {
             drawCurLinkAdd()
         }
     }

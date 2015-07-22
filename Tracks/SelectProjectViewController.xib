@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7531" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SelectProjectTableViewController" customModule="Tracks" customModuleProvider="target">
@@ -15,11 +15,18 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="YvE-SX-GWN">
-                    <rect key="frame" x="0.0" y="91" width="600" height="509"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                </tableView>
+                <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jbf-GC-g9K">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="O2c-BP-lj3">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </view>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="600" id="iA7-sy-pCb"/>
+                        <constraint firstAttribute="height" constant="600" id="qve-zT-KJb"/>
+                    </constraints>
+                    <blurEffect style="extraLight"/>
+                </visualEffectView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QUz-mL-IfH">
                     <rect key="frame" x="49" y="37" width="57" height="30"/>
                     <state key="normal" title="Settings">
@@ -35,19 +42,29 @@
                         <action selector="addProject:" destination="-1" eventType="touchUpInside" id="5DE-PS-pcr"/>
                     </connections>
                 </button>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="YvE-SX-GWN">
+                    <rect key="frame" x="0.0" y="91" width="600" height="509"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="509" id="nEA-0c-mlt"/>
+                    </constraints>
+                </tableView>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="QUz-mL-IfH" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="37" id="0mU-VU-OKf"/>
+                <constraint firstAttribute="bottom" secondItem="jbf-GC-g9K" secondAttribute="bottom" id="5kj-UB-4Z2"/>
+                <constraint firstAttribute="trailing" secondItem="YvE-SX-GWN" secondAttribute="trailing" id="9om-0J-jeC"/>
                 <constraint firstItem="Xvk-f7-hho" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="37" id="Ds0-4U-vsm"/>
-                <constraint firstItem="YvE-SX-GWN" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="EBC-0Y-z7R"/>
+                <constraint firstItem="jbf-GC-g9K" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="E1a-vT-yhX"/>
+                <constraint firstItem="jbf-GC-g9K" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="JJ2-FW-alE"/>
                 <constraint firstAttribute="trailing" secondItem="Xvk-f7-hho" secondAttribute="trailing" constant="49" id="PCm-Jv-BoZ"/>
-                <constraint firstAttribute="trailing" secondItem="YvE-SX-GWN" secondAttribute="trailing" id="Spx-I8-QEI"/>
                 <constraint firstItem="QUz-mL-IfH" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="49" id="WY5-Kc-9Fq"/>
-                <constraint firstItem="YvE-SX-GWN" firstAttribute="top" secondItem="QUz-mL-IfH" secondAttribute="bottom" constant="24" id="izE-so-Jiq"/>
-                <constraint firstAttribute="bottom" secondItem="YvE-SX-GWN" secondAttribute="bottom" id="vWi-3m-NDQ"/>
+                <constraint firstAttribute="bottom" secondItem="YvE-SX-GWN" secondAttribute="bottom" id="aEh-Mx-9F1"/>
+                <constraint firstAttribute="trailing" secondItem="jbf-GC-g9K" secondAttribute="trailing" id="cal-Bm-neZ"/>
+                <constraint firstItem="YvE-SX-GWN" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="fds-pm-VZE"/>
             </constraints>
-            <point key="canvasLocation" x="178" y="38"/>
+            <point key="canvasLocation" x="174" y="-5"/>
         </view>
     </objects>
 </document>

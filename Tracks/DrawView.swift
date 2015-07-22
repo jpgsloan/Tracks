@@ -85,7 +85,7 @@ class DrawView: UIView {
         request.predicate = NSPredicate(format: "projectEntity = %@", argumentArray: [self.projectEntity])
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
         if results.count == 1 {
-            var drawViewEntity = results[0] as DrawViewEntity
+            var drawViewEntity = results[0] as! DrawViewEntity
             var allPathsAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.allPaths)
             drawViewEntity.allLines = allPathsAsNSData
             self.context.save(nil)
@@ -96,25 +96,25 @@ class DrawView: UIView {
     }
     
     func loadAllPaths() {
-        appDel = UIApplication.sharedApplication().delegate as AppDelegate
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
         var request = NSFetchRequest(entityName: "DrawViewEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectEntity = %@", argumentArray: [self.projectEntity])
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
         if results.count == 1 {
-            var drawViewEntity = results[0] as DrawViewEntity
+            var drawViewEntity = results[0] as! DrawViewEntity
             var allPathsAsNSData = drawViewEntity.allLines as NSData
-            self.allPaths = NSKeyedUnarchiver.unarchiveObjectWithData(allPathsAsNSData) as [[Line]]
+            self.allPaths = NSKeyedUnarchiver.unarchiveObjectWithData(allPathsAsNSData) as! [[Line]]
             self.setNeedsDisplay()
         }
     }
     
     func saveAllPaths(projectEntity: ProjectEntity) {
-        appDel = UIApplication.sharedApplication().delegate as AppDelegate
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
         self.projectEntity = projectEntity
-        var drawViewEntity = NSEntityDescription.insertNewObjectForEntityForName("DrawViewEntity", inManagedObjectContext: self.context) as DrawViewEntity
+        var drawViewEntity = NSEntityDescription.insertNewObjectForEntityForName("DrawViewEntity", inManagedObjectContext: self.context) as! DrawViewEntity
         var allPathsAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.allPaths)
         drawViewEntity.projectEntity = projectEntity
         drawViewEntity.allLines = allPathsAsNSData

@@ -21,9 +21,10 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     var projectEntity: ProjectEntity!
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
+    var tracks: NSMutableArray = []
     var notesView: UITextView!
     var notesExpanded: Bool!
-    var statusBarBackgroundView: UIView!
+    var statusBarBackgroundView: UIVisualEffectView!
     var sideBarOpenBackgroundView: UIView!
     var drawView: DrawView!
     @IBOutlet weak var titleTextField: UITextField!
@@ -31,36 +32,53 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     @IBOutlet weak var navBarVertConstraint: NSLayoutConstraint!
     @IBOutlet weak var linkManager: LinkManager!
     @IBOutlet weak var toolbar: UIToolbar!
-    @IBOutlet weak var toolBarVertConstraint: NSLayoutConstraint!
-    
+    @IBOutlet weak var toolbarVertConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.drawView = DrawView(frame: self.view.frame)
-        self.drawView.backgroundColor = UIColor.clearColor()
-        self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
+        // Add draw view
+        drawView = DrawView(frame: self.view.frame)
+        drawView.backgroundColor = UIColor.clearColor()
+        drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
         self.view.addSubview(self.drawView)
         
-        self.statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20))
-        self.statusBarBackgroundView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.9)
-        self.view.addSubview(self.statusBarBackgroundView)
+        //Make toolbar transparent
+        self.toolbar.setBackgroundImage(UIImage(),
+            forToolbarPosition: UIBarPosition.Any,
+            barMetrics: UIBarMetrics.Default)
+        self.toolbar.setShadowImage(UIImage(),
+            forToolbarPosition: UIBarPosition.Any)
         
-        //Create notesView
+        // Create effect
+        let blur = UIBlurEffect(style: UIBlurEffectStyle.ExtraLight)
+        
+        // Add effect to an effect view
+        statusBarBackgroundView = UIVisualEffectView(effect: blur)
+        statusBarBackgroundView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20 + navigationBar.frame.height);
+        
+        // Add the effect view
+        self.view.addSubview(statusBarBackgroundView)
+        
+        self.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
+        self.navigationBar.shadowImage = UIImage()
+        self.navigationBar.translucent = true
+        
+        // Create notesView
         notesView = NotesTextView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: 0.0))
         notesExpanded = false
         
-        //Check if project folder already exists
-        let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as String
+        // Check if project folder already exists
+        let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
         let allProjects = filemanager.contentsOfDirectoryAtPath(docDirectory, error: nil)
         for project in allProjects! {
-            if project as NSString == self.projectID {
+            if project as! NSString == projectID {
                 createProjectFolder = false
                 break
             }
         }
         
-        //Create new folder for project if needed. stores audio files in this location.
+        // Create new folder for project if needed. stores audio files in this location.
         if createProjectFolder {
             println("CREATING NEW PROJECT FOLDER")
             let newDirectory = docDirectory.stringByAppendingPathComponent(projectID)
@@ -75,41 +93,42 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             projectDirectory = docDirectory.stringByAppendingPathComponent(projectID)
         }
         
-        //Assign context, and its core data project entity if it exists.
-        self.appDel = UIApplication.sharedApplication().delegate as AppDelegate
-        self.context = appDel.managedObjectContext!
+        // Assign context, and its core data project entity if it exists.
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        context = appDel.managedObjectContext!
         
         var request = NSFetchRequest(entityName: "ProjectEntity")
         request.returnsObjectsAsFaults = false
-        request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [self.projectID])
+        request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
       
         if results.count < 1 {
-            self.projectEntity =  NSEntityDescription.insertNewObjectForEntityForName("ProjectEntity", inManagedObjectContext: self.context) as ProjectEntity
-            self.projectEntity.projectID = self.projectID
-            if self.drawView != nil {
-                self.drawView.saveAllPaths(self.projectEntity)
+            projectEntity =  NSEntityDescription.insertNewObjectForEntityForName("ProjectEntity", inManagedObjectContext: context) as! ProjectEntity
+            projectEntity.projectID = projectID
+            if drawView != nil {
+                drawView.saveAllPaths(projectEntity)
             }
         } else {
-            self.projectEntity = results[0] as ProjectEntity
-            self.drawView.projectEntity = self.projectEntity
-            self.drawView.loadAllPaths()
+            projectEntity = results[0] as! ProjectEntity
+            drawView.projectEntity = projectEntity
+            drawView.loadAllPaths()
         }
         
-        self.loadTracks()
+        loadTracks()
         self.view.addSubview(notesView)
-        
-        self.view.bringSubviewToFront(self.statusBarBackgroundView)
-        self.view.bringSubviewToFront(self.navigationBar)
-        self.view.bringSubviewToFront(self.toolbar)
+        self.view.bringSubviewToFront(statusBarBackgroundView)
+        self.view.bringSubviewToFront(navigationBar)
+        self.view.bringSubviewToFront(toolbar)
     }
     
     override func viewDidLayoutSubviews() {
-        self.titleTextField.text = self.projectName
-        self.titleTextField.textAlignment = NSTextAlignment.Center
-        self.titleTextField.delegate = self
-        self.toolbar.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
-        self.drawView.frame = self.view.frame
+        titleTextField.text = projectName
+        titleTextField.textAlignment = NSTextAlignment.Center
+        titleTextField.delegate = self
+        
+        // Make navigationBar clear
+        navigationBar.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
+        drawView.frame = self.view.frame
     }
     
     override func didReceiveMemoryWarning() {
@@ -120,29 +139,30 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     @IBAction func addTrack(sender: UIBarButtonItem) {
         //Create new Track and set project directory where sound files will be stored.
         var newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
-        newTrack.projectDirectory = self.projectDirectory
+        newTrack.projectDirectory = projectDirectory
         
         //Center and add the new track node.
         newTrack.center = self.view.center
         newTrack.setLabelNameText("untitled")
-        newTrack.saveTrackCoreData(self.projectEntity)
+        newTrack.saveTrackCoreData(projectEntity)
+        tracks.addObject(newTrack)
         self.view.addSubview(newTrack)
     }
         
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
-        self.sideBarOpenBackgroundView = UIView(frame: self.view.frame)
-        self.sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
+        sideBarOpenBackgroundView = UIView(frame: self.view.frame)
+        sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
         var tapGesture = UITapGestureRecognizer(target: self, action: "closeSideBarVC:")
         tapGesture.numberOfTapsRequired = 1
-        self.sideBarOpenBackgroundView.addGestureRecognizer(tapGesture)
-        self.drawView.sideBarOpenLock = true
-        self.view.addSubview(self.sideBarOpenBackgroundView)
+        sideBarOpenBackgroundView.addGestureRecognizer(tapGesture)
+        drawView.sideBarOpenLock = true
+        self.view.addSubview(sideBarOpenBackgroundView)
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             self.sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.5)
             }, completion: { (bool:Bool) -> Void in
         })
         
-        (self.parentViewController as ProjectManagerViewController).openSideBarVC()
+        (parentViewController as! ProjectManagerViewController).openSideBarVC()
     }
         
     func closeSideBarVC(gestureRecognizer:UIGestureRecognizer) {
@@ -151,50 +171,54 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             }, completion: { (bool:Bool) -> Void in
                 self.sideBarOpenBackgroundView.removeFromSuperview()
         })
-        (self.parentViewController as ProjectManagerViewController).closeSideBarVC()
-    
-        self.drawView.sideBarOpenLock = false
+        
+        (parentViewController as! ProjectManagerViewController).closeSideBarVC()
+        drawView.sideBarOpenLock = false
     }
     
     func sideBarClosed() {
-        if self.sideBarOpenBackgroundView != nil {
-            self.sideBarOpenBackgroundView.removeFromSuperview()
+        if sideBarOpenBackgroundView != nil {
+            sideBarOpenBackgroundView.removeFromSuperview()
         }
     }
     
     @IBAction func addLinkMode(sender: UIBarButtonItem) {
-        if !self.linkManager.isInAddSimulLinkMode {
-            self.linkManager.isInAddSimulLinkMode = true
-            for link in self.linkManager.allSimulLink {
-                link.isInAddLinkMode = true
+        if linkManager.mode != "ADD_SIMUL_LINK" {
+            linkManager.mode = "ADD_SIMUL_LINK"
+            for link in linkManager.allSimulLink {
+                link.mode = "ADD_SIMUL_LINK"
             }
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                //change background color and remove toolbars to show current mode
                 self.drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor
                 self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
-                self.toolBarVertConstraint.constant -= self.toolbar.frame.height
+                self.toolbarVertConstraint.constant -= self.toolbar.frame.height
+                self.statusBarBackgroundView.frame.origin.y -= self.statusBarBackgroundView.frame.height
                 self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
         }
-        var exitTrashModeButton = UIButton(frame: CGRect(x: 20, y: self.view.frame.height - 40, width: 20, height: 20))
+        
+        //create exit button and add to view
+        var exitButton = UIButton(frame: CGRect(x: 20, y: self.view.frame.height - 40, width: 20, height: 20))
         var image = UIImage(named: "close-button")
-        exitTrashModeButton.setImage(image, forState: UIControlState.Normal)
-        exitTrashModeButton.addTarget(self, action: "exitAddLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
-        exitTrashModeButton.adjustsImageWhenHighlighted = true
-        self.view.addSubview(exitTrashModeButton)
-        self.view.exchangeSubviewAtIndex(self.view.subviews.count - 1, withSubviewAtIndex: self.view.subviews.count - 4)
+        exitButton.setImage(image, forState: UIControlState.Normal)
+        exitButton.addTarget(self, action: "exitAddLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
+        exitButton.adjustsImageWhenHighlighted = true
+        self.view.insertSubview(exitButton, atIndex: 4)
     }
     
     func exitAddLinkMode(sender: UIButton) {
-        if self.linkManager.isInAddSimulLinkMode {
-            self.linkManager.isInAddSimulLinkMode = false
-            for link in self.linkManager.allSimulLink {
-                link.isInAddLinkMode = false
+        if linkManager.mode == "ADD_SIMUL_LINK" {
+            linkManager.mode = ""
+            for link in linkManager.allSimulLink {
+                link.mode = ""
             }
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
                 self.navBarVertConstraint.constant += self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
-                self.toolBarVertConstraint.constant += self.toolbar.frame.height
+                self.toolbarVertConstraint.constant += self.toolbar.frame.height
+                self.statusBarBackgroundView.frame.origin.y += self.statusBarBackgroundView.frame.height
                 self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
@@ -202,9 +226,22 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         }
     }
     
+    
+    @IBAction func stopAudio(sender: UIBarButtonItem) {
+        for track in tracks {
+            (track as! Track).stopAudio()
+        }
+    }
+    
+    
+    @IBAction func undoDraw(sender: UIBarButtonItem) {
+        println("UNDODRAW")
+        drawView.undoDraw()
+    }
+    
+   
     @IBAction func toggleNotes(sender: UIBarButtonItem) {
-        self.view.bringSubviewToFront(notesView)
-        self.view.exchangeSubviewAtIndex(self.view.subviews.count - 1, withSubviewAtIndex: self.view.subviews.count - 4)
+        self.view.insertSubview(notesView, atIndex: self.view.subviews.count - 4)
         if notesExpanded! {
             var tmpFrame: CGRect = notesView.frame
             tmpFrame.size.height = 0
@@ -216,7 +253,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             notesExpanded = false
         } else {
             var tmpFrame: CGRect = notesView.frame
-            tmpFrame.size.height = 460 - self.toolbar.frame.height
+            tmpFrame.size.height = 460 - toolbar.frame.height
             tmpFrame.size.width = self.view.frame.width
             tmpFrame.origin.y = self.view.frame.height - 460
             UIView.beginAnimations("", context: nil)
@@ -228,19 +265,15 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
 
     }
     
-    @IBAction func undoDraw(sender: UIBarButtonItem) {
-        println("UNDODRAW")
-        self.drawView.undoDraw()
-    }
     
-    
-    @IBAction func trashMode(sender: UIBarButtonItem) {
-        if !self.linkManager.isInTrashMode {
-            self.linkManager.isInTrashMode = true
+    @IBAction func enterTrashMode(sender: UIBarButtonItem) {
+        if linkManager.mode != "TRASH" {
+            linkManager.mode = "TRASH"
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                     self.drawView.layer.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.5).CGColor
                     self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
-                    self.toolBarVertConstraint.constant -= self.toolbar.frame.height
+                    self.toolbarVertConstraint.constant -= self.toolbar.frame.height + 15
+                    self.statusBarBackgroundView.frame.origin.y -= self.statusBarBackgroundView.frame.height
                     self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
@@ -249,18 +282,18 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             exitTrashModeButton.setImage(image, forState: UIControlState.Normal)
             exitTrashModeButton.addTarget(self, action: "exitTrashMode:", forControlEvents: UIControlEvents.TouchUpInside)
             exitTrashModeButton.adjustsImageWhenHighlighted = true
-            self.view.addSubview(exitTrashModeButton)
-            self.view.exchangeSubviewAtIndex(self.view.subviews.count - 1, withSubviewAtIndex: self.view.subviews.count - 4)
+            self.view.insertSubview(exitTrashModeButton, atIndex: 4)
         }
     }
     
     func exitTrashMode(sender: UIButton) {
-        if self.linkManager.isInTrashMode {
-            self.linkManager.isInTrashMode = false
+        if linkManager.mode == "TRASH" {
+            linkManager.mode = ""
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
                 self.navBarVertConstraint.constant += self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
-                self.toolBarVertConstraint.constant += self.toolbar.frame.height
+                self.toolbarVertConstraint.constant += self.toolbar.frame.height + 15
+                self.statusBarBackgroundView.frame.origin.y += self.statusBarBackgroundView.frame.height
                 self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
@@ -269,9 +302,9 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
-        self.titleTextField.resignFirstResponder()
-        var projectName = self.titleTextField.text
-        (self.parentViewController as ProjectManagerViewController).updateProjectName(self.projectID, projectName: projectName)
+        titleTextField.resignFirstResponder()
+        var projectName = titleTextField.text
+        (parentViewController as! ProjectManagerViewController).updateProjectName(projectID, projectName: projectName)
         return true
     }
     
@@ -298,14 +331,15 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     func loadTracks() {
         var request = NSFetchRequest(entityName: "ProjectEntity")
         request.returnsObjectsAsFaults = false
-        request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [self.projectID])
+        request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
         //for result in results {
         if (results.count > 0) {
-            var res = results[0] as ProjectEntity
+            var res = results[0] as! ProjectEntity
             for track in res.track {
-                var trackEntity = track as TrackEntity
-                var trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as Track
+                var trackEntity = track as! TrackEntity
+                var trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as! Track
+                tracks.addObject(trackToAdd)
                 self.view.addSubview(trackToAdd)
             }
         }
