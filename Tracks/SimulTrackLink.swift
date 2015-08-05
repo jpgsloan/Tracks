@@ -8,11 +8,13 @@
 
 import UIKit
 import QuartzCore
+import CoreData
 
 class SimulTrackLink: UIView {
 
-    var trackNodes: Array<Track> = [Track]()
+    var trackNodeIDs: Array<String> = [String]()
     var linkEdges: Array<LinkEdge> = [LinkEdge]()
+    var simulLinkID: String = ""
     var curTouchedTrack: Track!
     var mode: String = ""
     var startTrackNode: Track!
@@ -20,26 +22,58 @@ class SimulTrackLink: UIView {
     var wasDragged: Bool = false
     var curTouchLoc: CGPoint!
     var touchHitEdge: Bool = false
+    var appDel: AppDelegate!
+    var context: NSManagedObjectContext!
     
     init (frame: CGRect, withTrack track: Track) {
         super.init(frame: frame)
+        
+        //Set the link id
+        if simulLinkID.isEmpty {
+            let currentDateTime = NSDate()
+            let formatter = NSDateFormatter()
+            formatter.dateFormat = "ddMMyyyy-HHmmss-SSS"
+            simulLinkID = "link-" + formatter.stringFromDate(currentDateTime)
+        }
+        
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        context = appDel.managedObjectContext!
+        
         self.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
-        trackNodes.append(track)
+        trackNodeIDs.append(track.trackID)
+        self.setNeedsDisplay()
+    }
+
+    init (frame: CGRect, withTrackIDs trackNodeIDs: Array<String>, linkEdges linkEdges: Array<LinkEdge>, andLinkID simulLinkID: String) {
+        super.init(frame: frame)
+        
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        context = appDel.managedObjectContext!
+        
+        self.simulLinkID = simulLinkID
+        self.trackNodeIDs = trackNodeIDs
+        
+        self.linkEdges = linkEdges
+        self.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
         self.setNeedsDisplay()
     }
 
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     func touchBegan(touches: NSSet, withEvent event: UIEvent) {
         println("TOUCHED TRACK LINK!")
         var touch: UITouch = touches.anyObject() as! UITouch
         var touchLoc: CGPoint = touch.locationInView(self)
         
         if mode == "ADD_SIMUL_LINK" {
-            for track in trackNodes {
-                if track.frame.contains(touchLoc) {
+            var highestIndex = -1
+            for trackID in trackNodeIDs {
+                var track = (self.superview as! LinkManager).getTrackByID(trackID)
+                var trackIndex = (self.superview as! LinkManager).getTrackIndex(track!)
+                if trackIndex > highestIndex && track!.frame.contains(touchLoc) {
+                    highestIndex = trackIndex
                     curTouchedTrack = track
                 }
             }
@@ -48,21 +82,36 @@ class SimulTrackLink: UIView {
         } else {
             var didTouchTrack = false
             touchHitEdge = true
-            for track in trackNodes {
+            
+            //Make a dictionary of the track nodes with the current z-order index
+            var trackSubviews = [Int: Track]()
+            for trackID in trackNodeIDs {
+                var track = (self.superview as! LinkManager).getTrackByID(trackID)
+                var trackIndex = (self.superview as! LinkManager).getTrackIndex(track!)
+                trackSubviews[trackIndex] = track!
+            }
+            
+            //Now iterate through dictionary, sorted by keys(index)
+            var sortedKeys = Array(trackSubviews.keys).sorted(<)
+            for index in sortedKeys {
+                var track = (trackSubviews[index] as Track!)
                 if track.frame.contains(touchLoc) {
                     self.curTouchedTrack = track
                     didTouchTrack = true
                     touchHitEdge = false
+                    track.touchBegan(touches, withEvent: event)
                 } else {
                     track.touchBegan(touches, withEvent: event)
                 }
             }
-            //touch current track last and readjust subviews for proper ordering.
+            
+            //touch current track last and readjust simullink index for proper ordering.
             if didTouchTrack {
                 self.curTouchedTrack.touchBegan(touches, withEvent: event)
             }
             var supervw = self.superview!
             supervw.insertSubview(self, atIndex: supervw.subviews.count - 4)
+            self.setNeedsDisplay()
         }
     }
 
@@ -76,8 +125,9 @@ class SimulTrackLink: UIView {
             self.setNeedsDisplay()
         } else {
             if touchHitEdge {
-                for track in trackNodes {
-                    track.touchMoved(touches, withEvent: event)
+                for trackID in trackNodeIDs {
+                    var track = (self.superview as! LinkManager).getTrackByID(trackID)
+                    track!.touchMoved(touches, withEvent: event)
                 }
             } else {
                 self.curTouchedTrack.touchMoved(touches, withEvent: event)
@@ -95,22 +145,23 @@ class SimulTrackLink: UIView {
             if wasDragged {
                 println("TOUCHED TRACK LINK ENDED")
                 if touchHitEdge {
-                    for track in trackNodes {
-                        track.touchEnded(touches, withEvent: event)
+                    for trackID in trackNodeIDs {
+                        var track = (self.superview as! LinkManager).getTrackByID(trackID)
+                        track!.touchEnded(touches, withEvent: event)
                     }
                     self.wasDragged = false
-                    self.setNeedsDisplay()
                 } else {
                     self.wasDragged = false
                     self.curTouchedTrack.touchEnded(touches, withEvent: event)
                     self.curTouchedTrack = nil
-                    self.setNeedsDisplay()
                 }
             } else {
-                for track in self.trackNodes {
-                    track.touchEnded(touches, withEvent: event)
+                for trackID in trackNodeIDs {
+                    var track = (self.superview as! LinkManager).getTrackByID(trackID)
+                    track!.touchEnded(touches, withEvent: event)
                 }
             }
+            self.setNeedsDisplay()
         }
     }
     
@@ -120,28 +171,23 @@ class SimulTrackLink: UIView {
     }
     
     func dequeueTrackFromAdding() {
-        self.queuedTrackForAdding.layer.borderWidth = 0
-        self.queuedTrackForAdding.layer.borderColor = UIColor.clearColor().CGColor
-        self.queuedTrackForAdding = nil
-        self.setNeedsDisplay()
+        if queuedTrackForAdding != nil {
+            queuedTrackForAdding.layer.borderWidth = 0
+            queuedTrackForAdding.layer.borderColor = UIColor.clearColor().CGColor
+            queuedTrackForAdding = nil
+            self.setNeedsDisplay()
+        }
     }
     
     func commitEdgeToLink() {
         println("ADDING TRACK!")
-        self.trackNodes.append(self.queuedTrackForAdding)
-        var newEdge = LinkEdge(startTrackNode: self.startTrackNode, endTrackNode: self.queuedTrackForAdding)
-        self.linkEdges.append(newEdge)
+        trackNodeIDs.append(queuedTrackForAdding.trackID)
+        var newEdge = LinkEdge(startTrackNode: startTrackNode, endTrackNode: queuedTrackForAdding)
+        linkEdges.append(newEdge)
         dequeueTrackFromAdding()
         self.setNeedsDisplay()
     }
-    
-    func prepareForDelete() {
-        for track in trackNodes {
-            track.layer.borderColor = UIColor.clearColor().CGColor
-            track.layer.borderWidth = 0
-        }
-    }
-    
+
     override func drawRect(rect: CGRect) {
         drawLinkEdges()
         drawTrackNodeOutlines()
@@ -151,15 +197,16 @@ class SimulTrackLink: UIView {
     }
     
     func drawTrackNodeOutlines() {
-        for node in trackNodes {
+        for trackID in trackNodeIDs {
+            var track = (self.superview as! LinkManager).getTrackByID(trackID)
             /*var outLineFrame = node.frame
             var strokeColor = UIColor.blueColor()//.colorWithAlphaComponent(0.5)
             strokeColor.setStroke()
             var outline = UIBezierPath(roundedRect: outLineFrame, cornerRadius: 12)
             outline.lineWidth = 5
             outline.stroke()*/
-            node.layer.borderColor = UIColor.blueColor().CGColor
-            node.layer.borderWidth = 5
+            track!.layer.borderColor = UIColor.blueColor().CGColor
+            track!.layer.borderWidth = 5
         }
         if self.queuedTrackForAdding != nil {
             /*var outLineFrame = self.queuedTrackForAdding.frame
@@ -177,41 +224,54 @@ class SimulTrackLink: UIView {
         var context = UIGraphicsGetCurrentContext()
         CGContextSetStrokeColorWithColor(context, UIColor.blueColor().colorWithAlphaComponent(1).CGColor)
         CGContextSetLineWidth(context, 8)
-        for linkEdge in self.linkEdges {
+        for linkEdge in linkEdges {
+            //For each link, paint line from one track node to the other.
             CGContextBeginPath(context)
             CGContextMoveToPoint(context, linkEdge.startTrackNode.center.x, linkEdge.startTrackNode.center.y)
             CGContextAddLineToPoint(context, linkEdge.endTrackNode.center.x, linkEdge.endTrackNode.center.y)
             CGContextStrokePath(context)
-            
-            CGContextClearRect(context, linkEdge.startTrackNode.frame)
-            CGContextClearRect(context, linkEdge.endTrackNode.frame)
         }
+        for linkEdge in linkEdges {
+            eraseLineOnTrack(linkEdge.startTrackNode)
+            eraseLineOnTrack(linkEdge.endTrackNode)
+        }
+    }
+    
+    func eraseLineOnTrack(track: Track) {
+        //Draws clear fill over track node to erase link line from center to edge of node.
+        var outLineFrame = track.frame
+        var outline = UIBezierPath(roundedRect: outLineFrame, cornerRadius: 12)
+        outline.fillWithBlendMode(kCGBlendModeClear, alpha: 1)
     }
     
     func drawCurLinkAdd() {
         var context = UIGraphicsGetCurrentContext()
         CGContextBeginPath(context)
-        CGContextMoveToPoint(context, self.curTouchedTrack.center.x, self.curTouchedTrack.center.y)
-        CGContextAddLineToPoint(context, self.curTouchLoc.x, self.curTouchLoc.y)
+        CGContextMoveToPoint(context, curTouchedTrack.center.x, curTouchedTrack.center.y)
+        CGContextAddLineToPoint(context, curTouchLoc.x, curTouchLoc.y)
         CGContextSetStrokeColorWithColor(context, UIColor.blueColor().colorWithAlphaComponent(1).CGColor)
         CGContextSetLineWidth(context, 8)
         CGContextStrokePath(context)
-        CGContextClearRect(context, self.curTouchedTrack.frame)
-        if self.queuedTrackForAdding != nil {
-            CGContextClearRect(context, self.queuedTrackForAdding.frame)
+        eraseLineOnTrack(curTouchedTrack)
+        if queuedTrackForAdding != nil {
+            eraseLineOnTrack(queuedTrackForAdding)
         }
     }
     
     func deleteSimulTrackLink() {
-        for track in trackNodes {
-            track.layer.borderWidth = 0
+        for trackID in trackNodeIDs {
+            var track = (self.superview as! LinkManager).getTrackByID(trackID)
+            track!.layer.borderColor = UIColor.clearColor().CGColor
+            track!.layer.borderWidth = 0
         }
+        deleteLinkFromCoreData()
         self.removeFromSuperview()
     }
     
     override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
-        for track in trackNodes {
-            if track.frame.contains(point) {
+        for trackID in trackNodeIDs {
+            var track = (self.superview as! LinkManager).getTrackByID(trackID)
+            if track!.frame.contains(point) {
                 return true
             }
         }
@@ -224,8 +284,9 @@ class SimulTrackLink: UIView {
     }
     
     override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
-        for track in trackNodes {
-            if track.frame.contains(point) {
+        for trackID in trackNodeIDs {
+            var track = (self.superview as! LinkManager).getTrackByID(trackID)
+            if track!.frame.contains(point) {
                 return self
             }
         }
@@ -237,4 +298,60 @@ class SimulTrackLink: UIView {
         return nil
     }
     
+    func updateLinkCoreData() {
+        println("Updating link data")
+        var request = NSFetchRequest(entityName: "SimulLinkEntity")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "simulLinkID = %@", argumentArray: [simulLinkID])
+        var results: NSArray = self.context.executeFetchRequest(request, error: nil)!
+        if results.count == 1 {
+            var simulLinkEntity = results[0] as! SimulLinkEntity
+            
+            //update trackIDs
+            var trackIDs: NSData = NSKeyedArchiver.archivedDataWithRootObject(trackNodeIDs)
+            simulLinkEntity.tracks = trackIDs
+            
+            //convert linkEdges to IDs for storing, then update
+            var edgeIDs = Array<Array<String>>()
+            for edge in linkEdges {
+                println("save link edge")
+                var idPair = [edge.startTrackNode.trackID,edge.endTrackNode.trackID]
+                edgeIDs.append(idPair)
+            }
+            var edges: NSData = NSKeyedArchiver.archivedDataWithRootObject(edgeIDs)
+            simulLinkEntity.edges = edges
+        }
+        self.context.save(nil)
+    }
+    
+    func saveLinkCoreData(projectEntity: ProjectEntity) {
+        println("first save of simul link: " + simulLinkID)
+        //convert linkEdges to IDs for storing
+        var edgeIDs = Array<Array<String>>()
+        for edge in linkEdges {
+            println("save link edge")
+            var idPair = [edge.startTrackNode.trackID,edge.endTrackNode.trackID]
+            edgeIDs.append(idPair)
+        }
+        var edges: NSData = NSKeyedArchiver.archivedDataWithRootObject(edgeIDs)
+        var trackIDs: NSData = NSKeyedArchiver.archivedDataWithRootObject(trackNodeIDs)
+        var simulLinkEntity = NSEntityDescription.insertNewObjectForEntityForName("SimulLinkEntity", inManagedObjectContext: context) as! SimulLinkEntity
+        simulLinkEntity.tracks = trackIDs
+        simulLinkEntity.project = projectEntity
+        simulLinkEntity.simulLinkID = self.simulLinkID
+        simulLinkEntity.edges = edges
+        self.context.save(nil)
+    }
+    
+    func deleteLinkFromCoreData() {
+        var request = NSFetchRequest(entityName: "SimulLinkEntity")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "simulLinkID = %@", argumentArray: [self.simulLinkID])
+        var results: NSArray = self.context.executeFetchRequest(request, error: nil)!
+        if results.count == 1 {
+            var linkToDelete = results[0] as! SimulLinkEntity
+            self.context.deleteObject(linkToDelete)
+        }
+    }
+
 }

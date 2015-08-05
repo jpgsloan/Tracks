@@ -70,7 +70,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         }
         
         self.backgroundColor = (aDecoder.decodeObjectForKey("color") as! UIColor)
-        audioPlot.backgroundColor = self.backgroundColor
+        
         labelName.text = aDecoder.decodeObjectForKey("labelName") as! String?
         self.projectDirectory = projectDirectory
         self.center = aDecoder.decodeCGPointForKey("center")
@@ -138,7 +138,8 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         //using EZAudio for now
         audioPlot = EZAudioPlot(frame: CGRect(x: originX, y: originY + trackHeight/4.2, width: trackWidth, height: trackHeight - trackHeight/4.2 - (trackHeight * 1.4 / 7.0)))
         audioPlot.plotType = EZPlotType.Buffer
-        audioPlot.backgroundColor = self.backgroundColor
+        audioPlot.backgroundColor = UIColor.clearColor()
+        audioPlot.opaque = false
         audioPlot.color = UIColor.whiteColor()
         audioPlot.shouldFill   = false
         audioPlot.shouldMirror = true
@@ -184,7 +185,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     }
     
     //Removes text field when user completes file name edit.
-    func textFieldShouldReturn(textField: UITextField!) -> Bool {
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         
         setLabelNameText(textField.text)
@@ -480,11 +481,11 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         
         bringTrackToFront()
         
-        self.labelName.frame = self.textFieldName.frame
-        self.labelName.text = self.textFieldName.text
-        self.addSubview(self.labelName)
-        self.textFieldName.removeFromSuperview()
-        self.exitEditModeButton.removeFromSuperview()
+        labelName.frame = textFieldName.frame
+        labelName.text = textFieldName.text
+        self.addSubview(labelName)
+        textFieldName.removeFromSuperview()
+        exitEditModeButton.removeFromSuperview()
         
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             
@@ -520,7 +521,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     
     func changeColor(sender: UIButton) {
         self.backgroundColor = sender.backgroundColor
-        self.audioPlot.backgroundColor = sender.backgroundColor
+        self.audioPlot.backgroundColor = UIColor.clearColor()
         self.updateTrackCoreData()
     }
     

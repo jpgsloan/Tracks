@@ -18,6 +18,16 @@ class LinkEdge: NSObject {
         self.endTrackNode = endTrackNode
     }
     
+    func containsTrack(track: Track) -> Bool {
+        if startTrackNode.trackID == track.trackID {
+            return true
+        } else if endTrackNode.trackID == track.trackID {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     func containsPoint(point: CGPoint) -> Bool {
         var path = UIBezierPath()
         path.moveToPoint(startTrackNode.center)

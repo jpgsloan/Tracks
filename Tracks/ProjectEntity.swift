@@ -1,9 +1,9 @@
 //
 //  ProjectEntity.swift
-//  Tracks
+//  
 //
-//  Created by John Sloan on 3/3/15.
-//  Copyright (c) 2015 JPGS inc. All rights reserved.
+//  Created by John Sloan on 7/23/15.
+//
 //
 
 import Foundation
@@ -13,6 +13,8 @@ import CoreData
 class ProjectEntity: NSManagedObject {
 
     @NSManaged var projectID: String
+    @NSManaged var drawView: DrawViewEntity
     @NSManaged var track: NSSet
+    @NSManaged var simulLink: NSSet
 
 }

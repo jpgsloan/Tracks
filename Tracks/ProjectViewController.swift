@@ -114,7 +114,11 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             drawView.loadAllPaths()
         }
         
+        //Pass on the project entity to give to newly-added links
+        linkManager.projectEntity = projectEntity
+        
         loadTracks()
+        loadLinks()
         self.view.addSubview(notesView)
         self.view.bringSubviewToFront(statusBarBackgroundView)
         self.view.bringSubviewToFront(navigationBar)
@@ -145,8 +149,14 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         newTrack.center = self.view.center
         newTrack.setLabelNameText("untitled")
         newTrack.saveTrackCoreData(projectEntity)
+        
+        println("IN FOR LOOP")
+        for subview in self.view.subviews {
+            println(subview)
+        }
+        println("END FOR LOOP")
         tracks.addObject(newTrack)
-        self.view.addSubview(newTrack)
+        self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 3)
     }
         
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
@@ -191,7 +201,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 //change background color and remove toolbars to show current mode
                 self.drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor
-                self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
+                self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.navigationBar.frame.origin.y
                 self.toolbarVertConstraint.constant -= self.toolbar.frame.height
                 self.statusBarBackgroundView.frame.origin.y -= self.statusBarBackgroundView.frame.height
                 self.view.layoutIfNeeded()
@@ -216,16 +226,16 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             }
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
-                self.navBarVertConstraint.constant += self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
+                self.navBarVertConstraint.constant += self.navigationBar.frame.height + 20
                 self.toolbarVertConstraint.constant += self.toolbar.frame.height
                 self.statusBarBackgroundView.frame.origin.y += self.statusBarBackgroundView.frame.height
                 self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
+            self.view.bringSubviewToFront(navigationBar)
             sender.removeFromSuperview()
         }
     }
-    
     
     @IBAction func stopAudio(sender: UIBarButtonItem) {
         for track in tracks {
@@ -233,12 +243,10 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         }
     }
     
-    
     @IBAction func undoDraw(sender: UIBarButtonItem) {
         println("UNDODRAW")
         drawView.undoDraw()
     }
-    
    
     @IBAction func toggleNotes(sender: UIBarButtonItem) {
         self.view.insertSubview(notesView, atIndex: self.view.subviews.count - 4)
@@ -264,7 +272,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         }
 
     }
-    
     
     @IBAction func enterTrashMode(sender: UIBarButtonItem) {
         if linkManager.mode != "TRASH" {
@@ -344,4 +351,41 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             }
         }
     }
+    
+    func loadLinks() {
+        var request = NSFetchRequest(entityName: "ProjectEntity")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
+        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        //for result in results {
+        if (results.count > 0) {
+            var res = results[0] as! ProjectEntity
+            for link in res.simulLink {
+                var simulLinkEntity = link as! SimulLinkEntity
+                println("LINK")
+                //Get Track and edge IDs (edges are two track ids, start and end)
+                var trackIDs = NSKeyedUnarchiver.unarchiveObjectWithData(simulLinkEntity.tracks) as! Array<String>
+                var edgeIDs = NSKeyedUnarchiver.unarchiveObjectWithData(simulLinkEntity.edges) as! Array<Array<String>>
+                
+                //Translate ID to track objects
+                var linkEdges = Array<LinkEdge>()
+                for edge in edgeIDs {
+                    println("edge")
+                    var startTrackNode = linkManager.getTrackByID(edge[0])
+                    var endTrackNode = linkManager.getTrackByID(edge[1])
+                    print("start: ")
+                    println(startTrackNode)
+                    print("end: ")
+                    println(endTrackNode)
+                    var newEdge = LinkEdge(startTrackNode: startTrackNode!, endTrackNode: endTrackNode!)
+                    linkEdges.append(newEdge)
+                }
+                
+                var linkToAdd = SimulTrackLink(frame: self.view.frame, withTrackIDs: trackIDs, linkEdges: linkEdges, andLinkID: simulLinkEntity.simulLinkID)
+                linkManager.allSimulLink.append(linkToAdd)
+                self.view.addSubview(linkToAdd)
+            }
+        }
+    }
+
 }

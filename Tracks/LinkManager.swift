@@ -17,6 +17,7 @@ class LinkManager: UIView {
     var addLinkStartLoc: CGPoint!
     var addLinkCurMovedLoc: CGPoint!
     var curSimulLinkAdd: SimulTrackLink!
+    var projectEntity: ProjectEntity!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -68,8 +69,8 @@ class LinkManager: UIView {
                 newLink.mode = "ADD_SIMUL_LINK"
                 self.allSimulLink.append(newLink)
                 self.curSimulLinkAdd = newLink
-                self.addSubview(newLink)
-                self.exchangeSubviewAtIndex(self.subviews.count - 1, withSubviewAtIndex: self.subviews.count - 4)
+                self.insertSubview(firstHitSubview, atIndex: self.subviews.count - 4)
+                self.insertSubview(newLink, atIndex: self.subviews.count - 4)
                 newLink.touchBegan(touches, withEvent: event)
             } else if firstHitSubview is SimulTrackLink {
                 print("DELETE, MOVE, OR CHANGE TRACK LINK")
@@ -135,14 +136,16 @@ class LinkManager: UIView {
             println(curHitSubview)
             
             if curHitSubview is Track {
-                self.curSimulLinkAdd.queueTrackForAdding(curHitSubview as! Track)
-            } else if self.curSimulLinkAdd != nil && curHitSubview == self.curSimulLinkAdd {
+                curSimulLinkAdd.dequeueTrackFromAdding()
+                self.insertSubview(curHitSubview, atIndex: self.subviews.count - 5)
+                curSimulLinkAdd.queueTrackForAdding(curHitSubview as! Track)
+            } else if curSimulLinkAdd != nil && curHitSubview == curSimulLinkAdd {
                 println("WAS CURRENT ADDING LINK")
             } else if curHitSubview is SimulTrackLink {
                 print("DELETE, MOVE, OR CHANGE TRACK LINK")
             } else {
-                if self.curSimulLinkAdd != nil && self.curSimulLinkAdd.queuedTrackForAdding != nil {
-                    self.curSimulLinkAdd.dequeueTrackFromAdding()
+                if curSimulLinkAdd != nil && curSimulLinkAdd.queuedTrackForAdding != nil {
+                    curSimulLinkAdd.dequeueTrackFromAdding()
                 }
             }
             
@@ -177,16 +180,20 @@ class LinkManager: UIView {
             
         case "ADD_SIMUL_LINK":
             println("add simul link mode")
-            if self.curSimulLinkAdd != nil {
-                if self.curSimulLinkAdd.queuedTrackForAdding != nil {
-                    self.curSimulLinkAdd.commitEdgeToLink()
+            if curSimulLinkAdd != nil {
+                if curSimulLinkAdd.queuedTrackForAdding != nil {
+                    curSimulLinkAdd.commitEdgeToLink()
+                    if curSimulLinkAdd.linkEdges.count > 1 {
+                        curSimulLinkAdd.updateLinkCoreData()
+                    } else {
+                        curSimulLinkAdd.saveLinkCoreData(projectEntity)
+                    }
                 } else {
-                    self.curSimulLinkAdd.removeFromSuperview()
-                    self.curSimulLinkAdd.prepareForDelete()
+                    curSimulLinkAdd.deleteSimulTrackLink()
                 }
                 
-                self.curSimulLinkAdd.touchEnded(touches, withEvent: event)
-                self.curSimulLinkAdd = nil
+                curSimulLinkAdd.touchEnded(touches, withEvent: event)
+                curSimulLinkAdd = nil
             }
 
         case "ADD_SEQ_LINK":
@@ -233,5 +240,28 @@ class LinkManager: UIView {
                 }
             }
         }
+    }
+    
+    func getTrackByID(trackID: String) -> Track? {
+        for subview in self.subviews {
+            if subview is Track && (subview as! Track).trackID == trackID {
+                return (subview as! Track)
+            }
+        }
+        return nil
+    }
+    
+    func getTrackIndex(track: Track) -> Int {
+        var trackIndex = -1
+        for var i = self.subviews.count - 1; i >= 0; i-- {
+            var subview = subviews[i]
+            if subview is Track {
+                if (subview as! Track) == track {
+                    trackIndex = i
+                }
+            }
+        }
+        println(trackIndex)
+        return trackIndex
     }
 }
