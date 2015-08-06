@@ -57,8 +57,8 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             hasStoppedRecording = true
         
             audioPlayer = AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl, error: nil)
-            println("recording ready for playback!")
-        
+            audioPlayer.prepareToPlay()
+            
             audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
         
             drawWaveform()
@@ -108,6 +108,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         
         appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
+        
         self.layer.cornerRadius = 12
         self.clipsToBounds = true
         
@@ -313,7 +314,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         
             stopAudio()
             audioPlayer.play()
-        
+            
             //reset the progress view to beginning
             UIView.animateWithDuration(0.001, delay: 0.0, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveLinear, animations: { () -> Void in
                 self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
@@ -350,6 +351,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             recordedAudio.filePathUrl = recorder.url
             recordedAudio.title = recorder.url.lastPathComponent
             audioPlayer = AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl, error: nil)
+            audioPlayer.prepareToPlay()
             readyToPlay = true
             println("recording ready for playback!")
             

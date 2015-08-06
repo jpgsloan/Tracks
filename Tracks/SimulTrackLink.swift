@@ -79,6 +79,9 @@ class SimulTrackLink: UIView {
             }
             startTrackNode = curTouchedTrack
             self.curTouchLoc = touchLoc
+            var supervw = self.superview!
+            supervw.insertSubview(curTouchedTrack, atIndex: supervw.subviews.count - 4)
+            supervw.insertSubview(self, atIndex: supervw.subviews.count - 4)
         } else {
             var didTouchTrack = false
             touchHitEdge = true
@@ -149,11 +152,11 @@ class SimulTrackLink: UIView {
                         var track = (self.superview as! LinkManager).getTrackByID(trackID)
                         track!.touchEnded(touches, withEvent: event)
                     }
-                    self.wasDragged = false
+                    wasDragged = false
                 } else {
-                    self.wasDragged = false
-                    self.curTouchedTrack.touchEnded(touches, withEvent: event)
-                    self.curTouchedTrack = nil
+                    wasDragged = false
+                    curTouchedTrack.touchEnded(touches, withEvent: event)
+                    curTouchedTrack = nil
                 }
             } else {
                 for trackID in trackNodeIDs {
@@ -191,8 +194,25 @@ class SimulTrackLink: UIView {
     override func drawRect(rect: CGRect) {
         drawLinkEdges()
         drawTrackNodeOutlines()
-        if mode == "ADD_SIMUL_LINK" && self.curTouchedTrack != nil {
+        if mode == "ADD_SIMUL_LINK" && curTouchedTrack != nil {
             drawCurLinkAdd()
+        }
+    }
+    
+    func drawLinkEdges() {
+        var context = UIGraphicsGetCurrentContext()
+        CGContextSetStrokeColorWithColor(context, UIColor.blueColor().colorWithAlphaComponent(1).CGColor)
+        CGContextSetLineWidth(context, 8)
+        for linkEdge in linkEdges {
+            //For each link, paint line from one track node to the other.
+            CGContextBeginPath(context)
+            CGContextMoveToPoint(context, linkEdge.startTrackNode.center.x, linkEdge.startTrackNode.center.y)
+            CGContextAddLineToPoint(context, linkEdge.endTrackNode.center.x, linkEdge.endTrackNode.center.y)
+            CGContextStrokePath(context)
+        }
+        for linkEdge in linkEdges {
+            eraseLineOnTrack(linkEdge.startTrackNode)
+            eraseLineOnTrack(linkEdge.endTrackNode)
         }
     }
     
@@ -217,23 +237,6 @@ class SimulTrackLink: UIView {
             outline.stroke()*/
             self.queuedTrackForAdding.layer.borderColor = UIColor.blueColor().colorWithAlphaComponent(0.4).CGColor
             self.queuedTrackForAdding.layer.borderWidth = 5
-        }
-    }
-    
-    func drawLinkEdges() {
-        var context = UIGraphicsGetCurrentContext()
-        CGContextSetStrokeColorWithColor(context, UIColor.blueColor().colorWithAlphaComponent(1).CGColor)
-        CGContextSetLineWidth(context, 8)
-        for linkEdge in linkEdges {
-            //For each link, paint line from one track node to the other.
-            CGContextBeginPath(context)
-            CGContextMoveToPoint(context, linkEdge.startTrackNode.center.x, linkEdge.startTrackNode.center.y)
-            CGContextAddLineToPoint(context, linkEdge.endTrackNode.center.x, linkEdge.endTrackNode.center.y)
-            CGContextStrokePath(context)
-        }
-        for linkEdge in linkEdges {
-            eraseLineOnTrack(linkEdge.startTrackNode)
-            eraseLineOnTrack(linkEdge.endTrackNode)
         }
     }
     

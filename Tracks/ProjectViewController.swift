@@ -27,6 +27,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     var statusBarBackgroundView: UIVisualEffectView!
     var sideBarOpenBackgroundView: UIView!
     var drawView: DrawView!
+    var seqLinksButton: UIButton!
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var navigationBar: UINavigationBar!
     @IBOutlet weak var navBarVertConstraint: NSLayoutConstraint!
@@ -216,12 +217,23 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         exitButton.addTarget(self, action: "exitAddLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
         exitButton.adjustsImageWhenHighlighted = true
         self.view.insertSubview(exitButton, atIndex: 4)
+        
+        //create sequential links button to allow creation of seq links
+        seqLinksButton = UIButton(frame: CGRect(x: 60, y: self.view.frame.height - 40, width: 40, height: 20))
+        seqLinksButton.setTitle("Seq Links", forState: UIControlState.Normal)
+        seqLinksButton.addTarget(self, action: "changeToSeqLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
+        seqLinksButton.adjustsImageWhenHighlighted = true
+        self.view.insertSubview(seqLinksButton, atIndex: 4)
+        
     }
     
     func exitAddLinkMode(sender: UIButton) {
-        if linkManager.mode == "ADD_SIMUL_LINK" {
+        if linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SEQ_LINK" {
             linkManager.mode = ""
             for link in linkManager.allSimulLink {
+                link.mode = ""
+            }
+            for link in linkManager.allSeqLink {
                 link.mode = ""
             }
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
@@ -233,7 +245,19 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
                 }) { (bool:Bool) -> Void in
             }
             self.view.bringSubviewToFront(navigationBar)
+            seqLinksButton.removeFromSuperview()
             sender.removeFromSuperview()
+        }
+    }
+    
+    func changeToSeqLinkMode(sender: UIButton) {
+        println("changing to seq link mode")
+        linkManager.mode = "ADD_SEQ_LINK"
+        for link in linkManager.allSimulLink {
+            link.mode = "ADD_SEQ_LINK"
+        }
+        for link in linkManager.allSeqLink {
+            link.mode = "ADD_SEQ_LINK"
         }
     }
     
