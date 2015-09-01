@@ -196,7 +196,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     @IBAction func addLinkMode(sender: UIBarButtonItem) {
         if linkManager.mode != "ADD_SIMUL_LINK" {
             linkManager.mode = "ADD_SIMUL_LINK"
-            for link in linkManager.allSimulLink {
+            for link in linkManager.allTrackLinks {
                 link.mode = "ADD_SIMUL_LINK"
             }
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
@@ -230,10 +230,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     func exitAddLinkMode(sender: UIButton) {
         if linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SEQ_LINK" {
             linkManager.mode = ""
-            for link in linkManager.allSimulLink {
-                link.mode = ""
-            }
-            for link in linkManager.allSeqLink {
+            for link in linkManager.allTrackLinks {
                 link.mode = ""
             }
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
@@ -253,10 +250,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     func changeToSeqLinkMode(sender: UIButton) {
         println("changing to seq link mode")
         linkManager.mode = "ADD_SEQ_LINK"
-        for link in linkManager.allSimulLink {
-            link.mode = "ADD_SEQ_LINK"
-        }
-        for link in linkManager.allSeqLink {
+        for link in linkManager.allTrackLinks {
             link.mode = "ADD_SEQ_LINK"
         }
     }
@@ -381,32 +375,23 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
         var results: NSArray = context.executeFetchRequest(request, error: nil)!
-        //for result in results {
         if (results.count > 0) {
             var res = results[0] as! ProjectEntity
-            for link in res.simulLink {
-                var simulLinkEntity = link as! SimulLinkEntity
-                println("LINK")
-                //Get Track and edge IDs (edges are two track ids, start and end)
-                var trackIDs = NSKeyedUnarchiver.unarchiveObjectWithData(simulLinkEntity.tracks) as! Array<String>
-                var edgeIDs = NSKeyedUnarchiver.unarchiveObjectWithData(simulLinkEntity.edges) as! Array<Array<String>>
+            for link in res.link {
+                var linkEntity = link as! LinkEntity
+                println("Loading link")
+                //Get stored array of tracklink nodes and create new link
+                var linkNodes = NSKeyedUnarchiver.unarchiveObjectWithData(linkEntity.linkNodes) as! [TrackLinkNode]
                 
-                //Translate ID to track objects
-                var linkEdges = Array<LinkEdge>()
-                for edge in edgeIDs {
-                    println("edge")
-                    var startTrackNode = linkManager.getTrackByID(edge[0])
-                    var endTrackNode = linkManager.getTrackByID(edge[1])
-                    print("start: ")
-                    println(startTrackNode)
-                    print("end: ")
-                    println(endTrackNode)
-                    var newEdge = LinkEdge(startTrackNode: startTrackNode!, endTrackNode: endTrackNode!)
-                    linkEdges.append(newEdge)
+                //Create audioplayer dictionary from linkNodes
+                var trackNodeIDs: [AVAudioPlayer:TrackLinkNode] = [AVAudioPlayer:TrackLinkNode]()
+                for node in linkNodes {
+                    var track = (self.view as! LinkManager).getTrackByID(node.rootTrackID)
+                    trackNodeIDs[track!.audioPlayer] = node
                 }
                 
-                var linkToAdd = SimulTrackLink(frame: self.view.frame, withTrackIDs: trackIDs, linkEdges: linkEdges, andLinkID: simulLinkEntity.simulLinkID)
-                linkManager.allSimulLink.append(linkToAdd)
+                var linkToAdd = TrackLink(frame: self.view.frame, withTrackNodeIDs: trackNodeIDs, rootTrackID: linkEntity.rootTrackID, linkID: linkEntity.linkID)
+                linkManager.allTrackLinks.append(linkToAdd)
                 self.view.addSubview(linkToAdd)
             }
         }

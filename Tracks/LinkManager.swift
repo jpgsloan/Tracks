@@ -12,13 +12,11 @@ import AVFoundation
 class LinkManager: UIView {
 
     var mode: String = ""
-    var allSimulLink: [SimulTrackLink] = [SimulTrackLink]()
-    var allSeqLink: [SeqTrackLink] = [SeqTrackLink]()
+    var allTrackLinks: [TrackLink] = [TrackLink]()
     var firstHitSubview = UIView()
     var addLinkStartLoc: CGPoint!
     var addLinkCurMovedLoc: CGPoint!
-    var curSimulLinkAdd: SimulTrackLink!
-    var curSeqLinkAdd: SeqTrackLink!
+    var curTrackLinkAdd: TrackLink!
     var projectEntity: ProjectEntity!
     
     override init(frame: CGRect) {
@@ -36,30 +34,27 @@ class LinkManager: UIView {
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
         let touch = touches.first as! UITouch
         var location: CGPoint = touch.locationInView(touch.window)
-        println("TOUCHED IN LINK MANAGER")
+        println("TOUCHED IN LINK MANAGER BEGAN")
         //Find the subview hit by touch
         firstHitSubview = UIView()
+        println("------------------")
+        for var i = self.subviews.count - 1; i >= 0; i-- {
+            var subview = self.subviews[i]
+            println(subview)
+        }
+        println("------------------")
+
         for var i = self.subviews.count - 1; i >= 0; i-- {
             var subview = self.subviews[i]
             if subview is LinkManager {
                 continue
-            } else if subview is Track {
+            } else if subview is Track || subview is DrawView {
                 if subview.frame.contains(location) {
                     firstHitSubview = subview as! UIView
                     break
                 }
-            } else if subview is SimulTrackLink {
+            } else if subview is TrackLink {
                 if subview.pointInside(location, withEvent: event) {
-                    firstHitSubview = subview as! UIView
-                    break
-                }
-            } else if subview is SeqTrackLink {
-                if subview.pointInside(location, withEvent: event) {
-                    firstHitSubview = subview as! UIView
-                    break
-                }
-            } else if subview is DrawView {
-                if subview.frame.contains(location) {
                     firstHitSubview = subview as! UIView
                     break
                 }
@@ -69,54 +64,34 @@ class LinkManager: UIView {
         print("FIRST HIT SUBVIEW: ")
         println(firstHitSubview)
     
-        switch mode {
-            
-        case "ADD_SIMUL_LINK":
+        if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             if firstHitSubview is Track {
-                var newLink = SimulTrackLink(frame: self.frame, withTrack: firstHitSubview as! Track)
-                newLink.mode = "ADD_SIMUL_LINK"
-                allSimulLink.append(newLink)
-                curSimulLinkAdd = newLink
+                var newLink = TrackLink(frame: self.frame, withTrack: firstHitSubview as! Track)
+                newLink.mode = mode
+                allTrackLinks.append(newLink)
+                curTrackLinkAdd = newLink
                 self.insertSubview(firstHitSubview, atIndex: self.subviews.count - 4)
                 self.insertSubview(newLink, atIndex: self.subviews.count - 4)
+                newLink.saveLinkCoreData(projectEntity)
                 newLink.touchBegan(touches, withEvent: event)
-            } else if firstHitSubview is SimulTrackLink {
-                print("DELETE, MOVE, OR CHANGE TRACK LINK")
-                curSimulLinkAdd = (firstHitSubview as! SimulTrackLink)
-                (firstHitSubview as! SimulTrackLink).touchBegan(touches, withEvent: event)
-            }
-            
-        case "ADD_SEQ_LINK":
-            if firstHitSubview is Track {
-                var newLink = SeqTrackLink(frame: self.frame, withTrack: firstHitSubview as! Track)
-                newLink.mode = "ADD_SEQ_LINK"
-                allSeqLink.append(newLink)
-                curSeqLinkAdd = newLink
-                self.insertSubview(firstHitSubview, atIndex: self.subviews.count - 4)
-                self.insertSubview(newLink, atIndex: self.subviews.count - 4)
-                newLink.touchBegan(touches, withEvent: event)
-            } else if firstHitSubview is SeqTrackLink {
+            } else if firstHitSubview is TrackLink {
                 println("DELETE, MOVE, OR CHANGE TRACK LINK")
-                curSeqLinkAdd = (firstHitSubview as! SeqTrackLink)
-                (firstHitSubview as! SeqTrackLink).touchBegan(touches, withEvent: event)
+                curTrackLinkAdd = (firstHitSubview as! TrackLink)
+                curTrackLinkAdd.touchBegan(touches, withEvent: event)
             }
-            
-        case "TRASH":
+        } else if mode == "TRASH" {
             if firstHitSubview is Track {
                 (firstHitSubview as! Track).deleteTrack()
-            } else if firstHitSubview is SimulTrackLink {
-                (firstHitSubview as! SimulTrackLink).deleteSimulTrackLink()
+            } else if firstHitSubview is TrackLink {
+                (firstHitSubview as! TrackLink).deleteTrackLink()
             } else if firstHitSubview is DrawView {
-            
+                //Do nothing
             }
-            
-        default:
+        } else {
             if firstHitSubview is Track {
                 (firstHitSubview as! Track).touchBegan(touches, withEvent: event)
-            } else if firstHitSubview is SimulTrackLink {
-                (firstHitSubview as! SimulTrackLink).touchBegan(touches, withEvent: event)
-            } else if firstHitSubview is SeqTrackLink {
-                (firstHitSubview as! SeqTrackLink).touchBegan(touches, withEvent: event)
+            } else if firstHitSubview is TrackLink {
+                (firstHitSubview as! TrackLink).touchBegan(touches, withEvent: event)
             } else if firstHitSubview is DrawView {
                 (firstHitSubview as! DrawView).touchBegan(touches, withEvent: event)
             } else {
@@ -128,9 +103,7 @@ class LinkManager: UIView {
     override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
         println("TOUCHES MOVED LINK MANAGER")
         
-        switch mode {
-            
-        case "ADD_SIMUL_LINK":
+        if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             let touch = touches.first as! UITouch
             var location: CGPoint = touch.locationInView(self)
             //determine the subview that is currently hit by moved touch
@@ -144,7 +117,7 @@ class LinkManager: UIView {
                         curHitSubview = subview as! UIView
                         break
                     }
-                } else if subview is SimulTrackLink {
+                } else if subview is TrackLink {
                     if subview.pointInside(location, withEvent: event) {
                         curHitSubview = subview as! UIView
                         break
@@ -155,78 +128,30 @@ class LinkManager: UIView {
             println(curHitSubview)
             
             if curHitSubview is Track {
-                curSimulLinkAdd.dequeueTrackFromAdding()
+                curTrackLinkAdd.dequeueTrackFromAdding()
                 self.insertSubview(curHitSubview, atIndex: self.subviews.count - 6)
-                curSimulLinkAdd.queueTrackForAdding(curHitSubview as! Track)
-            } else if curSimulLinkAdd != nil && curHitSubview == curSimulLinkAdd {
+                curTrackLinkAdd.queueTrackForAdding(curHitSubview as! Track)
+            } else if curTrackLinkAdd != nil && curHitSubview == curTrackLinkAdd {
                 println("WAS CURRENT ADDING LINK")
-                curSimulLinkAdd.dequeueTrackFromAdding()
-            } else if curHitSubview is SimulTrackLink {
+                curTrackLinkAdd.dequeueTrackFromAdding()
+            } else if curHitSubview is TrackLink {
                 print("DELETE, MOVE, OR CHANGE TRACK LINK")
             } else {
-                if curSimulLinkAdd != nil && curSimulLinkAdd.queuedTrackForAdding != nil {
-                    curSimulLinkAdd.dequeueTrackFromAdding()
+                if curTrackLinkAdd != nil && curTrackLinkAdd.queuedTrackForAdding != nil {
+                    curTrackLinkAdd.dequeueTrackFromAdding()
                 }
             }
             
-            //self.addLinkCurMovedLoc = location
-            if self.curSimulLinkAdd != nil {
-                self.curSimulLinkAdd.touchMoved(touches, withEvent: event)
+            if curTrackLinkAdd != nil {
+                curTrackLinkAdd.touchMoved(touches, withEvent: event)
             }
-            
-        case "ADD_SEQ_LINK":
-            let touch = touches.first as! UITouch
-            var location: CGPoint = touch.locationInView(self)
-            //determine the subview that is currently hit by moved touch
-            var curHitSubview = UIView()
-            for var i = self.subviews.count - 1; i >= 0; i-- {
-                var subview = subviews[i]
-                if subview is LinkManager {
-                    continue
-                } else if subview is Track {
-                    if subview.frame.contains(location) {
-                        curHitSubview = subview as! UIView
-                        break
-                    }
-                } else if subview is SeqTrackLink {
-                    if subview.pointInside(location, withEvent: event) {
-                        curHitSubview = subview as! UIView
-                        break
-                    }
-                }
-            }
-            
-            println(curHitSubview)
-            
-            if curHitSubview is Track {
-                curSeqLinkAdd.dequeueTrackFromAdding()
-                self.insertSubview(curHitSubview, atIndex: self.subviews.count - 6)
-                curSeqLinkAdd.queueTrackForAdding(curHitSubview as! Track)
-            } else if curSeqLinkAdd != nil && curHitSubview == curSeqLinkAdd {
-                println("WAS CURRENT ADDING LINK")
-                curSeqLinkAdd.dequeueTrackFromAdding()
-            } else if curHitSubview is SeqTrackLink {
-                print("DELETE, MOVE, OR CHANGE TRACK LINK")
-            } else {
-                if curSeqLinkAdd != nil && curSeqLinkAdd.queuedTrackForAdding != nil {
-                    curSeqLinkAdd.dequeueTrackFromAdding()
-                }
-            }
-            
-            if self.curSeqLinkAdd != nil {
-                self.curSeqLinkAdd.touchMoved(touches, withEvent: event)
-            }
-            
-        case "TRASH":
-            break //do nothing
-            
-        default:
+        } else if mode == "TRASH" {
+            //Do nothing
+        } else {
             if firstHitSubview is Track {
                 (firstHitSubview as! Track).touchMoved(touches, withEvent: event)
-            } else if firstHitSubview is SimulTrackLink {
-                (firstHitSubview as! SimulTrackLink).touchMoved(touches, withEvent: event)
-            } else if firstHitSubview is SeqTrackLink {
-                (firstHitSubview as! SeqTrackLink).touchMoved(touches, withEvent: event)
+            } else if firstHitSubview is TrackLink {
+                (firstHitSubview as! TrackLink).touchMoved(touches, withEvent: event)
             } else if firstHitSubview is DrawView {
                 (firstHitSubview as! DrawView).touchMoved(touches, withEvent: event)
             } else {
@@ -238,56 +163,29 @@ class LinkManager: UIView {
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
         println("TOUCHES ENDED LINK MANAGER")
         
-        switch mode {
-            
-        case "ADD_SIMUL_LINK":
-            println("add simul link mode")
-            if curSimulLinkAdd != nil {
-                if curSimulLinkAdd.queuedTrackForAdding != nil {
-                    curSimulLinkAdd.commitEdgeToLink()
-                    if curSimulLinkAdd.linkEdges.count > 1 {
-                        curSimulLinkAdd.updateLinkCoreData()
-                    } else {
-                        curSimulLinkAdd.saveLinkCoreData(projectEntity)
-                    }
+        if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
+            print("add link mode: ")
+            println(mode)
+            if curTrackLinkAdd != nil {
+                if curTrackLinkAdd.queuedTrackForAdding != nil {
+                    curTrackLinkAdd.commitEdgeToLink()
+                    curTrackLinkAdd.bringTrackLinkToFront()
                 } else {
-                    curSimulLinkAdd.deleteSimulTrackLink()
+                    curTrackLinkAdd.deleteTrackLink()
                 }
                 
-                curSimulLinkAdd.touchEnded(touches, withEvent: event)
-                curSimulLinkAdd = nil
+                curTrackLinkAdd.touchEnded(touches, withEvent: event)
+                curTrackLinkAdd = nil
             }
-
-        case "ADD_SEQ_LINK":
-            println("add seq link mode")
-            if curSeqLinkAdd != nil {
-                if curSeqLinkAdd.queuedTrackForAdding != nil {
-                    curSeqLinkAdd.commitEdgeToLink()
-                    /*if curSeqLinkAdd.linkEdges.count > 1 {
-                        curSeqLinkAdd.updateLinkCoreData()
-                    } else {
-                        curSeqLinkAdd.saveLinkCoreData(projectEntity)
-                    }*/
-                } else {
-                    curSeqLinkAdd.deleteSeqTrackLink()
-                }
-                
-                curSeqLinkAdd.touchEnded(touches, withEvent: event)
-                curSeqLinkAdd = nil
-            }
-        
-        case "TRASH":
+        } else if mode == "TRASH" {
             println("trash mode")
-            break //do nothing
-            
-        default:
+            //do nothing
+        } else {
             println("normal mode")
             if firstHitSubview is Track {
                 (firstHitSubview as! Track).touchEnded(touches, withEvent: event)
-            } else if firstHitSubview is SimulTrackLink {
-                (firstHitSubview as! SimulTrackLink).touchEnded(touches, withEvent: event)
-            } else if firstHitSubview is SeqTrackLink {
-                (firstHitSubview as! SeqTrackLink).touchEnded(touches, withEvent: event)
+            } else if firstHitSubview is TrackLink {
+                (firstHitSubview as! TrackLink).touchEnded(touches, withEvent: event)
             } else if firstHitSubview is DrawView {
                 (firstHitSubview as! DrawView).touchEnded(touches, withEvent: event)
             } else {
@@ -311,7 +209,7 @@ class LinkManager: UIView {
                         }
                         break
                     }
-                } else if subview is SimulTrackLink {
+                } else if subview is TrackLink {
                     if subview.pointInside(location, withEvent: nil) {
                         break
                     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7549" systemVersion="14B25" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14B25" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="DrawViewEntity" representedClassName="DrawViewEntity" syncable="YES">
         <attribute name="allLines" optional="YES" attributeType="Binary" syncable="YES"/>
         <relationship name="projectEntity" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectEntity" inverseName="drawView" inverseEntity="ProjectEntity" syncable="YES"/>
@@ -8,17 +8,17 @@
         <attribute name="projectID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="projectName" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
+    <entity name="LinkEntity" representedClassName="LinkEntity" syncable="YES">
+        <attribute name="linkID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="linkNodes" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="rootTrackID" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectEntity" inverseName="link" inverseEntity="ProjectEntity" syncable="YES"/>
+    </entity>
     <entity name="ProjectEntity" representedClassName="ProjectEntity" syncable="YES">
         <attribute name="projectID" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="drawView" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DrawViewEntity" inverseName="projectEntity" inverseEntity="DrawViewEntity" syncable="YES"/>
-        <relationship name="simulLink" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SimulLinkEntity" inverseName="project" inverseEntity="SimulLinkEntity" syncable="YES"/>
+        <relationship name="link" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="LinkEntity" inverseName="project" inverseEntity="LinkEntity" syncable="YES"/>
         <relationship name="track" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TrackEntity" inverseName="project" inverseEntity="TrackEntity" syncable="YES"/>
-    </entity>
-    <entity name="SimulLinkEntity" representedClassName="SimulLinkEntity" syncable="YES">
-        <attribute name="edges" optional="YES" attributeType="Binary" syncable="YES"/>
-        <attribute name="simulLinkID" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="tracks" optional="YES" attributeType="Binary" syncable="YES"/>
-        <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectEntity" inverseName="simulLink" inverseEntity="ProjectEntity" syncable="YES"/>
     </entity>
     <entity name="TableViewDataEntity" representedClassName="TableViewDataEntity" syncable="YES">
         <attribute name="tableData" optional="YES" attributeType="Binary" syncable="YES"/>
@@ -30,10 +30,10 @@
     </entity>
     <elements>
         <element name="DrawViewEntity" positionX="-126" positionY="-1" width="128" height="73"/>
-        <element name="LastOpenProjectEntity" positionX="160" positionY="72" width="128" height="75"/>
-        <element name="ProjectEntity" positionX="169" positionY="245" width="128" height="103"/>
-        <element name="TableViewDataEntity" positionX="160" positionY="-0" width="128" height="58"/>
+        <element name="LastOpenProjectEntity" positionX="187" positionY="0" width="128" height="75"/>
+        <element name="LinkEntity" positionX="-180" positionY="90" width="128" height="103"/>
+        <element name="ProjectEntity" positionX="187" positionY="275" width="128" height="105"/>
+        <element name="TableViewDataEntity" positionX="187" positionY="-72" width="128" height="58"/>
         <element name="TrackEntity" positionX="-216" positionY="215" width="128" height="88"/>
-        <element name="SimulLinkEntity" positionX="-162" positionY="108" width="126" height="103"/>
     </elements>
 </model>
