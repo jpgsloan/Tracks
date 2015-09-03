@@ -11,7 +11,7 @@ import UIKit
 import QuartzCore
 import CoreData
 
-class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITextFieldDelegate {
+class ProjectViewController: UIViewController, UITextFieldDelegate {
     
     var filemanager = NSFileManager.defaultManager()
     var projectDirectory: String!
@@ -22,10 +22,10 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
     var tracks: NSMutableArray = []
-    var notesView: UITextView!
-    var notesExpanded: Bool!
+    var notesView: NotesView!
     var statusBarBackgroundView: UIVisualEffectView!
     var sideBarOpenBackgroundView: UIView!
+    var notesOpenBackgroundView: UIView!
     var drawView: DrawView!
     var seqLinksButton: UIButton!
     @IBOutlet weak var titleTextField: UITextField!
@@ -66,8 +66,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         self.navigationBar.translucent = true
         
         // Create notesView
-        notesView = NotesTextView(frame: CGRect(x: 0, y: self.view.frame.height, width: self.view.frame.width, height: 0.0))
-        notesExpanded = false
+        notesView = NotesView(frame: self.view.bounds)
         
         // Check if project folder already exists
         let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
@@ -120,7 +119,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         
         loadTracks()
         loadLinks()
-        self.view.addSubview(notesView)
         self.view.bringSubviewToFront(statusBarBackgroundView)
         self.view.bringSubviewToFront(navigationBar)
         self.view.bringSubviewToFront(toolbar)
@@ -166,7 +164,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         var tapGesture = UITapGestureRecognizer(target: self, action: "closeSideBarVC:")
         tapGesture.numberOfTapsRequired = 1
         sideBarOpenBackgroundView.addGestureRecognizer(tapGesture)
-        drawView.sideBarOpenLock = true
+        (self.view as! LinkManager).mode = "NOTOUCHES"
         self.view.addSubview(sideBarOpenBackgroundView)
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             self.sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.5)
@@ -184,7 +182,7 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         })
         
         (parentViewController as! ProjectManagerViewController).closeSideBarVC()
-        drawView.sideBarOpenLock = false
+        (self.view as! LinkManager).mode = ""
     }
     
     func sideBarClosed() {
@@ -202,9 +200,9 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 //change background color and remove toolbars to show current mode
                 self.drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor
-                self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.navigationBar.frame.origin.y
-                self.toolbarVertConstraint.constant -= self.toolbar.frame.height
-                self.statusBarBackgroundView.frame.origin.y -= self.statusBarBackgroundView.frame.height
+                self.navBarVertConstraint.constant = -100
+                self.toolbarVertConstraint.constant = -100
+                self.statusBarBackgroundView.frame.origin.y = -100
                 self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
@@ -235,9 +233,9 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             }
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
-                self.navBarVertConstraint.constant += self.navigationBar.frame.height + 20
-                self.toolbarVertConstraint.constant += self.toolbar.frame.height
-                self.statusBarBackgroundView.frame.origin.y += self.statusBarBackgroundView.frame.height
+                self.navBarVertConstraint.constant = 20
+                self.toolbarVertConstraint.constant = 15
+                self.statusBarBackgroundView.frame.origin.y = 0
                 self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
@@ -267,28 +265,15 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
     }
    
     @IBAction func toggleNotes(sender: UIBarButtonItem) {
-        self.view.insertSubview(notesView, atIndex: self.view.subviews.count - 4)
-        if notesExpanded! {
-            var tmpFrame: CGRect = notesView.frame
-            tmpFrame.size.height = 0
-            tmpFrame.origin.y = self.view.frame.height
-            UIView.beginAnimations("", context: nil)
-            UIView.setAnimationDuration(0.2)
-            notesView.frame = tmpFrame
-            UIView.commitAnimations()
-            notesExpanded = false
-        } else {
-            var tmpFrame: CGRect = notesView.frame
-            tmpFrame.size.height = 460 - toolbar.frame.height
-            tmpFrame.size.width = self.view.frame.width
-            tmpFrame.origin.y = self.view.frame.height - 460
-            UIView.beginAnimations("", context: nil)
-            UIView.setAnimationDuration(0.2)
-            notesView.frame = tmpFrame
-            UIView.commitAnimations()
-            notesExpanded = true
-        }
-
+        // add notes view
+        notesView.frame = self.view.frame
+        self.view.addSubview(notesView)
+        
+        var tmpFrame: CGRect = notesView.frame
+        tmpFrame.size.height = 460 - toolbar.frame.height
+        tmpFrame.size.width = self.view.frame.width
+        tmpFrame.origin.y = self.view.frame.height - 460
+        notesView.openNotes(tmpFrame)
     }
     
     @IBAction func enterTrashMode(sender: UIBarButtonItem) {
@@ -296,9 +281,9 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             linkManager.mode = "TRASH"
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                     self.drawView.layer.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.5).CGColor
-                    self.navBarVertConstraint.constant -= self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
-                    self.toolbarVertConstraint.constant -= self.toolbar.frame.height + 15
-                    self.statusBarBackgroundView.frame.origin.y -= self.statusBarBackgroundView.frame.height
+                    self.navBarVertConstraint.constant = -100
+                    self.toolbarVertConstraint.constant = -100
+                    self.statusBarBackgroundView.frame.origin.y = -100
                     self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
@@ -316,9 +301,9 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
             linkManager.mode = ""
             UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
-                self.navBarVertConstraint.constant += self.navigationBar.frame.height + self.statusBarBackgroundView.frame.height
-                self.toolbarVertConstraint.constant += self.toolbar.frame.height + 15
-                self.statusBarBackgroundView.frame.origin.y += self.statusBarBackgroundView.frame.height
+                self.navBarVertConstraint.constant = 20
+                self.toolbarVertConstraint.constant = 15
+                self.statusBarBackgroundView.frame.origin.y = 0
                 self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
@@ -331,14 +316,6 @@ class ProjectViewController: UIViewController, UIGestureRecognizerDelegate, UITe
         var projectName = titleTextField.text
         (parentViewController as! ProjectManagerViewController).updateProjectName(projectID, projectName: projectName)
         return true
-    }
-    
-    func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer is UILongPressGestureRecognizer {
-            return true
-        } else {
-            return false
-        }
     }
     
     override func supportedInterfaceOrientations() -> Int {

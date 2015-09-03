@@ -20,12 +20,13 @@
 		11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEA1A9EB19800E09069 /* TrackColors.swift */; };
 		11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AF31A9EB1B000E09069 /* DrawView.swift */; };
 		11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11493AF51A9EB96F00E09069 /* Main.storyboard */; };
-		11584D2D1AB5EEA60035F715 /* NotesTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11584D2C1AB5EEA60035F715 /* NotesTextView.swift */; };
 		1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */; };
 		1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3801AA6EBB10066A52E /* TrackEntity.swift */; };
 		116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */; };
 		116A71371AD8D5D9003CD4C7 /* ProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */; };
 		1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */; };
+		11ABD8491B98D7B10048F1F9 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11ABD8481B98D7B10048F1F9 /* NotesView.swift */; };
+		11ABD84B1B98D9B70048F1F9 /* NotesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11ABD84A1B98D9B70048F1F9 /* NotesView.xib */; };
 		11C8F5EF1B7406B100BDD37C /* TrackLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C8F5EE1B7406B100BDD37C /* TrackLink.swift */; };
 		11C8F5F11B74081B00BDD37C /* TrackLinkNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C8F5F01B74081B00BDD37C /* TrackLinkNode.swift */; };
 		11C8F5F71B7C09FE00BDD37C /* LinkEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C8F5F61B7C09FE00BDD37C /* LinkEntity.swift */; };
@@ -67,12 +68,13 @@
 		11493AEA1A9EB19800E09069 /* TrackColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackColors.swift; sourceTree = "<group>"; };
 		11493AF31A9EB1B000E09069 /* DrawView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawView.swift; sourceTree = "<group>"; };
 		11493AF51A9EB96F00E09069 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		11584D2C1AB5EEA60035F715 /* NotesTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesTextView.swift; sourceTree = "<group>"; };
 		1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TracksDataModel.xcdatamodel; sourceTree = "<group>"; };
 		1162B3801AA6EBB10066A52E /* TrackEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
 		116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectManagerViewController.swift; sourceTree = "<group>"; };
 		116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectViewController.xib; sourceTree = "<group>"; };
 		1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SelectProjectViewController.xib; sourceTree = "<group>"; };
+		11ABD8481B98D7B10048F1F9 /* NotesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
+		11ABD84A1B98D9B70048F1F9 /* NotesView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotesView.xib; sourceTree = "<group>"; };
 		11C7FF3B1A9EC0320055879C /* Tracks-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tracks-Bridging-Header.h"; sourceTree = "<group>"; };
 		11C8F5EE1B7406B100BDD37C /* TrackLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackLink.swift; sourceTree = "<group>"; };
 		11C8F5F01B74081B00BDD37C /* TrackLinkNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackLinkNode.swift; sourceTree = "<group>"; };
@@ -143,7 +145,8 @@
 				11C8F5EE1B7406B100BDD37C /* TrackLink.swift */,
 				11C8F5F01B74081B00BDD37C /* TrackLinkNode.swift */,
 				11DCE8C31AFD90750099BFEE /* LinkEdge.swift */,
-				11584D2C1AB5EEA60035F715 /* NotesTextView.swift */,
+				11ABD8481B98D7B10048F1F9 /* NotesView.swift */,
+				11ABD84A1B98D9B70048F1F9 /* NotesView.xib */,
 				11493AF31A9EB1B000E09069 /* DrawView.swift */,
 				11493AE61A9EB19800E09069 /* Line.swift */,
 				11493AE91A9EB19800E09069 /* Track.swift */,
@@ -296,6 +299,7 @@
 				11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */,
 				11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */,
 				1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */,
+				11ABD84B1B98D9B70048F1F9 /* NotesView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,13 +356,13 @@
 				11DCE8C41AFD90750099BFEE /* LinkEdge.swift in Sources */,
 				11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */,
 				111302FE1AFC8421002EA4B1 /* LinkManager.swift in Sources */,
+				11ABD8491B98D7B10048F1F9 /* NotesView.swift in Sources */,
 				11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */,
 				11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */,
 				11C8F5F91B7C0A6A00BDD37C /* ProjectEntity.swift in Sources */,
 				116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */,
 				1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */,
 				11493AED1A9EB19800E09069 /* Line.swift in Sources */,
-				11584D2D1AB5EEA60035F715 /* NotesTextView.swift in Sources */,
 				11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */,
 				11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */,
 				11493AEF1A9EB19800E09069 /* RecordedAudio.swift in Sources */,

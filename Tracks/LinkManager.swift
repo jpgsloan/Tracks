@@ -28,6 +28,7 @@ class LinkManager: UIView {
         self.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
         var longPressEdit = UILongPressGestureRecognizer(target: self, action: "changeTrackToEditMode:")
         longPressEdit.numberOfTapsRequired = 0
+        longPressEdit.allowableMovement = CGFloat(2)
         self.addGestureRecognizer(longPressEdit)
     }
     
@@ -87,6 +88,8 @@ class LinkManager: UIView {
             } else if firstHitSubview is DrawView {
                 //Do nothing
             }
+        } else if mode == "NOTOUCHES" {
+            //Do nothing
         } else {
             if firstHitSubview is Track {
                 (firstHitSubview as! Track).touchBegan(touches, withEvent: event)
@@ -147,12 +150,17 @@ class LinkManager: UIView {
             }
         } else if mode == "TRASH" {
             //Do nothing
+        } else if mode == "NOTOUCHES" {
+            //Do nothing
         } else {
             if firstHitSubview is Track {
+                hideToolbars(true)
                 (firstHitSubview as! Track).touchMoved(touches, withEvent: event)
             } else if firstHitSubview is TrackLink {
+                hideToolbars(true)
                 (firstHitSubview as! TrackLink).touchMoved(touches, withEvent: event)
             } else if firstHitSubview is DrawView {
+                hideToolbars(true)
                 (firstHitSubview as! DrawView).touchMoved(touches, withEvent: event)
             } else {
                 println("UIVIEW")
@@ -180,13 +188,19 @@ class LinkManager: UIView {
         } else if mode == "TRASH" {
             println("trash mode")
             //do nothing
+        } else if mode == "NOTOUCHES" {
+            println("no touches mode (used for open notes and sidebar)")
+            //Do nothing
         } else {
             println("normal mode")
             if firstHitSubview is Track {
+                hideToolbars(false)
                 (firstHitSubview as! Track).touchEnded(touches, withEvent: event)
             } else if firstHitSubview is TrackLink {
+                hideToolbars(false)
                 (firstHitSubview as! TrackLink).touchEnded(touches, withEvent: event)
             } else if firstHitSubview is DrawView {
+                hideToolbars(false)
                 (firstHitSubview as! DrawView).touchEnded(touches, withEvent: event)
             } else {
                 println("OTHER UIVIEW")
@@ -194,9 +208,67 @@ class LinkManager: UIView {
         }
     }
     
+    func hideToolbars(shouldHide: Bool) {
+        var navigationBar: UINavigationBar?
+        var toolbar: UIToolbar?
+        var statusBarBackground: UIVisualEffectView?
+        for var i = self.subviews.count - 1; i >= 0; i-- {
+            var subview = subviews[i]
+            if subview is UINavigationBar {
+                navigationBar = subview as! UINavigationBar
+            } else if subview is UIToolbar {
+                toolbar = subview as! UIToolbar
+            } else if subview is UIVisualEffectView {
+                statusBarBackground = subview as! UIVisualEffectView
+            } else {
+                continue
+            }
+        }
+        if toolbar != nil && navigationBar != nil && statusBarBackground != nil {
+            var toolbarConstraint: NSLayoutConstraint?
+            var navBarConstraint: NSLayoutConstraint?
+            for constraint in toolbar!.constraintsAffectingLayoutForAxis(UILayoutConstraintAxis.Vertical) {
+                println(constraint)
+                if constraint is NSLayoutConstraint {
+                    toolbarConstraint = constraint as! NSLayoutConstraint
+                    break
+                }
+            }
+            for constraint in navigationBar!.constraintsAffectingLayoutForAxis(UILayoutConstraintAxis.Vertical) {
+                println(constraint)
+                if constraint is NSLayoutConstraint {
+                    navBarConstraint = constraint as! NSLayoutConstraint
+                    break
+                }
+            }
+        
+            if toolbarConstraint != nil && navBarConstraint != nil {
+                if shouldHide {
+                    UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                        navBarConstraint!.constant = -100
+                        toolbarConstraint!.constant = -100
+                        statusBarBackground!.frame.origin.y = -100
+                        self.layoutIfNeeded()
+                        }) { (bool:Bool) -> Void in
+                    }
+                } else {
+                    UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                        navBarConstraint!.constant = 20
+                        toolbarConstraint!.constant = 15
+                        statusBarBackground!.frame.origin.y = 0
+                        self.layoutIfNeeded()
+                        }) { (bool:Bool) -> Void in
+                    }
+                }
+            }
+            
+        }
+    }
+    
     func changeTrackToEditMode(gestureRecognizer: UIGestureRecognizer) {
         println("LONG PRESS RECOGNIZED")
         if mode == "" {
+            hideToolbars(true)
             var location = gestureRecognizer.locationInView(self)
             for var i = self.subviews.count - 1; i >= 0; i-- {
                 var subview = subviews[i]

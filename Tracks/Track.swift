@@ -177,12 +177,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         recordButton.layer.borderColor = UIColor.whiteColor().CGColor
         recordButton.backgroundColor = UIColor.lightGrayColor()
         self.addSubview(recordButton)
-        
-        //Add long press gesture for selecting track edit mode
-        var longPressEdit = UITapGestureRecognizer(target: self, action: "editMode:")
-        longPressEdit.numberOfTouchesRequired = 2
-        longPressEdit.numberOfTapsRequired = 0
-        self.addGestureRecognizer(longPressEdit)
     }
     
     //Removes text field when user completes file name edit.
@@ -479,8 +473,8 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     }
     
     func exitEditMode(sender: UIButton) {
-        self.isInEditMode = false
-        
+        isInEditMode = false
+        (self.superview as! LinkManager).hideToolbars(false)
         bringTrackToFront()
         
         labelName.frame = textFieldName.frame

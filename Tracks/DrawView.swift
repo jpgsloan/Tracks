@@ -18,8 +18,6 @@ class DrawView: UIView {
     var context: NSManagedObjectContext!
     var projectEntity: ProjectEntity!
     
-    var sideBarOpenLock: Bool = false
-    
     override init (frame: CGRect){
         super.init(frame: frame)
     }
@@ -29,28 +27,22 @@ class DrawView: UIView {
     }
     
     func touchBegan(touches: NSSet, withEvent event: UIEvent) {
-        if !sideBarOpenLock {
-            lastPoint = touches.anyObject()?.locationInView(self)
-        }
+        lastPoint = touches.anyObject()?.locationInView(self)
     }
     
     func touchMoved(touches: NSSet, withEvent event: UIEvent) {
-        if !sideBarOpenLock {
-            var newPoint = touches.anyObject()?.locationInView(self)
-            curPath.append(Line(start: lastPoint, end: newPoint!))
-            lastPoint = newPoint
-            self.setNeedsDisplay()
-        }
+        var newPoint = touches.anyObject()?.locationInView(self)
+        curPath.append(Line(start: lastPoint, end: newPoint!))
+        lastPoint = newPoint
+        self.setNeedsDisplay()
     }
     
     func touchEnded(touches: NSSet, withEvent event: UIEvent) {
-        if !sideBarOpenLock {
-            if (!curPath.isEmpty) {
-                self.allPaths.append(curPath)
-                self.updateAllPaths()
-            }
-            curPath = []
+        if (!curPath.isEmpty) {
+            self.allPaths.append(curPath)
+            self.updateAllPaths()
         }
+        curPath = []
     }
 
     override func drawRect(rect: CGRect) {
