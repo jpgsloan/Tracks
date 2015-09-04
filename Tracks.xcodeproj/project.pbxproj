@@ -27,6 +27,7 @@
 		1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */; };
 		11ABD8491B98D7B10048F1F9 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11ABD8481B98D7B10048F1F9 /* NotesView.swift */; };
 		11ABD84B1B98D9B70048F1F9 /* NotesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 11ABD84A1B98D9B70048F1F9 /* NotesView.xib */; };
+		11ABD84F1B9962BA0048F1F9 /* NotesEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11ABD84E1B9962BA0048F1F9 /* NotesEntity.swift */; };
 		11C8F5EF1B7406B100BDD37C /* TrackLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C8F5EE1B7406B100BDD37C /* TrackLink.swift */; };
 		11C8F5F11B74081B00BDD37C /* TrackLinkNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C8F5F01B74081B00BDD37C /* TrackLinkNode.swift */; };
 		11C8F5F71B7C09FE00BDD37C /* LinkEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11C8F5F61B7C09FE00BDD37C /* LinkEntity.swift */; };
@@ -75,6 +76,7 @@
 		1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SelectProjectViewController.xib; sourceTree = "<group>"; };
 		11ABD8481B98D7B10048F1F9 /* NotesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
 		11ABD84A1B98D9B70048F1F9 /* NotesView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NotesView.xib; sourceTree = "<group>"; };
+		11ABD84E1B9962BA0048F1F9 /* NotesEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotesEntity.swift; sourceTree = "<group>"; };
 		11C7FF3B1A9EC0320055879C /* Tracks-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tracks-Bridging-Header.h"; sourceTree = "<group>"; };
 		11C8F5EE1B7406B100BDD37C /* TrackLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackLink.swift; sourceTree = "<group>"; };
 		11C8F5F01B74081B00BDD37C /* TrackLinkNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackLinkNode.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				11C8F5F81B7C0A6A00BDD37C /* ProjectEntity.swift */,
 				1162B3801AA6EBB10066A52E /* TrackEntity.swift */,
 				11C8F5F61B7C09FE00BDD37C /* LinkEntity.swift */,
+				11ABD84E1B9962BA0048F1F9 /* NotesEntity.swift */,
 				11493ACD1A9EB13900E09069 /* Images.xcassets */,
 				11C7FF3B1A9EC0320055879C /* Tracks-Bridging-Header.h */,
 				11493AF51A9EB96F00E09069 /* Main.storyboard */,
@@ -365,6 +368,7 @@
 				11493AED1A9EB19800E09069 /* Line.swift in Sources */,
 				11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */,
 				11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */,
+				11ABD84F1B9962BA0048F1F9 /* NotesEntity.swift in Sources */,
 				11493AEF1A9EB19800E09069 /* RecordedAudio.swift in Sources */,
 				11C8F5F11B74081B00BDD37C /* TrackLinkNode.swift in Sources */,
 				1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */,

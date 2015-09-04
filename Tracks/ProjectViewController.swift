@@ -107,11 +107,15 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
             projectEntity.projectID = projectID
             if drawView != nil {
                 drawView.saveAllPaths(projectEntity)
+                notesView.saveNotes(projectEntity)
             }
         } else {
             projectEntity = results[0] as! ProjectEntity
             drawView.projectEntity = projectEntity
             drawView.loadAllPaths()
+            
+            notesView.projectEntity = projectEntity
+            notesView.loadNotes()
         }
         
         //Pass on the project entity to give to newly-added links
@@ -270,9 +274,11 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         self.view.addSubview(notesView)
         
         var tmpFrame: CGRect = notesView.frame
-        tmpFrame.size.height = 460 - toolbar.frame.height
-        tmpFrame.size.width = self.view.frame.width
-        tmpFrame.origin.y = self.view.frame.height - 460
+        tmpFrame.origin.x = 4
+        tmpFrame.origin.y = 50
+        tmpFrame.size.width = self.view.frame.width - 8
+        tmpFrame.size.height = self.view.frame.height - 100
+
         notesView.openNotes(tmpFrame)
     }
     

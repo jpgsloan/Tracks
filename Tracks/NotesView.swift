@@ -7,30 +7,43 @@
 //
 
 import UIKit
+import CoreData
 
-class NotesView: UIView {
-
+class NotesView: UIView, UITextViewDelegate {
+    
+    var appDel: AppDelegate!
+    var context: NSManagedObjectContext!
+    var projectEntity: ProjectEntity!
     @IBOutlet weak var backgroundView: UIView!
     @IBOutlet weak var blurView: UIVisualEffectView!
     @IBOutlet weak var notesTextView: UITextView!
     // custom view from the XIB file
     var view: UIView!
     
+    @IBOutlet weak var notesTextViewBottomContstraint: NSLayoutConstraint!
+    
+    
     override init (frame: CGRect){
         super.init(frame: frame)
         xibSetup()
         
-        var imageLayer: CALayer = self.layer
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        context = appDel.managedObjectContext!
+        
+        notesTextView.delegate = self
+        
+        var imageLayer: CALayer = blurView.layer
         imageLayer.cornerRadius = 10
         imageLayer.borderWidth = 2
-        imageLayer.borderColor = UIColor.lightGrayColor().CGColor
-      
-        blurView.layer.cornerRadius = 10
+        imageLayer.borderColor = UIColor.darkGrayColor().CGColor
         blurView.clipsToBounds = true
         
         var tapGesture = UITapGestureRecognizer(target: self, action: "exitNotes:")
         tapGesture.numberOfTapsRequired = 1
         backgroundView.addGestureRecognizer(tapGesture)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name:UIKeyboardWillShowNotification, object: nil);
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name:UIKeyboardWillHideNotification, object: nil);
         
     }
     
@@ -42,14 +55,9 @@ class NotesView: UIView {
     func xibSetup() {
         view = loadViewFromNib()
         
-        // use bounds not frame or it'll be offset
         view.frame = self.bounds
-        
-        // Make the view stretch with containing view
         view.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
-        
-        // Adding custom subview on top of our view (over any custom drawing > see note below)
-        addSubview(view)
+        self.addSubview(view)
     }
     
     func loadViewFromNib() -> UIView {
@@ -100,7 +108,60 @@ class NotesView: UIView {
     }
     
     @IBAction func doneTyping(sender: UIButton) {
-        
         notesTextView.resignFirstResponder()
+    }
+    
+    func keyboardWillShow(notification: NSNotification) {
+        var info = notification.userInfo!
+        var keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
+        
+        UIView.animateWithDuration(0.1, animations: { () -> Void in
+            self.notesTextViewBottomContstraint.constant = keyboardFrame.size.height - 50
+        })
+    }
+    
+    func keyboardWillHide(notification: NSNotification) {
+        UIView.animateWithDuration(0.1, animations: { () -> Void in
+            self.notesTextViewBottomContstraint.constant = 0
+        })
+    }
+    
+    func textViewDidChange(textView: UITextView) {
+        updateNotes()
+    }
+    
+    func updateNotes() {
+        println("UPDATING NOTES")
+        var request = NSFetchRequest(entityName: "NotesEntity")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "project = %@", argumentArray: [projectEntity])
+        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        if results.count == 1 {
+            var notesEntity = results[0] as! NotesEntity
+            notesEntity.text = notesTextView.text
+            self.context.save(nil)
+        } else {
+            println("Problem with updating drawView data")
+        }
+    }
+    
+    func loadNotes() {
+        var request = NSFetchRequest(entityName: "NotesEntity")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "project = %@", argumentArray: [projectEntity])
+        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        if results.count == 1 {
+            var notesEntity = results[0] as! NotesEntity
+            notesTextView.text = notesEntity.text
+            self.setNeedsDisplay()
+        }
+    }
+    
+    func saveNotes(projectEntity: ProjectEntity) {
+        self.projectEntity = projectEntity
+        var notesEntity = NSEntityDescription.insertNewObjectForEntityForName("NotesEntity", inManagedObjectContext: context) as! NotesEntity
+        notesEntity.project = projectEntity
+        notesEntity.text = notesTextView.text
+        self.context.save(nil)
     }
 }

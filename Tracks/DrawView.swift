@@ -20,6 +20,8 @@ class DrawView: UIView {
     
     override init (frame: CGRect){
         super.init(frame: frame)
+        appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        context = appDel.managedObjectContext!
     }
     
     required init(coder aDecoder: NSCoder){
