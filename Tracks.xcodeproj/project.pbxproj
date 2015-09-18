@@ -20,6 +20,12 @@
 		11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AEA1A9EB19800E09069 /* TrackColors.swift */; };
 		11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AF31A9EB1B000E09069 /* DrawView.swift */; };
 		11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11493AF51A9EB96F00E09069 /* Main.storyboard */; };
+		115854121B9F91F3007C0131 /* WaveformEditView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 115854111B9F91F3007C0131 /* WaveformEditView.xib */; };
+		115854141B9FB80C007C0131 /* WaveformEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115854131B9FB80C007C0131 /* WaveformEditView.swift */; };
+		115854201BA22ACF007C0131 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1158541F1BA22ACF007C0131 /* TimelineView.swift */; };
+		115854261BA39586007C0131 /* TrackEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 115854251BA39586007C0131 /* TrackEditView.swift */; };
+		115854281BA39DCB007C0131 /* TrackEditView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 115854271BA39DCB007C0131 /* TrackEditView.xib */; };
+		1158542C1BAB9E7B007C0131 /* TimeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1158542B1BAB9E7B007C0131 /* TimeSelectorView.swift */; };
 		1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */; };
 		1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3801AA6EBB10066A52E /* TrackEntity.swift */; };
 		116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */; };
@@ -69,6 +75,12 @@
 		11493AEA1A9EB19800E09069 /* TrackColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackColors.swift; sourceTree = "<group>"; };
 		11493AF31A9EB1B000E09069 /* DrawView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawView.swift; sourceTree = "<group>"; };
 		11493AF51A9EB96F00E09069 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		115854111B9F91F3007C0131 /* WaveformEditView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WaveformEditView.xib; sourceTree = "<group>"; };
+		115854131B9FB80C007C0131 /* WaveformEditView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaveformEditView.swift; sourceTree = "<group>"; };
+		1158541F1BA22ACF007C0131 /* TimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		115854251BA39586007C0131 /* TrackEditView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackEditView.swift; sourceTree = "<group>"; };
+		115854271BA39DCB007C0131 /* TrackEditView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TrackEditView.xib; sourceTree = "<group>"; };
+		1158542B1BAB9E7B007C0131 /* TimeSelectorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSelectorView.swift; sourceTree = "<group>"; };
 		1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TracksDataModel.xcdatamodel; sourceTree = "<group>"; };
 		1162B3801AA6EBB10066A52E /* TrackEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
 		116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectManagerViewController.swift; sourceTree = "<group>"; };
@@ -152,6 +164,12 @@
 				11493AF31A9EB1B000E09069 /* DrawView.swift */,
 				11493AE61A9EB19800E09069 /* Line.swift */,
 				11493AE91A9EB19800E09069 /* Track.swift */,
+				115854251BA39586007C0131 /* TrackEditView.swift */,
+				115854271BA39DCB007C0131 /* TrackEditView.xib */,
+				115854131B9FB80C007C0131 /* WaveformEditView.swift */,
+				115854111B9F91F3007C0131 /* WaveformEditView.xib */,
+				1158541F1BA22ACF007C0131 /* TimelineView.swift */,
+				1158542B1BAB9E7B007C0131 /* TimeSelectorView.swift */,
 				11493AE81A9EB19800E09069 /* RecordedAudio.swift */,
 				11493AEA1A9EB19800E09069 /* TrackColors.swift */,
 				1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */,
@@ -301,6 +319,8 @@
 				11493AD11A9EB13900E09069 /* LaunchScreen.xib in Resources */,
 				11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */,
 				11493AF61A9EB96F00E09069 /* Main.storyboard in Resources */,
+				115854281BA39DCB007C0131 /* TrackEditView.xib in Resources */,
+				115854121B9F91F3007C0131 /* WaveformEditView.xib in Resources */,
 				1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */,
 				11ABD84B1B98D9B70048F1F9 /* NotesView.xib in Resources */,
 			);
@@ -354,16 +374,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */,
+				115854141B9FB80C007C0131 /* WaveformEditView.swift in Sources */,
 				11CEDDD31AE843B30092AE87 /* ProjectTableViewCell.swift in Sources */,
+				1158542C1BAB9E7B007C0131 /* TimeSelectorView.swift in Sources */,
 				11C8F5F71B7C09FE00BDD37C /* LinkEntity.swift in Sources */,
 				11DCE8C41AFD90750099BFEE /* LinkEdge.swift in Sources */,
 				11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */,
 				111302FE1AFC8421002EA4B1 /* LinkManager.swift in Sources */,
 				11ABD8491B98D7B10048F1F9 /* NotesView.swift in Sources */,
+				115854261BA39586007C0131 /* TrackEditView.swift in Sources */,
 				11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */,
 				11493AEE1A9EB19800E09069 /* ProjectViewController.swift in Sources */,
 				11C8F5F91B7C0A6A00BDD37C /* ProjectEntity.swift in Sources */,
 				116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */,
+				115854201BA22ACF007C0131 /* TimelineView.swift in Sources */,
 				1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */,
 				11493AED1A9EB19800E09069 /* Line.swift in Sources */,
 				11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */,

@@ -353,28 +353,41 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             drawWaveform()
             
             //Set the duration label text
-            var durationSec = Float64(audioFile.totalFrames()) / audioFile.fileFormat().mSampleRate
+            var durationSec = audioFile.duration
             var format = NSDateFormatter()
             format.dateFormat = "H:mm:ss"
-            var durationDate = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(durationSec))
+            var durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
             format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
             var text = format.stringFromDate(durationDate)
-            self.setLabelDurationText(text)
-            self.updateTrackCoreData()
+            setLabelDurationText(text)
+            updateTrackCoreData()
         } else {
             println("did not record successfully")
         }
     }
 
-    func drawWaveform () {
-        audioFile.getWaveformDataWithCompletionBlock(
-            { (waveformData: UnsafeMutablePointer<Float>, length: UInt32) in
-                self.audioPlot.updateBuffer(waveformData, withBufferSize:length);
-        })
+    func drawWaveform() {
+        // asycronously get waveform data from audio file and update audioPlot buffer.
+        var waveClosure: EZAudioWaveformDataCompletionBlock = {
+            (waveformData: UnsafeMutablePointer<UnsafeMutablePointer<Float>>, length: Int32) in
+            //Do something like update the audio plot buffer if you are plotting the waveform
+            self.audioPlot.updateBuffer(waveformData[0], withBufferSize: UInt32(length))
+        }
+        self.audioFile.getWaveformDataWithCompletionBlock(waveClosure)
     }
     
     func editMode(gestureRecognizer: UIGestureRecognizer) {
         if !self.isInEditMode {
+            self.isInEditMode = true
+            var editView = TrackEditView(frame: self.frame, track: self)
+            (self.superview as! LinkManager).mode = "NOTOUCHES"
+            self.superview?.addSubview(editView)
+            editView.animateOpen()
+        }
+        
+        //self.frame = CGRectMake(frame.origin.x - 15, frame.origin.y - 15, frame.width + 30, frame.height + 30)
+        
+        if !self.isInEditMode && false {
         self.isInEditMode = true
         self.savedBoundsDuringEdit = self.frame
         var supervw = self.superview!
@@ -399,6 +412,19 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         exitEditModeButton.adjustsImageWhenHighlighted = true;
         self.addSubview(exitEditModeButton)
         
+        //Add button for exiting edit mode
+        var cropButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 45, y: self.bounds.origin.y + 26, width: 20, height: 20))
+        cropButton.setImage(image, forState: UIControlState.Normal)
+        cropButton.addTarget(self, action: "trimAudio:", forControlEvents: UIControlEvents.TouchUpInside)
+        cropButton.adjustsImageWhenHighlighted = true;
+        self.addSubview(cropButton)
+        
+        self.audioPlot.removeFromSuperview()
+        let filePath = recordedAudio.filePathUrl
+        var waveformEditView = WaveformEditView(frame: CGRect(x: 0, y: self.bounds.height / 9.6, width: self.bounds.width, height: self.bounds.height / 2.4))
+        waveformEditView.setAudio(filePath)
+        self.addSubview(waveformEditView)
+            
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             var newFrame = self.superview!.frame
             self.frame = newFrame
@@ -410,10 +436,14 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             var trackWidth = self.bounds.width
             
             //Resize waveform plot
-            self.audioPlot.frame = CGRect(x: originX - 1, y: originY + trackHeight / 9.6, width: trackWidth + 2, height: trackHeight / 2.4)
+            /*self.audioPlot.frame = CGRect(x: originX - 1, y: originY + trackHeight / 9.6, width: trackWidth + 2, height: trackHeight / 2.4)
             self.drawWaveform()
             self.audioPlot.layer.borderWidth = 1
             self.audioPlot.layer.borderColor = UIColor.whiteColor().CGColor
+            */
+            waveformEditView.frame = CGRect(x: 0, y: trackHeight / 9.6, width: trackWidth, height: trackHeight / 2.4)
+            waveformEditView.layer.borderWidth = 1
+            waveformEditView.layer.borderColor = UIColor.whiteColor().CGColor
             
             //Resize label for file name
             self.textFieldName.frame = CGRect(x: originX + trackWidth / 4.0, y: originY + 25, width: trackWidth / 2.0, height: 26.0)
@@ -515,15 +545,97 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         })
     }
     
+    func trimAudio(sender: UIButton) {
+        if let asset = AVAsset.assetWithURL(recordedAudio.filePathUrl) as? AVAsset {
+            exportAsset(asset, fileName: recordedAudio.title + "-tmp-cropping")
+        }
+    }
+    
+    func exportAsset(asset:AVAsset, fileName:String) {
+        let pathArray = [self.projectDirectory, fileName]
+        let trimmedSoundFileURL = NSURL.fileURLWithPathComponents(pathArray)
+        var soundFilePath = self.projectDirectory.stringByAppendingPathComponent(fileName)
+        let filemanager = NSFileManager.defaultManager()
+        if filemanager.fileExistsAtPath(soundFilePath) {
+            println("sound exists")
+        }
+        
+        let exporter = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A)
+        exporter.outputFileType = AVFileTypeWAVE
+        exporter.outputURL = trimmedSoundFileURL
+        
+        let duration = CMTimeGetSeconds(asset.duration)
+        if (duration < 5.0) {
+            println("sound is not long enough")
+            return
+        }
+    
+        // e.g. the first 5 seconds
+        let startTime = CMTimeMake(0, 1)
+        let stopTime = CMTimeMake(2, 1)
+        let exportTimeRange = CMTimeRangeFromTimeToTime(startTime, stopTime)
+        exporter.timeRange = exportTimeRange
+        
+        // set up the audio mix
+        let tracks = asset.tracksWithMediaType(AVMediaTypeAudio)
+        if tracks.count == 0 {
+            return
+        }
+        let track = tracks[0] as! AVAssetTrack
+        let exportAudioMix = AVMutableAudioMix()
+        let exportAudioMixInputParameters =
+        AVMutableAudioMixInputParameters(track: track)
+        exportAudioMixInputParameters.setVolume(1.0, atTime: CMTimeMake(0, 1))
+        exportAudioMix.inputParameters = [exportAudioMixInputParameters]
+        exporter.audioMix = exportAudioMix
+        
+        // do it
+        exporter.exportAsynchronouslyWithCompletionHandler({
+            switch exporter.status {
+            case  AVAssetExportSessionStatus.Failed:
+                println("export failed \(exporter.error)")
+            case AVAssetExportSessionStatus.Cancelled:
+                println("export cancelled \(exporter.error)")
+            default:
+                println("export complete")
+                //TODO: delete the old file, rename cropped file with old name.
+                self.updateTrackSubviews(newTrackUrl: "")
+            }
+        })
+    }
+    
+    func updateTrackSubviews(#newTrackUrl: String) {
+        let pathArray = [projectDirectory, newTrackUrl.lastPathComponent]
+        let filePath = NSURL.fileURLWithPathComponents(pathArray)
+        
+        recordedAudio.filePathUrl = filePath
+        recordedAudio.title = filePath!.lastPathComponent
+        audioPlayer = AVAudioPlayer(contentsOfURL: filePath, error: nil)
+        audioPlayer.prepareToPlay()
+        
+        audioFile = EZAudioFile(URL: filePath)
+        drawWaveform()
+        
+        //Set the duration label text
+        var durationSec = audioFile.duration
+        var format = NSDateFormatter()
+        format.dateFormat = "H:mm:ss"
+        var durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
+        format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+        var text = format.stringFromDate(durationDate)
+        setLabelDurationText(text)
+    }
+    
     func changeColor(sender: UIButton) {
         self.backgroundColor = sender.backgroundColor
-        self.audioPlot.backgroundColor = UIColor.clearColor()
-        self.updateTrackCoreData()
+        audioPlot.backgroundColor = UIColor.clearColor()
+        updateTrackCoreData()
     }
     
     func deleteTrack() {
         println("DELETE TRACK")
-        self.deleteTrackFromCoreData()
+        deleteTrackFromCoreData()
+        stopAudio()
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             var curCenter = self.center
             self.frame = CGRect(x: curCenter.x, y: curCenter.y, width: 0.0, height: 0.0)

@@ -126,6 +126,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         self.view.bringSubviewToFront(statusBarBackgroundView)
         self.view.bringSubviewToFront(navigationBar)
         self.view.bringSubviewToFront(toolbar)
+        
     }
     
     override func viewDidLayoutSubviews() {
