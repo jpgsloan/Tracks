@@ -367,13 +367,8 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     }
 
     func drawWaveform() {
-        // asycronously get waveform data from audio file and update audioPlot buffer.
-        var waveClosure: EZAudioWaveformDataCompletionBlock = {
-            (waveformData: UnsafeMutablePointer<UnsafeMutablePointer<Float>>, length: Int32) in
-            //Do something like update the audio plot buffer if you are plotting the waveform
-            self.audioPlot.updateBuffer(waveformData[0], withBufferSize: UInt32(length))
-        }
-        self.audioFile.getWaveformDataWithCompletionBlock(waveClosure)
+        let waveformData = self.audioFile.getWaveformData()
+        self.audioPlot.updateBuffer(waveformData.buffers[0], withBufferSize: waveformData.bufferSize)
     }
     
     func editMode(gestureRecognizer: UIGestureRecognizer) {
@@ -545,65 +540,6 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         })
     }
     
-    func trimAudio(sender: UIButton) {
-        if let asset = AVAsset.assetWithURL(recordedAudio.filePathUrl) as? AVAsset {
-            exportAsset(asset, fileName: recordedAudio.title + "-tmp-cropping")
-        }
-    }
-    
-    func exportAsset(asset:AVAsset, fileName:String) {
-        let pathArray = [self.projectDirectory, fileName]
-        let trimmedSoundFileURL = NSURL.fileURLWithPathComponents(pathArray)
-        var soundFilePath = self.projectDirectory.stringByAppendingPathComponent(fileName)
-        let filemanager = NSFileManager.defaultManager()
-        if filemanager.fileExistsAtPath(soundFilePath) {
-            println("sound exists")
-        }
-        
-        let exporter = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A)
-        exporter.outputFileType = AVFileTypeWAVE
-        exporter.outputURL = trimmedSoundFileURL
-        
-        let duration = CMTimeGetSeconds(asset.duration)
-        if (duration < 5.0) {
-            println("sound is not long enough")
-            return
-        }
-    
-        // e.g. the first 5 seconds
-        let startTime = CMTimeMake(0, 1)
-        let stopTime = CMTimeMake(2, 1)
-        let exportTimeRange = CMTimeRangeFromTimeToTime(startTime, stopTime)
-        exporter.timeRange = exportTimeRange
-        
-        // set up the audio mix
-        let tracks = asset.tracksWithMediaType(AVMediaTypeAudio)
-        if tracks.count == 0 {
-            return
-        }
-        let track = tracks[0] as! AVAssetTrack
-        let exportAudioMix = AVMutableAudioMix()
-        let exportAudioMixInputParameters =
-        AVMutableAudioMixInputParameters(track: track)
-        exportAudioMixInputParameters.setVolume(1.0, atTime: CMTimeMake(0, 1))
-        exportAudioMix.inputParameters = [exportAudioMixInputParameters]
-        exporter.audioMix = exportAudioMix
-        
-        // do it
-        exporter.exportAsynchronouslyWithCompletionHandler({
-            switch exporter.status {
-            case  AVAssetExportSessionStatus.Failed:
-                println("export failed \(exporter.error)")
-            case AVAssetExportSessionStatus.Cancelled:
-                println("export cancelled \(exporter.error)")
-            default:
-                println("export complete")
-                //TODO: delete the old file, rename cropped file with old name.
-                self.updateTrackSubviews(newTrackUrl: "")
-            }
-        })
-    }
-    
     func updateTrackSubviews(#newTrackUrl: String) {
         let pathArray = [projectDirectory, newTrackUrl.lastPathComponent]
         let filePath = NSURL.fileURLWithPathComponents(pathArray)
@@ -624,6 +560,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
         var text = format.stringFromDate(durationDate)
         setLabelDurationText(text)
+        updateTrackCoreData()
     }
     
     func changeColor(sender: UIButton) {

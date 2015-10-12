@@ -136,6 +136,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         
         // Make navigationBar clear
         navigationBar.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
+
         drawView.frame = self.view.frame
     }
     

@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class LinkManager: UIView {
+class LinkManager: UIView, UIGestureRecognizerDelegate {
 
     var mode: String = ""
     var allTrackLinks: [TrackLink] = [TrackLink]()
@@ -29,6 +29,7 @@ class LinkManager: UIView {
         var longPressEdit = UILongPressGestureRecognizer(target: self, action: "changeTrackToEditMode:")
         longPressEdit.numberOfTapsRequired = 0
         longPressEdit.allowableMovement = CGFloat(2)
+        longPressEdit.delegate = self
         self.addGestureRecognizer(longPressEdit)
     }
     
@@ -189,7 +190,7 @@ class LinkManager: UIView {
             println("trash mode")
             //do nothing
         } else if mode == "NOTOUCHES" {
-            println("no touches mode (used for open notes and sidebar)")
+            println("no touches mode (used for open notes, sidebar, edit mode)")
             //Do nothing
         } else {
             println("normal mode")
@@ -287,6 +288,14 @@ class LinkManager: UIView {
                     }
                 }
             }
+        }
+    }
+    
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+        if mode == "NOTOUCHES" {
+            return false
+        } else {
+            return true
         }
     }
     

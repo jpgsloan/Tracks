@@ -68,8 +68,6 @@ class TimelineView: UIView {
             
             var newX = CGFloat(Float64(i) / totalTime) * widthWithOffset + leadingOffset
             // Draw time labels if necessary
-            print("newX")
-            println(newX)
             if newX <= self.frame.width - trailingOffset {
                 // Create formatted time from current seconds
                 var durationDate = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(Int64(i)))

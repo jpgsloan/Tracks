@@ -49,7 +49,6 @@
 #pragma mark - Utility Components
 //------------------------------------------------------------------------------
 
-#import "EZAudioFFT.h"
 #import "EZAudioFloatConverter.h"
 #import "EZAudioFloatData.h"
 #import "EZAudioUtilities.h"

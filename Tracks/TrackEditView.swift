@@ -23,6 +23,7 @@ class TrackEditView: UIView {
         self.view.backgroundColor = UIColor.clearColor()
         titleTextField.text = track.labelName.text
         waveformEditView.layoutIfNeeded()
+        waveformEditView.setTrackRef(track)
         waveformEditView.setAudio(track.recordedAudio.filePathUrl)
     }
     
@@ -77,7 +78,7 @@ class TrackEditView: UIView {
     func setAudio() {
         waveformEditView.setAudio(track.recordedAudio.filePathUrl)
     }
-
+    
     @IBAction func exitEditMode(sender: UIButton) {
         //TODO: animate close, update track with any new info if not done already
         (self.superview as! LinkManager).hideToolbars(false)
