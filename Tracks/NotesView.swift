@@ -32,13 +32,13 @@ class NotesView: UIView, UITextViewDelegate {
         
         notesTextView.delegate = self
         
-        var imageLayer: CALayer = blurView.layer
+        let imageLayer: CALayer = blurView.layer
         imageLayer.cornerRadius = 10
         imageLayer.borderWidth = 2
         imageLayer.borderColor = UIColor.darkGrayColor().CGColor
         blurView.clipsToBounds = true
         
-        var tapGesture = UITapGestureRecognizer(target: self, action: "exitNotes:")
+        let tapGesture = UITapGestureRecognizer(target: self, action: "exitNotes:")
         tapGesture.numberOfTapsRequired = 1
         backgroundView.addGestureRecognizer(tapGesture)
         
@@ -47,7 +47,7 @@ class NotesView: UIView, UITextViewDelegate {
         
     }
     
-    required init(coder aDecoder: NSCoder){
+    required init?(coder aDecoder: NSCoder){
         super.init(coder: aDecoder)
         xibSetup()
     }
@@ -56,7 +56,7 @@ class NotesView: UIView, UITextViewDelegate {
         view = loadViewFromNib()
         
         view.frame = self.bounds
-        view.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+        view.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
         self.addSubview(view)
     }
     
@@ -113,7 +113,7 @@ class NotesView: UIView, UITextViewDelegate {
     
     func keyboardWillShow(notification: NSNotification) {
         var info = notification.userInfo!
-        var keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
+        let keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
         
         UIView.animateWithDuration(0.1, animations: { () -> Void in
             self.notesTextViewBottomContstraint.constant = keyboardFrame.size.height - 50
@@ -131,27 +131,30 @@ class NotesView: UIView, UITextViewDelegate {
     }
     
     func updateNotes() {
-        println("UPDATING NOTES")
-        var request = NSFetchRequest(entityName: "NotesEntity")
+        print("UPDATING NOTES")
+        let request = NSFetchRequest(entityName: "NotesEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "project = %@", argumentArray: [projectEntity])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
-            var notesEntity = results[0] as! NotesEntity
+            let notesEntity = results[0] as! NotesEntity
             notesEntity.text = notesTextView.text
-            self.context.save(nil)
+            do {
+                try self.context.save()
+            } catch _ {
+            }
         } else {
-            println("Problem with updating drawView data")
+            print("Problem with updating drawView data")
         }
     }
     
     func loadNotes() {
-        var request = NSFetchRequest(entityName: "NotesEntity")
+        let request = NSFetchRequest(entityName: "NotesEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "project = %@", argumentArray: [projectEntity])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
-            var notesEntity = results[0] as! NotesEntity
+            let notesEntity = results[0] as! NotesEntity
             notesTextView.text = notesEntity.text
             self.setNeedsDisplay()
         }
@@ -159,9 +162,12 @@ class NotesView: UIView, UITextViewDelegate {
     
     func saveNotes(projectEntity: ProjectEntity) {
         self.projectEntity = projectEntity
-        var notesEntity = NSEntityDescription.insertNewObjectForEntityForName("NotesEntity", inManagedObjectContext: context) as! NotesEntity
+        let notesEntity = NSEntityDescription.insertNewObjectForEntityForName("NotesEntity", inManagedObjectContext: context) as! NotesEntity
         notesEntity.project = projectEntity
         notesEntity.text = notesTextView.text
-        self.context.save(nil)
+        do {
+            try self.context.save()
+        } catch _ {
+        }
     }
 }

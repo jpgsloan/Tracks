@@ -31,7 +31,7 @@ class ProjectManagerViewController: UIViewController {
         self.view.addSubview(sideBarVC.view)
         sideBarVC.didMoveToParentViewController(self)
         
-        var project = self.requestLastOpenProject()
+        let project = self.requestLastOpenProject()
         var projectID = ""
         var projectName = ""
         if (project.count < 1) {
@@ -61,7 +61,7 @@ class ProjectManagerViewController: UIViewController {
     }
     
     func openSideBarVC() {
-        println("OPEN SIDEBAR")
+        print("OPEN SIDEBAR")
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.sideBarVC.view.frame.origin.x = self.view.frame.origin.x
             }, completion: { (bool:Bool) -> Void in
@@ -78,9 +78,9 @@ class ProjectManagerViewController: UIViewController {
     }
     
     func openProject(projectID: String, projectName: String) {
-        println("opening project")
+        print("opening project")
         closeSideBarVC()
-        var newProjVC = ProjectViewController(nibName: "ProjectViewController",bundle: nil)
+        let newProjVC = ProjectViewController(nibName: "ProjectViewController",bundle: nil)
         newProjVC.projectID = projectID
         newProjVC.projectName = projectName
         
@@ -101,8 +101,8 @@ class ProjectManagerViewController: UIViewController {
         self.updateLastOpenProjectCoreData(projectID, projectName: projectName)
     }
     
-    override func supportedInterfaceOrientations() -> Int {
-        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
     
     override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
@@ -114,26 +114,29 @@ class ProjectManagerViewController: UIViewController {
     }
     
     func createNewProject() -> String {
-        var todaysDate:NSDate = NSDate()
-        var dateFormatter:NSDateFormatter = NSDateFormatter()
+        let todaysDate:NSDate = NSDate()
+        let dateFormatter:NSDateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "MMddyy-HHmmss-SSS"
-        var dateInFormat = dateFormatter.stringFromDate(todaysDate)
+        let dateInFormat = dateFormatter.stringFromDate(todaysDate)
         
-        var lastOpenProjectEntity = NSEntityDescription.insertNewObjectForEntityForName("LastOpenProjectEntity", inManagedObjectContext: context) as! LastOpenProjectEntity
+        let lastOpenProjectEntity = NSEntityDescription.insertNewObjectForEntityForName("LastOpenProjectEntity", inManagedObjectContext: context) as! LastOpenProjectEntity
         
         lastOpenProjectEntity.projectID = dateInFormat
         lastOpenProjectEntity.projectName = "Untitled Project"
-        self.context.save(nil)
+        do {
+            try self.context.save()
+        } catch _ {
+        }
         return dateInFormat
     }
     
     func requestLastOpenProject() -> NSMutableDictionary {
-        var request = NSFetchRequest(entityName: "LastOpenProjectEntity")
+        let request = NSFetchRequest(entityName: "LastOpenProjectEntity")
         request.returnsObjectsAsFaults = false
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if (results.count >= 1) {
-            var res = results[0] as! LastOpenProjectEntity
-            var projectInfo = NSMutableDictionary()
+            let res = results[0] as! LastOpenProjectEntity
+            let projectInfo = NSMutableDictionary()
             projectInfo.setValue(res.projectID, forKey: "ProjectID")
             projectInfo.setValue(res.projectName, forKey: "ProjectName")
             return projectInfo
@@ -143,18 +146,21 @@ class ProjectManagerViewController: UIViewController {
     }
     
     func updateLastOpenProjectCoreData(projectID: String, projectName: String) {
-        var request = NSFetchRequest(entityName: "LastOpenProjectEntity")
+        let request = NSFetchRequest(entityName: "LastOpenProjectEntity")
         request.returnsObjectsAsFaults = false
         
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
-        print("HERE: ")
-        println(results.count)
+        let results: NSArray = try! context.executeFetchRequest(request)
+        print("HERE: ", terminator: "")
+        print(results.count)
         if (results.count == 1) {
-            var res = results[0] as! LastOpenProjectEntity
+            let res = results[0] as! LastOpenProjectEntity
             res.projectID = projectID
             res.projectName = projectName
         }
-        self.context.save(nil)
+        do {
+            try self.context.save()
+        } catch _ {
+        }
     }
     
 }

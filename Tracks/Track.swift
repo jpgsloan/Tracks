@@ -37,16 +37,16 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     var longPressLock: Bool = false
     var trackID: String = ""
 
-    required convenience init(coder aDecoder: NSCoder) {
-        var bounds = aDecoder.decodeCGRectForKey("bounds")
-        let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
-        var projectName = aDecoder.decodeObjectForKey("projectName") as! String
-        var projectDirectory = docDirectory.stringByAppendingPathComponent(projectName)
-        var trackName = aDecoder.decodeObjectForKey("trackName") as! String
+    required convenience init?(coder aDecoder: NSCoder) {
+        let bounds = aDecoder.decodeCGRectForKey("bounds")
+        let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] 
+        let projectName = aDecoder.decodeObjectForKey("projectName") as! String
+        let projectDirectory = NSString(string: docDirectory).stringByAppendingPathComponent(projectName)
+        let trackName = aDecoder.decodeObjectForKey("trackName") as! String
         if trackName == "" {
             self.init(frame:bounds)
         } else {
-            var audioFileUrl = projectDirectory.stringByAppendingPathComponent(trackName)
+            let audioFileUrl = NSString(string: projectDirectory).stringByAppendingPathComponent(trackName)
             self.init(frame: bounds)
             
             recordButton.removeFromSuperview()
@@ -56,7 +56,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             hasStartedRecording = true
             hasStoppedRecording = true
         
-            audioPlayer = AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl, error: nil)
+            audioPlayer = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl)
             audioPlayer.prepareToPlay()
             
             audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
@@ -90,7 +90,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         } else {
             aCoder.encodeObject(recordedAudio.title, forKey: "trackName")
         }
-        aCoder.encodeObject(projectDirectory.lastPathComponent, forKey: "projectName")
+        aCoder.encodeObject(NSString(string: projectDirectory).lastPathComponent, forKey: "projectName")
         aCoder.encodeObject(labelName.text, forKey: "labelName")
         aCoder.encodeObject(labelDate.text, forKey: "labelDate")
         aCoder.encodeObject(labelDuration.text, forKey: "labelDuration")
@@ -113,7 +113,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.clipsToBounds = true
         
         if self.backgroundColor == nil {
-            println("picking color")
+            print("picking color")
             self.backgroundColor = tealColor()
         }
         
@@ -131,10 +131,10 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         }
         
         //Frequently reused bounds values
-        var originX = self.bounds.origin.x
-        var originY = self.bounds.origin.y
-        var trackHeight = self.bounds.height
-        var trackWidth = self.bounds.width
+        let originX = self.bounds.origin.x
+        let originY = self.bounds.origin.y
+        let trackHeight = self.bounds.height
+        let trackWidth = self.bounds.width
         
         //using EZAudio for now
         audioPlot = EZAudioPlot(frame: CGRect(x: originX, y: originY + trackHeight/4.2, width: trackWidth, height: trackHeight - trackHeight/4.2 - (trackHeight * 1.4 / 7.0)))
@@ -152,10 +152,10 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         labelName.userInteractionEnabled = true
         
         //Add label for date
-        var todaysDate:NSDate = NSDate()
-        var dateFormatter:NSDateFormatter = NSDateFormatter()
+        let todaysDate:NSDate = NSDate()
+        let dateFormatter:NSDateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "MM/dd/yy"
-        var dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
+        let dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
         labelDate = UILabel(frame: CGRect(x: originX + (trackWidth / 12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth, height: trackHeight * 1.4 / 7.0))
         labelDate.textAlignment = NSTextAlignment.Left
         labelDate.textColor = UIColor.whiteColor()
@@ -183,7 +183,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         
-        setLabelNameText(textField.text)
+        setLabelNameText(textField.text!)
         updateTrackCoreData()
         return true;
     }
@@ -201,29 +201,29 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     }
     
     func bringTrackToFront() {
-        var supervw = self.superview!
+        let supervw = self.superview!
         supervw.insertSubview(self, atIndex: supervw.subviews.count - 4)
     }
     
-    func touchBegan(touches: NSSet, withEvent event: UIEvent) {
-        println("track touched began")
-        var touch: UITouch = touches.anyObject() as! UITouch
+    func touchBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("track touched began")
+        let touch: UITouch = touches.first!
         startLoc = touch.locationInView(self)
         if !isInEditMode {
             bringTrackToFront()
         }
     }
     
-    func touchMoved(touches: NSSet, withEvent event: UIEvent) {
-        println("track touched moved")
+    func touchMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("track touched moved")
         if !isInEditMode {
             wasDragged = true
-            var touch: UITouch = touches.anyObject() as! UITouch
-            var touchLoc: CGPoint = touch.locationInView(self)
+            let touch: UITouch = touches.first!
+            let touchLoc: CGPoint = touch.locationInView(self)
         
             //move the track node relative to the starting location.
-            var newCenterX = self.center.x + touchLoc.x - startLoc.x
-            var newCenterY = self.center.y + touchLoc.y - startLoc.y
+            let newCenterX = self.center.x + touchLoc.x - startLoc.x
+            let newCenterY = self.center.y + touchLoc.y - startLoc.y
             if newCenterX < self.superview?.frame.width && newCenterX > 0 {
                 self.center.x = newCenterX
             }
@@ -233,11 +233,11 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         }
     }
     
-    func touchEnded(touches: NSSet, withEvent event: UIEvent) {
-        println("track touched ended")
+    func touchEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("track touched ended")
         if (!wasDragged) {
             if (!hasStartedRecording) {
-                println("started recording")
+                print("started recording")
                 
                 var originX = self.bounds.origin.x
                 var originY = self.bounds.origin.y
@@ -260,15 +260,20 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 let formatter = NSDateFormatter()
                 formatter.dateFormat = "ddMMyyyy-HHmmss-SSS"
                 let recordingName = formatter.stringFromDate(currentDateTime) + ".wav"
-                let pathArray = [projectDirectory, recordingName]
+                let pathArray = [projectDirectory!, recordingName]
                 let filePath = NSURL.fileURLWithPathComponents(pathArray)
                 
                 var session = AVAudioSession.sharedInstance()
-                session.setCategory(AVAudioSessionCategoryPlayAndRecord, error: nil)
-                session.overrideOutputAudioPort(AVAudioSessionPortOverride.Speaker,
-                    error:nil)
+                do {
+                    try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+                } catch _ {
+                }
+                do {
+                    try session.overrideOutputAudioPort(AVAudioSessionPortOverride.Speaker)
+                } catch _ {
+                }
                 
-                audioRecorder = AVAudioRecorder(URL: filePath, settings: nil, error: nil)
+                audioRecorder = try? AVAudioRecorder(URL: filePath!, settings: [String : AnyObject]())
                 audioRecorder.delegate = self
                 audioRecorder.meteringEnabled = true
                 audioRecorder.prepareToRecord()
@@ -277,7 +282,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 hasStartedRecording = true
                 hasStoppedRecording = false
             } else if (!hasStoppedRecording) {
-                println("stopping recording")
+                print("stopping recording")
                 Track.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
                     self.recordButton.transform = CGAffineTransformMakeScale(0.01, 0.01)
                     }, completion: { (Bool) -> Void in
@@ -290,7 +295,10 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
                 
                 audioRecorder.stop()
                 var audioSession = AVAudioSession.sharedInstance()
-                audioSession.setActive(false, error: nil)
+                do {
+                    try audioSession.setActive(false)
+                } catch _ {
+                }
                 hasStoppedRecording = true
             } else if (readyToPlay) {
                 playAudio()
@@ -304,13 +312,13 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     
     func playAudio() {
         if !isInEditMode {
-            println("playing")
+            print("playing")
         
             stopAudio()
             audioPlayer.play()
             
             //reset the progress view to beginning
-            UIView.animateWithDuration(0.001, delay: 0.0, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveLinear, animations: { () -> Void in
+            UIView.animateWithDuration(0.001, delay: 0.0, options: [UIViewAnimationOptions.BeginFromCurrentState, UIViewAnimationOptions.CurveLinear], animations: { () -> Void in
                 self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
             }, completion: nil)
         
@@ -324,7 +332,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             self.bringSubviewToFront(labelDate)
         
             //play progress view
-            UIView.animateWithDuration(audioPlayer.duration, delay: 0.1, options:UIViewAnimationOptions.CurveLinear|UIViewAnimationOptions.BeginFromCurrentState, animations: { () -> Void in
+            UIView.animateWithDuration(audioPlayer.duration, delay: 0.1, options:[UIViewAnimationOptions.CurveLinear, UIViewAnimationOptions.BeginFromCurrentState], animations: { () -> Void in
                 var tmpFrame: CGRect = self.progressView.frame
                 tmpFrame.origin.x += self.bounds.width + 1
                 self.progressView.frame = tmpFrame
@@ -335,34 +343,34 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     func stopAudio() {
         audioPlayer.stop()
         audioPlayer.currentTime = 0.0
-        UIView.animateWithDuration(0.001, delay: 0.0, options: UIViewAnimationOptions.BeginFromCurrentState|UIViewAnimationOptions.CurveLinear, animations: { () -> Void in
+        UIView.animateWithDuration(0.001, delay: 0.0, options: [UIViewAnimationOptions.BeginFromCurrentState, UIViewAnimationOptions.CurveLinear], animations: { () -> Void in
             self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
             }, completion: nil)
     }
     
-    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
+    func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
         if ( flag ) {
             recordedAudio.filePathUrl = recorder.url
             recordedAudio.title = recorder.url.lastPathComponent
-            audioPlayer = AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl, error: nil)
+            audioPlayer = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl)
             audioPlayer.prepareToPlay()
             readyToPlay = true
-            println("recording ready for playback!")
+            print("recording ready for playback!")
             
             audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
             drawWaveform()
             
             //Set the duration label text
-            var durationSec = audioFile.duration
-            var format = NSDateFormatter()
+            let durationSec = audioFile.duration
+            let format = NSDateFormatter()
             format.dateFormat = "H:mm:ss"
-            var durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
+            let durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
             format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
-            var text = format.stringFromDate(durationDate)
+            let text = format.stringFromDate(durationDate)
             setLabelDurationText(text)
             updateTrackCoreData()
         } else {
-            println("did not record successfully")
+            print("did not record successfully")
         }
     }
 
@@ -374,7 +382,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     func editMode(gestureRecognizer: UIGestureRecognizer) {
         if !self.isInEditMode {
             self.isInEditMode = true
-            var editView = TrackEditView(frame: self.frame, track: self)
+            let editView = TrackEditView(frame: self.frame, track: self)
             (self.superview as! LinkManager).mode = "NOTOUCHES"
             self.superview?.addSubview(editView)
             editView.animateOpen()
@@ -385,7 +393,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         if !self.isInEditMode && false {
         self.isInEditMode = true
         self.savedBoundsDuringEdit = self.frame
-        var supervw = self.superview!
+        let supervw = self.superview!
         supervw.bringSubviewToFront(self)
             
         //Add text field for allowing track name edits (masks name label)
@@ -401,14 +409,14 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         
         //Add button for exiting edit mode
         exitEditModeButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 15, y: self.bounds.origin.y + 26, width: 20, height: 20))
-        var image = UIImage(named: "close-button")
+        let image = UIImage(named: "close-button")
         exitEditModeButton.setImage(image, forState: UIControlState.Normal)
         exitEditModeButton.addTarget(self, action: "exitEditMode:", forControlEvents: UIControlEvents.TouchUpInside)
         exitEditModeButton.adjustsImageWhenHighlighted = true;
         self.addSubview(exitEditModeButton)
         
         //Add button for exiting edit mode
-        var cropButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 45, y: self.bounds.origin.y + 26, width: 20, height: 20))
+        let cropButton = UIButton(frame: CGRect(x: self.bounds.origin.x + 45, y: self.bounds.origin.y + 26, width: 20, height: 20))
         cropButton.setImage(image, forState: UIControlState.Normal)
         cropButton.addTarget(self, action: "trimAudio:", forControlEvents: UIControlEvents.TouchUpInside)
         cropButton.adjustsImageWhenHighlighted = true;
@@ -416,19 +424,19 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         
         self.audioPlot.removeFromSuperview()
         let filePath = recordedAudio.filePathUrl
-        var waveformEditView = WaveformEditView(frame: CGRect(x: 0, y: self.bounds.height / 9.6, width: self.bounds.width, height: self.bounds.height / 2.4))
+        let waveformEditView = WaveformEditView(frame: CGRect(x: 0, y: self.bounds.height / 9.6, width: self.bounds.width, height: self.bounds.height / 2.4))
         waveformEditView.setAudio(filePath)
         self.addSubview(waveformEditView)
             
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            var newFrame = self.superview!.frame
+            let newFrame = self.superview!.frame
             self.frame = newFrame
            
             //Frequently reused bounds values
-            var originX = self.bounds.origin.x
-            var originY = self.bounds.origin.y
-            var trackHeight = self.bounds.height
-            var trackWidth = self.bounds.width
+            let originX = self.bounds.origin.x
+            let originY = self.bounds.origin.y
+            let trackHeight = self.bounds.height
+            let trackWidth = self.bounds.width
             
             //Resize waveform plot
             /*self.audioPlot.frame = CGRect(x: originX - 1, y: originY + trackHeight / 9.6, width: trackWidth + 2, height: trackHeight / 2.4)
@@ -456,7 +464,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             self.progressView.frame = CGRect(x: self.bounds.width + 1, y: self.bounds.origin.y, width: 1, height: self.bounds.height)
         
             }, completion: { (bool:Bool) -> Void in
-                var animation = CABasicAnimation(keyPath: "cornerRadius")
+                let animation = CABasicAnimation(keyPath: "cornerRadius")
                 animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
                 animation.fromValue = 12.0
                 animation.toValue = 0.0
@@ -466,7 +474,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         })
         
         //Add volume slider and label
-        var volumeSlider = UISlider(frame: CGRect(x: 0, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 3.0 / 9.0 - 4 , width: self.frame.width, height: self.bounds.height / 9.0))
+        let volumeSlider = UISlider(frame: CGRect(x: 0, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 3.0 / 9.0 - 4 , width: self.frame.width, height: self.bounds.height / 9.0))
         volumeSlider.backgroundColor = UIColor.clearColor()
         volumeSlider.minimumValue = 0.0
         volumeSlider.maximumValue = 1.0
@@ -474,7 +482,7 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         volumeSlider.value = 0.5
         self.addSubview(volumeSlider)
             
-        var volumeLabel = UILabel(frame: CGRect(x: self.bounds.origin.x + 5, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 3.5 / 9.0 - 4, width: self.frame.width, height: self.bounds.height / 9.0))
+        let volumeLabel = UILabel(frame: CGRect(x: self.bounds.origin.x + 5, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 3.5 / 9.0 - 4, width: self.frame.width, height: self.bounds.height / 9.0))
         volumeLabel.text = "Track Volume"
         volumeLabel.textAlignment = NSTextAlignment.Left
         volumeLabel.textColor = UIColor.whiteColor()
@@ -482,10 +490,10 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         self.addSubview(volumeLabel)
 
         //Add color buttons to change track color
-        var colorList = colors()
+        let colorList = colors()
         var i = 0.0
         for color in colorList {
-            var colorButton = UIButton(frame: CGRect(x: self.bounds.origin.x + (self.bounds.width - 4.0) * CGFloat(i) / 5.0 + 2, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 2.0 / 9.0 - 4, width: (self.bounds.width - 4.0) / 5.0, height: self.bounds.height / 9.0))
+            let colorButton = UIButton(frame: CGRect(x: self.bounds.origin.x + (self.bounds.width - 4.0) * CGFloat(i) / 5.0 + 2, y: self.bounds.origin.y + self.bounds.height - self.bounds.height * 2.0 / 9.0 - 4, width: (self.bounds.width - 4.0) / 5.0, height: self.bounds.height / 9.0))
             colorButton.backgroundColor = color
             colorButton.layer.borderColor = UIColor.whiteColor().CGColor
             colorButton.layer.borderWidth = 1.0
@@ -513,10 +521,10 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             self.frame = self.savedBoundsDuringEdit
             self.layer.cornerRadius = 12
             //Frequently reused bounds values
-            var originX = self.bounds.origin.x
-            var originY = self.bounds.origin.y
-            var trackHeight = self.bounds.height
-            var trackWidth = self.bounds.width
+            let originX = self.bounds.origin.x
+            let originY = self.bounds.origin.y
+            let trackHeight = self.bounds.height
+            let trackWidth = self.bounds.width
             
             //Resize label for file name
             self.labelDuration.font = UIFont(name: "ArialMT", size: 10)
@@ -540,13 +548,13 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
         })
     }
     
-    func updateTrackSubviews(#newTrackUrl: String) {
-        let pathArray = [projectDirectory, newTrackUrl.lastPathComponent]
+    func updateTrackSubviews(newTrackUrl newTrackUrl: String) {
+        let pathArray = [projectDirectory!, NSString(string: newTrackUrl).lastPathComponent]
         let filePath = NSURL.fileURLWithPathComponents(pathArray)
         
         recordedAudio.filePathUrl = filePath
         recordedAudio.title = filePath!.lastPathComponent
-        audioPlayer = AVAudioPlayer(contentsOfURL: filePath, error: nil)
+        audioPlayer = try? AVAudioPlayer(contentsOfURL: filePath!)
         audioPlayer.prepareToPlay()
         
         audioFile = EZAudioFile(URL: filePath)
@@ -570,18 +578,18 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     }
     
     func deleteTrack() {
-        println("DELETE TRACK")
+        print("DELETE TRACK")
         deleteTrackFromCoreData()
         stopAudio()
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            var curCenter = self.center
+            let curCenter = self.center
             self.frame = CGRect(x: curCenter.x, y: curCenter.y, width: 0.0, height: 0.0)
             self.layer.cornerRadius = 12
             //Frequently reused bounds values
-            var originX = self.bounds.origin.x
-            var originY = self.bounds.origin.y
-            var trackHeight = self.bounds.height
-            var trackWidth = self.bounds.width
+            let originX = self.bounds.origin.x
+            let originY = self.bounds.origin.y
+            let trackHeight = self.bounds.height
+            let trackWidth = self.bounds.width
             
             //Resize label for file name
             self.labelDuration.font = UIFont(name: "ArialMT", size: 10)
@@ -607,35 +615,41 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     }
     
     func updateTrackCoreData() {
-        println("Updating track data")
-        var request = NSFetchRequest(entityName: "TrackEntity")
+        print("Updating track data")
+        let request = NSFetchRequest(entityName: "TrackEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "trackID = %@", argumentArray: [self.trackID])
-        var results: NSArray = self.context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! self.context.executeFetchRequest(request)
         if results.count == 1 {
-            var trackEntity = results[0] as! TrackEntity
-            var trackData = NSKeyedArchiver.archivedDataWithRootObject(self)
+            let trackEntity = results[0] as! TrackEntity
+            let trackData = NSKeyedArchiver.archivedDataWithRootObject(self)
             trackEntity.track = trackData
         }
-        self.context.save(nil)
+        do {
+            try self.context.save()
+        } catch _ {
+        }
     }
     
     func saveTrackCoreData(projectEntity: ProjectEntity) {
-        var trackData: NSData = NSKeyedArchiver.archivedDataWithRootObject(self)
-        var trackEntity = NSEntityDescription.insertNewObjectForEntityForName("TrackEntity", inManagedObjectContext: context) as! TrackEntity
+        let trackData: NSData = NSKeyedArchiver.archivedDataWithRootObject(self)
+        let trackEntity = NSEntityDescription.insertNewObjectForEntityForName("TrackEntity", inManagedObjectContext: context) as! TrackEntity
         trackEntity.track = trackData
         trackEntity.project = projectEntity
         trackEntity.trackID = self.trackID
-        self.context.save(nil)
+        do {
+            try self.context.save()
+        } catch _ {
+        }
     }
     
     func deleteTrackFromCoreData() {
-        var request = NSFetchRequest(entityName: "TrackEntity")
+        let request = NSFetchRequest(entityName: "TrackEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "trackID = %@", argumentArray: [self.trackID])
-        var results: NSArray = self.context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! self.context.executeFetchRequest(request)
         if results.count == 1 {
-            var trackToDelete = results[0] as! TrackEntity
+            let trackToDelete = results[0] as! TrackEntity
             self.context.deleteObject(trackToDelete)
         }
     }

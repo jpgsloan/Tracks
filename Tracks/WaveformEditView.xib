@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WaveformEditView" customModule="Tracks" customModuleProvider="target">
@@ -23,16 +24,11 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="481"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dxa-Jn-SAB">
-                    <rect key="frame" x="534" y="451" width="46" height="30"/>
-                    <state key="normal" title="Crop">
-                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                    </state>
-                    <connections>
-                        <action selector="trimMode:" destination="-1" eventType="touchUpInside" id="mxZ-M8-hpE"/>
-                    </connections>
-                </button>
+                <view alpha="0.20000000000000001" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XUn-Tv-R5B">
+                    <rect key="frame" x="0.0" y="22" width="600" height="415"/>
+                    <animations/>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
                 <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceHorizontal="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MBH-C5-OE1">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="438"/>
                     <subviews>
@@ -41,6 +37,7 @@
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qE7-zS-pLL" customClass="EZAudioPlot">
                                     <rect key="frame" x="0.0" y="22" width="600" height="416"/>
+                                    <animations/>
                                     <color key="backgroundColor" red="0.066659177550000004" green="0.54316820570000002" blue="0.58443173879999999" alpha="1" colorSpace="calibratedRGB"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="443" id="Mg9-Gn-FRz"/>
@@ -55,12 +52,14 @@
                                 </view>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MeN-DE-yuR" customClass="TimelineView" customModule="Tracks" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="22"/>
+                                    <animations/>
                                     <color key="backgroundColor" red="0.9699065992" green="0.30182210040000002" blue="0.38926671509999999" alpha="1" colorSpace="calibratedRGB"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="22" id="oQF-E8-TeF"/>
                                     </constraints>
                                 </view>
                             </subviews>
+                            <animations/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="MeN-DE-yuR" secondAttribute="trailing" id="3qw-xa-b0E"/>
@@ -87,6 +86,7 @@
                             </variation>
                         </view>
                     </subviews>
+                    <animations/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="centerX" secondItem="0T9-OT-dOl" secondAttribute="centerX" placeholder="YES" id="42C-gE-0Qb"/>
@@ -104,11 +104,24 @@
                     </variation>
                 </scrollView>
                 <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fmi-3Z-vqI" userLabel="Time Selector" customClass="TimeSelectorView" customModule="Tracks" customModuleProvider="target">
-                    <rect key="frame" x="0.0" y="16" width="600" height="428"/>
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="445"/>
+                    <animations/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                 </view>
+                <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dxa-Jn-SAB">
+                    <rect key="frame" x="534" y="451" width="46" height="30"/>
+                    <animations/>
+                    <state key="normal" title="Crop">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="trimMode:" destination="-1" eventType="touchUpInside" id="mxZ-M8-hpE"/>
+                    </connections>
+                </button>
                 <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zcD-bq-bW7">
                     <rect key="frame" x="20" y="451" width="46" height="30"/>
+                    <animations/>
                     <state key="normal" title="Play">
                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -119,11 +132,13 @@
                 </button>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.20000000000000007" translatesAutoresizingMaskIntoConstraints="NO" id="RZm-21-Kjg">
                     <rect key="frame" x="263" y="445" width="74" height="36"/>
+                    <animations/>
                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="26"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
+            <animations/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="2hR-0F-K20"/>
@@ -131,21 +146,25 @@
                 <constraint firstAttribute="trailing" secondItem="dxa-Jn-SAB" secondAttribute="trailing" constant="20" id="B3y-Fx-mSP"/>
                 <constraint firstItem="dxa-Jn-SAB" firstAttribute="top" secondItem="fmi-3Z-vqI" secondAttribute="bottom" constant="32" id="EO2-1z-7am"/>
                 <constraint firstAttribute="centerX" secondItem="RZm-21-Kjg" secondAttribute="centerX" id="Jfe-is-9Db"/>
+                <constraint firstItem="XUn-Tv-R5B" firstAttribute="trailing" secondItem="fmi-3Z-vqI" secondAttribute="trailing" id="Oh7-AY-lM2"/>
                 <constraint firstItem="qE7-zS-pLL" firstAttribute="bottom" secondItem="fmi-3Z-vqI" secondAttribute="bottom" constant="-4" id="Q3t-jD-FXu"/>
-                <constraint firstItem="fmi-3Z-vqI" firstAttribute="bottom" secondItem="qE7-zS-pLL" secondAttribute="bottom" constant="6" id="QHH-I5-Jly"/>
+                <constraint firstItem="fmi-3Z-vqI" firstAttribute="bottom" secondItem="qE7-zS-pLL" secondAttribute="bottom" constant="7" id="QHH-I5-Jly"/>
                 <constraint firstItem="MBH-C5-OE1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="VAH-IA-gG3"/>
                 <constraint firstAttribute="bottom" secondItem="dxa-Jn-SAB" secondAttribute="bottom" id="Vkr-Qo-q5I"/>
+                <constraint firstItem="XUn-Tv-R5B" firstAttribute="top" secondItem="MeN-DE-yuR" secondAttribute="bottom" id="dwy-z3-oGG"/>
+                <constraint firstItem="fmi-3Z-vqI" firstAttribute="top" secondItem="MeN-DE-yuR" secondAttribute="top" id="fMD-wW-1Br"/>
                 <constraint firstItem="zcD-bq-bW7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="fwf-sK-bmD"/>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="height" secondItem="MBH-C5-OE1" secondAttribute="height" constant="3" id="jJS-2c-iob"/>
                 <constraint firstItem="zcD-bq-bW7" firstAttribute="top" secondItem="MBH-C5-OE1" secondAttribute="bottom" constant="13" id="jQ3-gB-btU"/>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="rGV-qy-QJ0"/>
+                <constraint firstItem="XUn-Tv-R5B" firstAttribute="leading" secondItem="fmi-3Z-vqI" secondAttribute="leading" id="rXV-oF-mBl"/>
+                <constraint firstItem="XUn-Tv-R5B" firstAttribute="bottom" secondItem="zcD-bq-bW7" secondAttribute="top" constant="-13" id="t4N-Tb-R4h"/>
                 <constraint firstItem="MBH-C5-OE1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="ubZ-he-LZb"/>
                 <constraint firstAttribute="bottom" secondItem="RZm-21-Kjg" secondAttribute="bottom" id="ujr-di-EfM"/>
                 <constraint firstAttribute="trailing" secondItem="fmi-3Z-vqI" secondAttribute="trailing" id="wkD-fN-AEN"/>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="height" secondItem="qE7-zS-pLL" secondAttribute="height" constant="3" id="yQX-w9-vh2"/>
                 <constraint firstItem="qE7-zS-pLL" firstAttribute="top" secondItem="fmi-3Z-vqI" secondAttribute="top" constant="4" id="yQu-u2-1PV"/>
                 <constraint firstAttribute="trailing" secondItem="MBH-C5-OE1" secondAttribute="trailing" id="z0Y-20-WRY"/>
-                <constraint firstItem="qE7-zS-pLL" firstAttribute="top" secondItem="fmi-3Z-vqI" secondAttribute="top" constant="6" id="zMF-cS-ad3"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
@@ -159,7 +178,7 @@
                     <exclude reference="EO2-1z-7am"/>
                 </mask>
             </variation>
-            <point key="canvasLocation" x="303" y="162.5"/>
+            <point key="canvasLocation" x="269" y="160.5"/>
         </view>
     </objects>
 </document>

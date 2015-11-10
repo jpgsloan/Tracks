@@ -19,7 +19,7 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        println("initializing table view")
+        print("initializing table view")
         appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
         
@@ -33,21 +33,24 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         tableView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 0.0)
         
         //Checkif stored tableData exists in CoreData
-        var request = NSFetchRequest(entityName: "TableViewDataEntity")
+        let request = NSFetchRequest(entityName: "TableViewDataEntity")
         request.returnsObjectsAsFaults = false
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         
         if results.count == 1 {
-            println("loading previous table data")
+            print("loading previous table data")
             loadTableData()
         } else if results.count > 1 {
-            println("MEGAPROBLEM: More than 1 tableData objects")
+            print("MEGAPROBLEM: More than 1 tableData objects")
         } else {
             //Save tableData to CoreData for first time
-            var tableDataAsNSData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tableData)
-            var tableViewDataEntity = NSEntityDescription.insertNewObjectForEntityForName("TableViewDataEntity", inManagedObjectContext: context) as! TableViewDataEntity
+            let tableDataAsNSData: NSData = NSKeyedArchiver.archivedDataWithRootObject(tableData)
+            let tableViewDataEntity = NSEntityDescription.insertNewObjectForEntityForName("TableViewDataEntity", inManagedObjectContext: context) as! TableViewDataEntity
             tableViewDataEntity.tableData = tableDataAsNSData
-            context.save(nil)
+            do {
+                try context.save()
+            } catch _ {
+            }
         }
     }
 
@@ -57,10 +60,10 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("row selected")
-        var data = self.tableData[indexPath.row]
-        var projectID = data.valueForKey("projectID") as! String
-        var projectName = data.valueForKey("projectName") as! String
+        print("row selected")
+        let data = self.tableData[indexPath.row]
+        let projectID = data.valueForKey("projectID") as! String
+        let projectName = data.valueForKey("projectName") as! String
         (self.parentViewController as! ProjectManagerViewController).openProject(projectID, projectName: projectName)
     }
     
@@ -78,7 +81,7 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: ProjectTableViewCell = tableView.dequeueReusableCellWithIdentifier("selectProjectCell") as! ProjectTableViewCell
         
-        var data: NSMutableDictionary = self.tableData[indexPath.row] as NSMutableDictionary
+        let data: NSMutableDictionary = self.tableData[indexPath.row] as NSMutableDictionary
 
         cell.projectName.text = (data.valueForKey("projectName") as! String)
         cell.projectName.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
@@ -112,12 +115,12 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     }
     
     @IBAction func addProject(sender: UIButton) {
-        println("adding new project")
-        var data = NSMutableDictionary()
+        print("adding new project")
+        let data = NSMutableDictionary()
         data.setValue("Untitled Project", forKey: "projectName")
         
-        var todaysDate:NSDate = NSDate()
-        var dateFormatter:NSDateFormatter = NSDateFormatter()
+        let todaysDate:NSDate = NSDate()
+        let dateFormatter:NSDateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "MM/dd/yy"
         var dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
         data.setValue(dateInFormat, forKey: "projectDate")
@@ -132,16 +135,16 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     }
 
     func addProject(projectID: String, projectName:String) {
-        println("adding new project from ID and name")
-        var data = NSMutableDictionary()
+        print("adding new project from ID and name")
+        let data = NSMutableDictionary()
         
         data.setValue(projectName, forKey: "projectName")
         data.setValue(projectID, forKey: "projectID")
         
-        var todaysDate:NSDate = NSDate()
-        var dateFormatter:NSDateFormatter = NSDateFormatter()
+        let todaysDate:NSDate = NSDate()
+        let dateFormatter:NSDateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "MM/dd/yy"
-        var dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
+        let dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
         data.setValue(dateInFormat, forKey: "projectDate")
         
         self.tableData.append(data)
@@ -160,8 +163,8 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         self.updateTableData()
     }
    
-    override func supportedInterfaceOrientations() -> Int {
-        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
     
     override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
@@ -173,34 +176,37 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     }
     
     func loadTableData() {
-        var request = NSFetchRequest(entityName: "TableViewDataEntity")
+        let request = NSFetchRequest(entityName: "TableViewDataEntity")
         request.returnsObjectsAsFaults = false
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
-        var tableViewDataEntity = results[0] as! TableViewDataEntity
-        var tableDataAsNSData = tableViewDataEntity.tableData as NSData
+        let results: NSArray = try! context.executeFetchRequest(request)
+        let tableViewDataEntity = results[0] as! TableViewDataEntity
+        let tableDataAsNSData = tableViewDataEntity.tableData as NSData
         self.tableData = NSKeyedUnarchiver.unarchiveObjectWithData(tableDataAsNSData) as! Array<NSMutableDictionary>
         self.tableView.reloadData()
     }
     
     func updateTableData() {
         for (var i = 0; i < self.tableData.count; i++) {
-            var cell: ProjectTableViewCell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as! ProjectTableViewCell
+            let cell: ProjectTableViewCell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as! ProjectTableViewCell
                 
             self.tableData[i].setValue(cell.projectName.text, forKey: "projectName")
-            print("inforloop:")
-            println(i)
+            print("inforloop:", terminator: "")
+            print(i)
         }
     
-        var request = NSFetchRequest(entityName: "TableViewDataEntity")
+        let request = NSFetchRequest(entityName: "TableViewDataEntity")
         request.returnsObjectsAsFaults = false
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
-            var tableViewDataEntity = results[0] as! TableViewDataEntity
-            var newTableDataAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.tableData)
+            let tableViewDataEntity = results[0] as! TableViewDataEntity
+            let newTableDataAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.tableData)
             tableViewDataEntity.tableData = newTableDataAsNSData
-            self.context.save(nil)
+            do {
+                try self.context.save()
+            } catch _ {
+            }
         } else {
-            println("Problem with updating tableData")
+            print("Problem with updating tableData")
         }
     }
 }

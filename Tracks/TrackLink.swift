@@ -41,7 +41,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         self.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
         rootTrackID = track.trackID
         rootTrackAudioPlayer = track.audioPlayer
-        var rootNode = TrackLinkNode(track: track)
+        let rootNode = TrackLinkNode(track: track)
         trackNodeIDs[rootTrackAudioPlayer] = rootNode
         setNeedsDisplay()
     }
@@ -59,21 +59,21 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         setNeedsDisplay()
     }
     
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func touchBegan(touches: NSSet, withEvent event: UIEvent) {
-        println("TOUCHED TRACKLINK BEGAN")
-        var touch: UITouch = touches.anyObject() as! UITouch
-        var touchLoc: CGPoint = touch.locationInView(self)
+    func touchBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("TOUCHED TRACKLINK BEGAN")
+        let touch: UITouch = touches.first!
+        let touchLoc: CGPoint = touch.locationInView(self)
         
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             var highestIndex = -1
             for audioPlayer in trackNodeIDs.keys {
-                var trackID = trackNodeIDs[audioPlayer]!.rootTrackID
-                var track = (self.superview as! LinkManager).getTrackByID(trackID)
-                var trackIndex = (self.superview as! LinkManager).getTrackIndex(track!)
+                let trackID = trackNodeIDs[audioPlayer]!.rootTrackID
+                let track = (self.superview as! LinkManager).getTrackByID(trackID)
+                let trackIndex = (self.superview as! LinkManager).getTrackIndex(track!)
                 if trackIndex > highestIndex && track!.frame.contains(touchLoc) {
                     highestIndex = trackIndex
                     curTouchedTrack = track
@@ -87,16 +87,16 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             //Make a dictionary of the track nodes with the current z-order index
             var trackSubviews = [Int: Track]()
             for audioPlayer in trackNodeIDs.keys {
-                var trackID = trackNodeIDs[audioPlayer]!.rootTrackID
-                var track = (self.superview as! LinkManager).getTrackByID(trackID)
-                var trackIndex = (self.superview as! LinkManager).getTrackIndex(track!)
+                let trackID = trackNodeIDs[audioPlayer]!.rootTrackID
+                let track = (self.superview as! LinkManager).getTrackByID(trackID)
+                let trackIndex = (self.superview as! LinkManager).getTrackIndex(track!)
                 trackSubviews[trackIndex] = track!
             }
             
             //Now iterate through dictionary, sorted by keys(index), to distribute touch, and check if touch landed on an edge or a node.
-            var sortedKeys = Array(trackSubviews.keys).sorted(<)
+            let sortedKeys = Array(trackSubviews.keys).sort(<)
             for index in sortedKeys {
-                var track = (trackSubviews[index] as Track!)
+                let track = (trackSubviews[index] as Track!)
                 if track.frame.contains(touchLoc) {
                     curTouchedTrack = track
                     didTouchTrack = true
@@ -116,10 +116,10 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         }
     }
     
-    func touchMoved(touches: NSSet, withEvent event: UIEvent) {
-        println("TOUCHED TRACKLINK MOVED")
-        var touch: UITouch = touches.anyObject() as! UITouch
-        var touchLoc: CGPoint = touch.locationInView(self)
+    func touchMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("TOUCHED TRACKLINK MOVED")
+        let touch: UITouch = touches.first!
+        let touchLoc: CGPoint = touch.locationInView(self)
         
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             curTouchLoc = touchLoc
@@ -127,8 +127,8 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         } else {
             if touchHitEdge {
                 for audioPlayer in trackNodeIDs.keys {
-                    var trackID = trackNodeIDs[audioPlayer]!.rootTrackID
-                    var track = (self.superview as! LinkManager).getTrackByID(trackID)
+                    let trackID = trackNodeIDs[audioPlayer]!.rootTrackID
+                    let track = (self.superview as! LinkManager).getTrackByID(trackID)
                     track!.touchMoved(touches, withEvent: event)
                 }
             } else {
@@ -139,8 +139,8 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         }
     }
     
-    func touchEnded(touches: NSSet, withEvent event: UIEvent) {
-        println("TOUCHED TRACKLINK ENDED")
+    func touchEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("TOUCHED TRACKLINK ENDED")
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             curTouchLoc = nil
             curTouchedTrack = nil
@@ -148,8 +148,8 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             if wasDragged {
                 if touchHitEdge {
                     for audioPlayer in trackNodeIDs.keys {
-                        var trackID = trackNodeIDs[audioPlayer]!.rootTrackID
-                        var track = (self.superview as! LinkManager).getTrackByID(trackID)
+                        let trackID = trackNodeIDs[audioPlayer]!.rootTrackID
+                        let track = (self.superview as! LinkManager).getTrackByID(trackID)
                         track!.touchEnded(touches, withEvent: event)
                     }
                 } else {
@@ -167,18 +167,18 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     }
     
     func bringTrackLinkToFront() {
-        var supervw = self.superview!
+        let supervw = self.superview!
         supervw.insertSubview(self, atIndex: supervw.subviews.count - 4)
     }
     
     func beginPlaySequence(fromStartTrack startTrack: Track) {
-        var node = trackNodeIDs[startTrack.audioPlayer]
+        let node = trackNodeIDs[startTrack.audioPlayer]
         if node != nil {
-            var rootTrack = (self.superview as! LinkManager).getTrackByID(node!.rootTrackID)
+            let rootTrack = (self.superview as! LinkManager).getTrackByID(node!.rootTrackID)
             rootTrack!.audioPlayer.delegate = self
             rootTrack!.playAudio()
             
-            var visitedSiblings = NSMutableArray()
+            let visitedSiblings = NSMutableArray()
             visitedSiblings.addObject(rootTrack!.trackID)
             var siblingQueue = [String]()
             //Append initial siblings.
@@ -187,10 +187,10 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             }
             //continue adding siblings of siblings to queue until all have been visited.
             while !siblingQueue.isEmpty {
-                print("SIBLING COUNT: ")
-                println(siblingQueue.count)
-                var sibling = (self.superview as! LinkManager).getTrackByID(siblingQueue.removeAtIndex(0))
-                var sibNode = trackNodeIDs[sibling!.audioPlayer]
+                print("SIBLING COUNT: ", terminator: "")
+                print(siblingQueue.count)
+                let sibling = (self.superview as! LinkManager).getTrackByID(siblingQueue.removeAtIndex(0))
+                let sibNode = trackNodeIDs[sibling!.audioPlayer]
                 sibling!.audioPlayer.delegate = self
                 sibling!.playAudio()
                 visitedSiblings.addObject(sibling!.trackID)
@@ -202,21 +202,21 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             }
             
         } else {
-            println("startTrack did not belong to this link")
+            print("startTrack did not belong to this link")
         }
     }
     
-    func audioPlayerDidFinishPlaying(player: AVAudioPlayer!, successfully flag: Bool) {
-        println("finished playing!!!")
-        var node = trackNodeIDs[player]!
+    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
+        print("finished playing!!!")
+        let node = trackNodeIDs[player]!
         //Begin plaing each child and each child's siblings, if any.
         for childID in node.childrenIDs {
-            var child = (self.superview as! LinkManager).getTrackByID(childID)
+            let child = (self.superview as! LinkManager).getTrackByID(childID)
             child!.audioPlayer.delegate = self
             child!.playAudio()
-            var childNode = trackNodeIDs[child!.audioPlayer]!
+            let childNode = trackNodeIDs[child!.audioPlayer]!
         
-            var visitedSiblings = NSMutableArray()
+            let visitedSiblings = NSMutableArray()
             visitedSiblings.addObject(child!.trackID)
             var siblingQueue = [String]()
             //Append initial siblings.
@@ -225,8 +225,8 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             }
             //continue adding siblings of siblings to queue until all have been visited.
             while !siblingQueue.isEmpty {
-                var sibling = (self.superview as! LinkManager).getTrackByID(siblingQueue.removeAtIndex(0))
-                var sibNode = trackNodeIDs[sibling!.audioPlayer]
+                let sibling = (self.superview as! LinkManager).getTrackByID(siblingQueue.removeAtIndex(0))
+                let sibNode = trackNodeIDs[sibling!.audioPlayer]
                 sibling!.audioPlayer.delegate = self
                 sibling!.playAudio()
                 visitedSiblings.addObject(sibling!.trackID)
@@ -255,20 +255,20 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     }
     
     func commitEdgeToLink() {
-        println("ADDING TRACK TO TRACKLINK!")
+        print("ADDING TRACK TO TRACKLINK!")
         //Add queued track to dictionary as a new node
-        var newNode = TrackLinkNode(track: queuedTrackForAdding)
+        let newNode = TrackLinkNode(track: queuedTrackForAdding)
         trackNodeIDs[queuedTrackForAdding.audioPlayer] = newNode
         
         if mode == "ADD_SEQ_LINK" {
             //Add queued track to children array of curTouchedTrack
-            var node = trackNodeIDs[curTouchedTrack.audioPlayer]
+            let node = trackNodeIDs[curTouchedTrack.audioPlayer]
             if node != nil {
                 node!.childrenIDs.append(queuedTrackForAdding.trackID)
             }
         } else if mode == "ADD_SIMUL_LINK" {
             //Add queued track to sibling array of curTouchedTrack
-            var node = trackNodeIDs[curTouchedTrack.audioPlayer]
+            let node = trackNodeIDs[curTouchedTrack.audioPlayer]
             if node != nil {
                 node!.siblingIDs.append(queuedTrackForAdding.trackID)
                 newNode.siblingIDs.append(node!.rootTrackID)
@@ -288,16 +288,16 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     }
     
     func drawLinkEdges() {
-        var context = UIGraphicsGetCurrentContext()
+        let context = UIGraphicsGetCurrentContext()
         
         for audioPlayer in trackNodeIDs.keys {
             
-            var node = trackNodeIDs[audioPlayer]!
-            var trackID = node.rootTrackID
-            var startTrack = (self.superview as! LinkManager).getTrackByID(trackID)
+            let node = trackNodeIDs[audioPlayer]!
+            let trackID = node.rootTrackID
+            let startTrack = (self.superview as! LinkManager).getTrackByID(trackID)
             
             for childTrackID in node.childrenIDs {
-                var endTrack = (self.superview as! LinkManager).getTrackByID(childTrackID)
+                let endTrack = (self.superview as! LinkManager).getTrackByID(childTrackID)
                 //For each child, paint line from parent track node.
                 CGContextSetStrokeColorWithColor(context, UIColor.redColor().colorWithAlphaComponent(1).CGColor)
                 CGContextSetLineWidth(context, 8)
@@ -308,7 +308,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             }
             
             for siblingTrackID in node.siblingIDs {
-                var endTrack = (self.superview as! LinkManager).getTrackByID(siblingTrackID)
+                let endTrack = (self.superview as! LinkManager).getTrackByID(siblingTrackID)
                 //For each child, paint line from parent track node.
                 CGContextSetStrokeColorWithColor(context, UIColor.blueColor().colorWithAlphaComponent(1).CGColor)
                 CGContextSetLineWidth(context, 8)
@@ -323,16 +323,16 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     
     func eraseLineOnTrack(track: Track) {
         //Draws clear fill over track node to erase link line from center to edge of node.
-        var outLineFrame = track.frame
-        var outline = UIBezierPath(roundedRect: outLineFrame, cornerRadius: 12)
-        outline.fillWithBlendMode(kCGBlendModeClear, alpha: 1)
+        let outLineFrame = track.frame
+        let outline = UIBezierPath(roundedRect: outLineFrame, cornerRadius: 12)
+        outline.fillWithBlendMode(CGBlendMode.Clear, alpha: 1)
     }
     
     func drawTrackNodeOutlines() {
         for audioPlayer in trackNodeIDs.keys {
-            var node = trackNodeIDs[audioPlayer]!
-            var trackID = node.rootTrackID
-            var track = (self.superview as! LinkManager).getTrackByID(trackID)
+            let node = trackNodeIDs[audioPlayer]!
+            let trackID = node.rootTrackID
+            let track = (self.superview as! LinkManager).getTrackByID(trackID)
             track!.layer.borderWidth = 5
             if !node.siblingIDs.isEmpty && !node.childrenIDs.isEmpty {
                 track!.layer.borderColor = UIColor.purpleColor().CGColor
@@ -369,7 +369,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     }
     
     func drawCurLinkAdd() {
-        var context = UIGraphicsGetCurrentContext()
+        let context = UIGraphicsGetCurrentContext()
         CGContextBeginPath(context)
         CGContextMoveToPoint(context, curTouchedTrack.center.x, curTouchedTrack.center.y)
         CGContextAddLineToPoint(context, curTouchLoc.x, curTouchLoc.y)
@@ -388,8 +388,8 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     
     func deleteTrackLink() {
         for audioPlayer in trackNodeIDs.keys {
-            var trackID = trackNodeIDs[audioPlayer]!.rootTrackID
-            var track = (self.superview as! LinkManager).getTrackByID(trackID)
+            let trackID = trackNodeIDs[audioPlayer]!.rootTrackID
+            let track = (self.superview as! LinkManager).getTrackByID(trackID)
             track!.layer.borderColor = UIColor.clearColor().CGColor
             track!.layer.borderWidth = 0
         }
@@ -399,22 +399,22 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     
     override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
         for audioPlayer in trackNodeIDs.keys {
-            var node = trackNodeIDs[audioPlayer]!
-            var trackID = node.rootTrackID
-            var startTrack = (self.superview as! LinkManager).getTrackByID(trackID)
+            let node = trackNodeIDs[audioPlayer]!
+            let trackID = node.rootTrackID
+            let startTrack = (self.superview as! LinkManager).getTrackByID(trackID)
             if startTrack!.frame.contains(point) {
                 return true
             }
             for childTrackID in node.childrenIDs {
-                var endTrack = (self.superview as! LinkManager).getTrackByID(childTrackID)
-                var edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
+                let endTrack = (self.superview as! LinkManager).getTrackByID(childTrackID)
+                let edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
                 if edge.containsPoint(point) {
                     return true
                 }
             }
             for siblingID in node.siblingIDs {
-                var endTrack = (self.superview as! LinkManager).getTrackByID(siblingID)
-                var edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
+                let endTrack = (self.superview as! LinkManager).getTrackByID(siblingID)
+                let edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
                 if edge.containsPoint(point) {
                     return true
                 }
@@ -425,22 +425,22 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     
     override func hitTest(point: CGPoint, withEvent event: UIEvent?) -> UIView? {
         for audioPlayer in trackNodeIDs.keys {
-            var node = trackNodeIDs[audioPlayer]!
-            var trackID = node.rootTrackID
-            var startTrack = (self.superview as! LinkManager).getTrackByID(trackID)
+            let node = trackNodeIDs[audioPlayer]!
+            let trackID = node.rootTrackID
+            let startTrack = (self.superview as! LinkManager).getTrackByID(trackID)
             if startTrack!.frame.contains(point) {
                 return self
             }
             for childTrackID in node.childrenIDs {
-                var endTrack = (self.superview as! LinkManager).getTrackByID(childTrackID)
-                var edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
+                let endTrack = (self.superview as! LinkManager).getTrackByID(childTrackID)
+                let edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
                 if edge.containsPoint(point) {
                     return self
                 }
             }
             for siblingID in node.siblingIDs {
-                var endTrack = (self.superview as! LinkManager).getTrackByID(siblingID)
-                var edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
+                let endTrack = (self.superview as! LinkManager).getTrackByID(siblingID)
+                let edge = LinkEdge(startTrackNode: startTrack!, endTrackNode: endTrack!)
                 if edge.containsPoint(point) {
                     return self
                 }
@@ -450,57 +450,66 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     }
 
     func updateLinkCoreData() {
-        println("Updating link data")
-        var request = NSFetchRequest(entityName: "LinkEntity")
+        print("Updating link data")
+        let request = NSFetchRequest(entityName: "LinkEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "linkID = %@", argumentArray: [linkID])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
-            var linkEntity = results[0] as! LinkEntity
+            let linkEntity = results[0] as! LinkEntity
             
             //update tracklink nodes
             var nodeArray = [TrackLinkNode]()
             for node in trackNodeIDs.values {
                 nodeArray.append(node)
             }
-            var nodeData = NSKeyedArchiver.archivedDataWithRootObject(nodeArray)
+            let nodeData = NSKeyedArchiver.archivedDataWithRootObject(nodeArray)
             linkEntity.linkNodes = nodeData
             linkEntity.rootTrackID = rootTrackID
         } else {
-            println("MULTIPLE LINKS WITH SAME ID!")
+            print("MULTIPLE LINKS WITH SAME ID!")
         }
-        context.save(nil)
+        do {
+            try context.save()
+        } catch _ {
+        }
     }
     
     func saveLinkCoreData(projectEntity: ProjectEntity) {
-        println("first save of simul link: " + linkID)
+        print("first save of simul link: " + linkID)
         
         //Create array of link nodes from trackNodeIDs dictionary.
         var nodeArray = [TrackLinkNode]()
         for node in trackNodeIDs.values {
             nodeArray.append(node)
         }
-        var nodeData = NSKeyedArchiver.archivedDataWithRootObject(nodeArray)
+        let nodeData = NSKeyedArchiver.archivedDataWithRootObject(nodeArray)
         
-        var linkEntity = NSEntityDescription.insertNewObjectForEntityForName("LinkEntity", inManagedObjectContext: context) as! LinkEntity
+        let linkEntity = NSEntityDescription.insertNewObjectForEntityForName("LinkEntity", inManagedObjectContext: context) as! LinkEntity
         linkEntity.linkNodes = nodeData
         linkEntity.project = projectEntity
         linkEntity.rootTrackID = rootTrackID
         linkEntity.linkID = linkID
-        context.save(nil)
+        do {
+            try context.save()
+        } catch _ {
+        }
     }
     
     func deleteLinkFromCoreData() {
-        var request = NSFetchRequest(entityName: "LinkEntity")
+        let request = NSFetchRequest(entityName: "LinkEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "linkID = %@", argumentArray: [linkID])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
-            var linkToDelete = results[0] as! LinkEntity
+            let linkToDelete = results[0] as! LinkEntity
             context.deleteObject(linkToDelete)
-            context.save(nil)
+            do {
+                try context.save()
+            } catch _ {
+            }
         }  else {
-            println("MULTIPLE LINKS WITH SAME ID!")
+            print("MULTIPLE LINKS WITH SAME ID!")
         }
     }    
 }

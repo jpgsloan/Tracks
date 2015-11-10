@@ -24,22 +24,22 @@ class DrawView: UIView {
         context = appDel.managedObjectContext!
     }
     
-    required init(coder aDecoder: NSCoder){
+    required init?(coder aDecoder: NSCoder){
         super.init(coder: aDecoder)
     }
     
-    func touchBegan(touches: NSSet, withEvent event: UIEvent) {
-        lastPoint = touches.anyObject()?.locationInView(self)
+    func touchBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        lastPoint = touches.first!.locationInView(self)
     }
     
-    func touchMoved(touches: NSSet, withEvent event: UIEvent) {
-        var newPoint = touches.anyObject()?.locationInView(self)
-        curPath.append(Line(start: lastPoint, end: newPoint!))
+    func touchMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        let newPoint = touches.first!.locationInView(self)
+        curPath.append(Line(start: lastPoint, end: newPoint))
         lastPoint = newPoint
         self.setNeedsDisplay()
     }
     
-    func touchEnded(touches: NSSet, withEvent event: UIEvent) {
+    func touchEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if (!curPath.isEmpty) {
             self.allPaths.append(curPath)
             self.updateAllPaths()
@@ -48,7 +48,7 @@ class DrawView: UIView {
     }
 
     override func drawRect(rect: CGRect) {
-        var context = UIGraphicsGetCurrentContext()
+        let context = UIGraphicsGetCurrentContext()
         CGContextBeginPath(context)
         for path in allPaths {
             for line in path {
@@ -74,17 +74,20 @@ class DrawView: UIView {
     }
     
     func updateAllPaths() {
-        var request = NSFetchRequest(entityName: "DrawViewEntity")
+        let request = NSFetchRequest(entityName: "DrawViewEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectEntity = %@", argumentArray: [self.projectEntity])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
-            var drawViewEntity = results[0] as! DrawViewEntity
-            var allPathsAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.allPaths)
+            let drawViewEntity = results[0] as! DrawViewEntity
+            let allPathsAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.allPaths)
             drawViewEntity.allLines = allPathsAsNSData
-            self.context.save(nil)
+            do {
+                try self.context.save()
+            } catch _ {
+            }
         } else {
-            println("Problem with updating drawView data")
+            print("Problem with updating drawView data")
         }
 
     }
@@ -92,13 +95,13 @@ class DrawView: UIView {
     func loadAllPaths() {
         appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
-        var request = NSFetchRequest(entityName: "DrawViewEntity")
+        let request = NSFetchRequest(entityName: "DrawViewEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectEntity = %@", argumentArray: [self.projectEntity])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
-            var drawViewEntity = results[0] as! DrawViewEntity
-            var allPathsAsNSData = drawViewEntity.allLines as NSData
+            let drawViewEntity = results[0] as! DrawViewEntity
+            let allPathsAsNSData = drawViewEntity.allLines as NSData
             self.allPaths = NSKeyedUnarchiver.unarchiveObjectWithData(allPathsAsNSData) as! [[Line]]
             self.setNeedsDisplay()
         }
@@ -108,10 +111,13 @@ class DrawView: UIView {
         appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
         self.projectEntity = projectEntity
-        var drawViewEntity = NSEntityDescription.insertNewObjectForEntityForName("DrawViewEntity", inManagedObjectContext: self.context) as! DrawViewEntity
-        var allPathsAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.allPaths)
+        let drawViewEntity = NSEntityDescription.insertNewObjectForEntityForName("DrawViewEntity", inManagedObjectContext: self.context) as! DrawViewEntity
+        let allPathsAsNSData = NSKeyedArchiver.archivedDataWithRootObject(self.allPaths)
         drawViewEntity.projectEntity = projectEntity
         drawViewEntity.allLines = allPathsAsNSData
-        self.context.save(nil)
+        do {
+            try self.context.save()
+        } catch _ {
+        }
     }
 }

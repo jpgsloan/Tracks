@@ -23,52 +23,51 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
         super.init(frame: frame)
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
-        var longPressEdit = UILongPressGestureRecognizer(target: self, action: "changeTrackToEditMode:")
+        let longPressEdit = UILongPressGestureRecognizer(target: self, action: "changeTrackToEditMode:")
         longPressEdit.numberOfTapsRequired = 0
         longPressEdit.allowableMovement = CGFloat(2)
         longPressEdit.delegate = self
         self.addGestureRecognizer(longPressEdit)
     }
     
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
-        let touch = touches.first as! UITouch
-        var location: CGPoint = touch.locationInView(touch.window)
-        println("TOUCHED IN LINK MANAGER BEGAN")
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        let touch = touches.first!
+        let location: CGPoint = touch.locationInView(touch.window)
+        print("TOUCHED IN LINK MANAGER BEGAN")
         //Find the subview hit by touch
         firstHitSubview = UIView()
-        println("------------------")
+        print("------------------")
         for var i = self.subviews.count - 1; i >= 0; i-- {
-            var subview = self.subviews[i]
-            println(subview)
+            print(self.subviews[i])
         }
-        println("------------------")
+        print("------------------")
 
         for var i = self.subviews.count - 1; i >= 0; i-- {
-            var subview = self.subviews[i]
+            let subview = self.subviews[i]
             if subview is LinkManager {
                 continue
             } else if subview is Track || subview is DrawView {
                 if subview.frame.contains(location) {
-                    firstHitSubview = subview as! UIView
+                    firstHitSubview = subview 
                     break
                 }
             } else if subview is TrackLink {
                 if subview.pointInside(location, withEvent: event) {
-                    firstHitSubview = subview as! UIView
+                    firstHitSubview = subview 
                     break
                 }
             }
         }
 
-        print("FIRST HIT SUBVIEW: ")
-        println(firstHitSubview)
+        print("FIRST HIT SUBVIEW: ", terminator: "")
+        print(firstHitSubview)
     
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             if firstHitSubview is Track {
-                var newLink = TrackLink(frame: self.frame, withTrack: firstHitSubview as! Track)
+                let newLink = TrackLink(frame: self.frame, withTrack: firstHitSubview as! Track)
                 newLink.mode = mode
                 allTrackLinks.append(newLink)
                 curTrackLinkAdd = newLink
@@ -77,7 +76,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 newLink.saveLinkCoreData(projectEntity)
                 newLink.touchBegan(touches, withEvent: event)
             } else if firstHitSubview is TrackLink {
-                println("DELETE, MOVE, OR CHANGE TRACK LINK")
+                print("DELETE, MOVE, OR CHANGE TRACK LINK")
                 curTrackLinkAdd = (firstHitSubview as! TrackLink)
                 curTrackLinkAdd.touchBegan(touches, withEvent: event)
             }
@@ -99,16 +98,16 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             } else if firstHitSubview is DrawView {
                 (firstHitSubview as! DrawView).touchBegan(touches, withEvent: event)
             } else {
-                println("not important view for link manager")
+                print("not important view for link manager")
             }
         }
     }
     
-    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
-        println("TOUCHES MOVED LINK MANAGER")
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("TOUCHES MOVED LINK MANAGER")
         
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
-            let touch = touches.first as! UITouch
+            let touch = touches.first!
             var location: CGPoint = touch.locationInView(self)
             //determine the subview that is currently hit by moved touch
             var curHitSubview = UIView()
@@ -118,28 +117,28 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                     continue
                 } else if subview is Track {
                     if subview.frame.contains(location) {
-                        curHitSubview = subview as! UIView
+                        curHitSubview = subview 
                         break
                     }
                 } else if subview is TrackLink {
                     if subview.pointInside(location, withEvent: event) {
-                        curHitSubview = subview as! UIView
+                        curHitSubview = subview 
                         break
                     }
                 }
             }
             
-            println(curHitSubview)
+            print(curHitSubview)
             
             if curHitSubview is Track {
                 curTrackLinkAdd.dequeueTrackFromAdding()
                 self.insertSubview(curHitSubview, atIndex: self.subviews.count - 6)
                 curTrackLinkAdd.queueTrackForAdding(curHitSubview as! Track)
             } else if curTrackLinkAdd != nil && curHitSubview == curTrackLinkAdd {
-                println("WAS CURRENT ADDING LINK")
+                print("WAS CURRENT ADDING LINK")
                 curTrackLinkAdd.dequeueTrackFromAdding()
             } else if curHitSubview is TrackLink {
-                print("DELETE, MOVE, OR CHANGE TRACK LINK")
+                print("DELETE, MOVE, OR CHANGE TRACK LINK", terminator: "")
             } else {
                 if curTrackLinkAdd != nil && curTrackLinkAdd.queuedTrackForAdding != nil {
                     curTrackLinkAdd.dequeueTrackFromAdding()
@@ -164,17 +163,16 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 hideToolbars(true)
                 (firstHitSubview as! DrawView).touchMoved(touches, withEvent: event)
             } else {
-                println("UIVIEW")
+                print("UIVIEW")
             }
         }
     }
    
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
-        println("TOUCHES ENDED LINK MANAGER")
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("TOUCHES ENDED LINK MANAGER")
         
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
-            print("add link mode: ")
-            println(mode)
+            print("add link mode: \(mode)")
             if curTrackLinkAdd != nil {
                 if curTrackLinkAdd.queuedTrackForAdding != nil {
                     curTrackLinkAdd.commitEdgeToLink()
@@ -187,13 +185,13 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 curTrackLinkAdd = nil
             }
         } else if mode == "TRASH" {
-            println("trash mode")
+            print("trash mode")
             //do nothing
         } else if mode == "NOTOUCHES" {
-            println("no touches mode (used for open notes, sidebar, edit mode)")
+            print("no touches mode (used for open notes, sidebar, edit mode)")
             //Do nothing
         } else {
-            println("normal mode")
+            print("normal mode")
             if firstHitSubview is Track {
                 hideToolbars(false)
                 (firstHitSubview as! Track).touchEnded(touches, withEvent: event)
@@ -204,17 +202,17 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 hideToolbars(false)
                 (firstHitSubview as! DrawView).touchEnded(touches, withEvent: event)
             } else {
-                println("OTHER UIVIEW")
+                print("OTHER UIVIEW")
             }
         }
     }
     
-    func hideToolbars(shouldHide: Bool) {
+    func hideToolbars(shouldHide: Bool) {        
         var navigationBar: UINavigationBar?
         var toolbar: UIToolbar?
         var statusBarBackground: UIVisualEffectView?
         for var i = self.subviews.count - 1; i >= 0; i-- {
-            var subview = subviews[i]
+            let subview = subviews[i]
             if subview is UINavigationBar {
                 navigationBar = subview as! UINavigationBar
             } else if subview is UIToolbar {
@@ -226,53 +224,30 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             }
         }
         if toolbar != nil && navigationBar != nil && statusBarBackground != nil {
-            var toolbarConstraint: NSLayoutConstraint?
-            var navBarConstraint: NSLayoutConstraint?
-            for constraint in toolbar!.constraintsAffectingLayoutForAxis(UILayoutConstraintAxis.Vertical) {
-                println(constraint)
-                if constraint is NSLayoutConstraint {
-                    toolbarConstraint = constraint as! NSLayoutConstraint
-                    break
-                }
+            // fade out toolbar and navbar            
+            if shouldHide {
+                UIView.beginAnimations("fade", context: nil)
+                navigationBar!.alpha = 0.0
+                toolbar!.alpha = 0.0
+                statusBarBackground!.alpha = 0.0
+                UIView.commitAnimations()
+            } else {
+                UIView.beginAnimations("fade", context: nil)
+                navigationBar!.alpha = 1.0
+                toolbar!.alpha = 1.0
+                statusBarBackground!.alpha = 1.0
+                UIView.commitAnimations()
             }
-            for constraint in navigationBar!.constraintsAffectingLayoutForAxis(UILayoutConstraintAxis.Vertical) {
-                println(constraint)
-                if constraint is NSLayoutConstraint {
-                    navBarConstraint = constraint as! NSLayoutConstraint
-                    break
-                }
-            }
-        
-            if toolbarConstraint != nil && navBarConstraint != nil {
-                if shouldHide {
-                    UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                        navBarConstraint!.constant = -100
-                        toolbarConstraint!.constant = -100
-                        statusBarBackground!.frame.origin.y = -100
-                        self.layoutIfNeeded()
-                        }) { (bool:Bool) -> Void in
-                    }
-                } else {
-                    UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                        navBarConstraint!.constant = 20
-                        toolbarConstraint!.constant = 15
-                        statusBarBackground!.frame.origin.y = 0
-                        self.layoutIfNeeded()
-                        }) { (bool:Bool) -> Void in
-                    }
-                }
-            }
-            
         }
     }
     
     func changeTrackToEditMode(gestureRecognizer: UIGestureRecognizer) {
-        println("LONG PRESS RECOGNIZED")
+        print("LONG PRESS RECOGNIZED")
         if mode == "" {
             hideToolbars(true)
-            var location = gestureRecognizer.locationInView(self)
+            let location = gestureRecognizer.locationInView(self)
             for var i = self.subviews.count - 1; i >= 0; i-- {
-                var subview = subviews[i]
+                let subview = subviews[i]
                 if subview is LinkManager {
                     continue
                 } else if subview is Track {
@@ -311,7 +286,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     func getTrackIndex(track: Track) -> Int {
         var trackIndex = -1
         for var i = self.subviews.count - 1; i >= 0; i-- {
-            var subview = subviews[i]
+            let subview = subviews[i]
             if subview is Track {
                 if (subview as! Track) == track {
                     trackIndex = i

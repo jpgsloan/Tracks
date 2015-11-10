@@ -69,10 +69,10 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         notesView = NotesView(frame: self.view.bounds)
         
         // Check if project folder already exists
-        let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
-        let allProjects = filemanager.contentsOfDirectoryAtPath(docDirectory, error: nil)
+        let docDirectory = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] 
+        let allProjects = try? filemanager.contentsOfDirectoryAtPath(docDirectory)
         for project in allProjects! {
-            if project as! NSString == projectID {
+            if project as NSString == projectID {
                 createProjectFolder = false
                 break
             }
@@ -80,27 +80,29 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         
         // Create new folder for project if needed. stores audio files in this location.
         if createProjectFolder {
-            println("CREATING NEW PROJECT FOLDER")
-            let newDirectory = docDirectory.stringByAppendingPathComponent(projectID)
+            print("CREATING NEW PROJECT FOLDER")
+            let newDirectory = NSString(string: docDirectory).stringByAppendingPathComponent(projectID)
             var error: NSError?
-            if filemanager.createDirectoryAtPath(newDirectory, withIntermediateDirectories: true, attributes: nil, error: &error) {
+            do {
+                try filemanager.createDirectoryAtPath(newDirectory, withIntermediateDirectories: true, attributes: nil)
                 projectDirectory = newDirectory
-            } else {
-                println("could not make new project directory: \(error!.localizedDescription) ")
+            } catch let error1 as NSError {
+                error = error1
+                print("could not make new project directory: \(error!.localizedDescription) ")
             }
         } else {
-            println("LOADING OLD PROJECT")
-            projectDirectory = docDirectory.stringByAppendingPathComponent(projectID)
+            print("LOADING OLD PROJECT")
+            projectDirectory = NSString(string: docDirectory).stringByAppendingPathComponent(projectID)
         }
         
         // Assign context, and its core data project entity if it exists.
         appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
         
-        var request = NSFetchRequest(entityName: "ProjectEntity")
+        let request = NSFetchRequest(entityName: "ProjectEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
       
         if results.count < 1 {
             projectEntity =  NSEntityDescription.insertNewObjectForEntityForName("ProjectEntity", inManagedObjectContext: context) as! ProjectEntity
@@ -147,7 +149,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func addTrack(sender: UIBarButtonItem) {
         //Create new Track and set project directory where sound files will be stored.
-        var newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
+        let newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
         newTrack.projectDirectory = projectDirectory
         
         //Center and add the new track node.
@@ -155,11 +157,11 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         newTrack.setLabelNameText("untitled")
         newTrack.saveTrackCoreData(projectEntity)
         
-        println("IN FOR LOOP")
+        print("IN FOR LOOP")
         for subview in self.view.subviews {
-            println(subview)
+            print(subview)
         }
-        println("END FOR LOOP")
+        print("END FOR LOOP")
         tracks.addObject(newTrack)
         self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 3)
     }
@@ -167,7 +169,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
         sideBarOpenBackgroundView = UIView(frame: self.view.frame)
         sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
-        var tapGesture = UITapGestureRecognizer(target: self, action: "closeSideBarVC:")
+        let tapGesture = UITapGestureRecognizer(target: self, action: "closeSideBarVC:")
         tapGesture.numberOfTapsRequired = 1
         sideBarOpenBackgroundView.addGestureRecognizer(tapGesture)
         (self.view as! LinkManager).mode = "NOTOUCHES"
@@ -215,8 +217,8 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         }
         
         //create exit button and add to view
-        var exitButton = UIButton(frame: CGRect(x: 20, y: self.view.frame.height - 40, width: 20, height: 20))
-        var image = UIImage(named: "close-button")
+        let exitButton = UIButton(frame: CGRect(x: 20, y: self.view.frame.height - 40, width: 20, height: 20))
+        let image = UIImage(named: "close-button")
         exitButton.setImage(image, forState: UIControlState.Normal)
         exitButton.addTarget(self, action: "exitAddLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
         exitButton.adjustsImageWhenHighlighted = true
@@ -252,7 +254,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     }
     
     func changeToSeqLinkMode(sender: UIButton) {
-        println("changing to seq link mode")
+        print("changing to seq link mode")
         linkManager.mode = "ADD_SEQ_LINK"
         for link in linkManager.allTrackLinks {
             link.mode = "ADD_SEQ_LINK"
@@ -266,7 +268,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func undoDraw(sender: UIBarButtonItem) {
-        println("UNDODRAW")
+        print("UNDODRAW")
         drawView.undoDraw()
     }
    
@@ -295,8 +297,8 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
                     self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
-            var exitTrashModeButton = UIButton(frame: CGRect(x: self.view.frame.width - 40, y: self.view.frame.height - 40, width: 20, height: 20))
-            var image = UIImage(named: "close-button")
+            let exitTrashModeButton = UIButton(frame: CGRect(x: self.view.frame.width - 40, y: self.view.frame.height - 40, width: 20, height: 20))
+            let image = UIImage(named: "close-button")
             exitTrashModeButton.setImage(image, forState: UIControlState.Normal)
             exitTrashModeButton.addTarget(self, action: "exitTrashMode:", forControlEvents: UIControlEvents.TouchUpInside)
             exitTrashModeButton.adjustsImageWhenHighlighted = true
@@ -321,13 +323,13 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         titleTextField.resignFirstResponder()
-        var projectName = titleTextField.text
-        (parentViewController as! ProjectManagerViewController).updateProjectName(projectID, projectName: projectName)
+        let projectName = titleTextField.text
+        (parentViewController as! ProjectManagerViewController).updateProjectName(projectID, projectName: projectName!)
         return true
     }
     
-    override func supportedInterfaceOrientations() -> Int {
-        return Int(UIInterfaceOrientationMask.Portrait.rawValue)
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.Portrait
     }
     
     override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
@@ -339,16 +341,16 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     }
     
     func loadTracks() {
-        var request = NSFetchRequest(entityName: "ProjectEntity")
+        let request = NSFetchRequest(entityName: "ProjectEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         //for result in results {
         if (results.count > 0) {
-            var res = results[0] as! ProjectEntity
+            let res = results[0] as! ProjectEntity
             for track in res.track {
-                var trackEntity = track as! TrackEntity
-                var trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as! Track
+                let trackEntity = track as! TrackEntity
+                let trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as! Track
                 tracks.addObject(trackToAdd)
                 self.view.addSubview(trackToAdd)
             }
@@ -356,26 +358,26 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     }
     
     func loadLinks() {
-        var request = NSFetchRequest(entityName: "ProjectEntity")
+        let request = NSFetchRequest(entityName: "ProjectEntity")
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
-        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+        let results: NSArray = try! context.executeFetchRequest(request)
         if (results.count > 0) {
-            var res = results[0] as! ProjectEntity
+            let res = results[0] as! ProjectEntity
             for link in res.link {
-                var linkEntity = link as! LinkEntity
-                println("Loading link")
+                let linkEntity = link as! LinkEntity
+                print("Loading link")
                 //Get stored array of tracklink nodes and create new link
-                var linkNodes = NSKeyedUnarchiver.unarchiveObjectWithData(linkEntity.linkNodes) as! [TrackLinkNode]
+                let linkNodes = NSKeyedUnarchiver.unarchiveObjectWithData(linkEntity.linkNodes) as! [TrackLinkNode]
                 
                 //Create audioplayer dictionary from linkNodes
                 var trackNodeIDs: [AVAudioPlayer:TrackLinkNode] = [AVAudioPlayer:TrackLinkNode]()
                 for node in linkNodes {
-                    var track = (self.view as! LinkManager).getTrackByID(node.rootTrackID)
+                    let track = (self.view as! LinkManager).getTrackByID(node.rootTrackID)
                     trackNodeIDs[track!.audioPlayer] = node
                 }
                 
-                var linkToAdd = TrackLink(frame: self.view.frame, withTrackNodeIDs: trackNodeIDs, rootTrackID: linkEntity.rootTrackID, linkID: linkEntity.linkID)
+                let linkToAdd = TrackLink(frame: self.view.frame, withTrackNodeIDs: trackNodeIDs, rootTrackID: linkEntity.rootTrackID, linkID: linkEntity.linkID)
                 linkManager.allTrackLinks.append(linkToAdd)
                 self.view.addSubview(linkToAdd)
             }

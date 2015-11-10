@@ -32,7 +32,7 @@ class TrackEditView: UIView {
         xibSetup()
     }
     
-    required init(coder aDecoder: NSCoder){
+    required init?(coder aDecoder: NSCoder){
         super.init(coder: aDecoder)
         xibSetup()
     }
@@ -41,7 +41,7 @@ class TrackEditView: UIView {
         view = loadViewFromNib()
         
         view.frame = self.bounds
-        view.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+        view.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
         self.addSubview(view)
     }
     
@@ -56,7 +56,7 @@ class TrackEditView: UIView {
     
     func animateOpen() {
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            var newFrame = self.superview!.frame
+            let newFrame = self.superview!.frame
             self.frame = newFrame
             self.layoutIfNeeded()
             self.waveformEditView.setAudio(self.track.recordedAudio.filePathUrl)
@@ -66,7 +66,7 @@ class TrackEditView: UIView {
     
     func animateClose() {
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            var newFrame = self.track.frame
+            let newFrame = self.track.frame
             self.frame = newFrame
             self.backgroundColor = self.track.backgroundColor?.colorWithAlphaComponent(0.0)
         }, completion: { (bool:Bool) -> Void in

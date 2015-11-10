@@ -11,8 +11,10 @@ import UIKit
 class TimelineView: UIView {
 
     var totalTime: NSTimeInterval!
+    var timeWindow: CMTime!
     var leadingOffset: CGFloat = 0.0
     var trailingOffset: CGFloat = 0.0
+    var trimMode: Bool = false
     
     convenience init(frame: CGRect, duration: NSTimeInterval) {
         self.init(frame: frame)
@@ -25,7 +27,7 @@ class TimelineView: UIView {
         totalTime = 0.0
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.backgroundColor = UIColor.clearColor()
         totalTime = 0.0
@@ -36,15 +38,21 @@ class TimelineView: UIView {
         trailingOffset = trailing
     }
     
-    func updateTimeline(duration: NSTimeInterval) {
+    func updateTimeline(duration: NSTimeInterval, window: CMTime) {
         totalTime = duration
+        timeWindow = window
+        setNeedsDisplay()
+    }
+    
+    func toggleTrimMode(isOn: Bool) {
+        trimMode = isOn
         setNeedsDisplay()
     }
     
     override func drawRect(rect: CGRect) {
-        var stringAttrs = [NSFontAttributeName : UIFont.systemFontOfSize(13.0), NSForegroundColorAttributeName : UIColor.whiteColor()]
+        let stringAttrs = [NSFontAttributeName : UIFont.systemFontOfSize(13.0), NSForegroundColorAttributeName : UIColor.whiteColor()]
 
-        var format = NSDateFormatter()
+        let format = NSDateFormatter()
         if totalTime >= 3600 {
             format.dateFormat = "H:mm:ss"
         } else {
@@ -52,7 +60,7 @@ class TimelineView: UIView {
         }
         
         // Draw underline
-        var context = UIGraphicsGetCurrentContext()
+        let context = UIGraphicsGetCurrentContext()
         CGContextBeginPath(context)
         CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().CGColor)
         CGContextSetLineWidth(context, 1)
@@ -61,19 +69,37 @@ class TimelineView: UIView {
         CGContextStrokePath(context)
         
         // often reused values
-        var mainTickHeight = CGFloat(self.frame.height - 4.0)
-        var subTickHeight = CGFloat(self.frame.height / 5.0)
-        var widthWithOffset = self.frame.width - leadingOffset - trailingOffset
-        for (var i = 0; i < Int(ceil((self.frame.width / widthWithOffset) * CGFloat(totalTime))); i++) {
+        let mainTickHeight = CGFloat(self.frame.height - 4.0)
+        let subTickHeight = CGFloat(self.frame.height / 5.0)
+        var widthWithoutOffsets = self.frame.width - leadingOffset - trailingOffset
+        if widthWithoutOffsets == 0 {
+            print("DIVIDE BY ZERO ERROR")
+            widthWithoutOffsets = 1.0
+        }
+        
+        // adjust timeline tick scale so they aren't too close together with long recordings.
+        var incrementAdjust: Int = 1
+        if timeWindow.seconds > 120 {
+            incrementAdjust = 16
+        } else if timeWindow.seconds > 80 {
+            incrementAdjust = 8
+        } else if timeWindow.seconds > 40 {
+            incrementAdjust = 4
+        } else if timeWindow.seconds > 12 {
+            incrementAdjust = 2
+        }
+
+        let secondsWithOffsets = Int(ceil((self.frame.width / widthWithoutOffsets) * CGFloat(totalTime)))
+        for (var i = 0; i < secondsWithOffsets; i += incrementAdjust) {
             
-            var newX = CGFloat(Float64(i) / totalTime) * widthWithOffset + leadingOffset
-            // Draw time labels if necessary
-            if newX <= self.frame.width - trailingOffset {
+            let newX = CGFloat(Float64(i) / totalTime) * widthWithoutOffsets + leadingOffset
+            // Draw time labels if necessary (in trim mode labels are hidden)
+            if newX <= self.frame.width - trailingOffset && !trimMode {
                 // Create formatted time from current seconds
-                var durationDate = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(Int64(i)))
+                let durationDate = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(Int64(i)))
                 format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
-                var text = format.stringFromDate(durationDate)
-                var attrStr: NSAttributedString = NSAttributedString(string: text, attributes: stringAttrs)
+                let text = format.stringFromDate(durationDate)
+                let attrStr: NSAttributedString = NSAttributedString(string: text, attributes: stringAttrs)
                 attrStr.drawAtPoint(CGPoint(x: newX + CGFloat(2), y: 0 ))
             }
             
@@ -83,7 +109,7 @@ class TimelineView: UIView {
             CGContextSetLineWidth(context, 1)
             
             for (var j: CGFloat = 0; j < 4; j++) {
-                var subIncrement = (widthWithOffset / CGFloat(totalTime) ) / 4.0
+                let subIncrement = ((widthWithoutOffsets / CGFloat(totalTime) ) / 4.0) * CGFloat(incrementAdjust)
                 CGContextMoveToPoint(context, newX + (subIncrement * j), self.frame.height)
                 if j == 0 {
                     CGContextAddLineToPoint(context, newX + (subIncrement * j), self.frame.height - mainTickHeight)
@@ -96,16 +122,16 @@ class TimelineView: UIView {
         }
         
         // fill in leading offset with tick marks but no labels
-        for (var i = 0; i < Int(ceil((leadingOffset / widthWithOffset) * CGFloat(totalTime))); i++) {
+        for (var i = 0; i < Int(ceil((leadingOffset / widthWithoutOffsets) * CGFloat(totalTime))); i += incrementAdjust) {
             
-            var newX = leadingOffset - CGFloat(Float64(i) / totalTime) * widthWithOffset
+            let newX = leadingOffset - CGFloat(Float64(i) / totalTime) * widthWithoutOffsets
             
             CGContextBeginPath(context)
             CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().CGColor)
             CGContextSetLineWidth(context, 1)
             // Draw tick marks
             for (var j: CGFloat = 0; j < 4; j++) {
-                var subIncrement = (widthWithOffset / CGFloat(totalTime) ) / 4.0
+                let subIncrement = ((widthWithoutOffsets / CGFloat(totalTime) ) / 4.0) * CGFloat(incrementAdjust)
                 CGContextMoveToPoint(context, newX - (subIncrement * j), self.frame.height)
                 if j == 0 {
                     CGContextAddLineToPoint(context, newX - (subIncrement * j), self.frame.height - mainTickHeight)
