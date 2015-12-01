@@ -87,6 +87,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 (firstHitSubview as! TrackLink).deleteTrackLink()
             } else if firstHitSubview is DrawView {
                 //Do nothing
+                (firstHitSubview as! DrawView).deleteLineContainingTouch(location)
             }
         } else if mode == "NOTOUCHES" {
             //Do nothing
@@ -105,14 +106,14 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         print("TOUCHES MOVED LINK MANAGER")
-        
+        let touch = touches.first!
+        let location: CGPoint = touch.locationInView(self)
+
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
-            let touch = touches.first!
-            var location: CGPoint = touch.locationInView(self)
             //determine the subview that is currently hit by moved touch
             var curHitSubview = UIView()
             for var i = self.subviews.count - 1; i >= 0; i-- {
-                var subview = subviews[i]
+                let subview = subviews[i]
                 if subview is LinkManager {
                     continue
                 } else if subview is Track {
@@ -149,7 +150,35 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 curTrackLinkAdd.touchMoved(touches, withEvent: event)
             }
         } else if mode == "TRASH" {
-            //Do nothing
+            //determine the subview that is currently hit by moved touch
+            var curHitSubview = UIView()
+            for var i = self.subviews.count - 1; i >= 0; i-- {
+                var subview = subviews[i]
+                if subview is LinkManager {
+                    continue
+                } else if subview is Track {
+                    if subview.frame.contains(location) {
+                        curHitSubview = subview
+                        break
+                    }
+                } else if subview is TrackLink {
+                    if subview.pointInside(location, withEvent: event) {
+                        curHitSubview = subview
+                        break
+                    }
+                } else if subview is DrawView {
+                    curHitSubview = subview
+                }
+            }
+            
+            if curHitSubview is Track {
+                (curHitSubview as! Track).deleteTrack()
+            } else if curHitSubview is TrackLink {
+                (curHitSubview as! TrackLink).deleteTrackLink()
+            } else if curHitSubview is DrawView {
+                //Do nothing
+                (curHitSubview as! DrawView).deleteLineContainingTouch(location)
+            }
         } else if mode == "NOTOUCHES" {
             //Do nothing
         } else {
@@ -209,36 +238,72 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     
     func hideToolbars(shouldHide: Bool) {        
         var navigationBar: UINavigationBar?
-        var toolbar: UIToolbar?
-        var statusBarBackground: UIVisualEffectView?
+        var modeSegmentedControl: ModeSelectSegmentedControl?
+        var statusBarBackground: UIView?
         for var i = self.subviews.count - 1; i >= 0; i-- {
             let subview = subviews[i]
             if subview is UINavigationBar {
                 navigationBar = subview as! UINavigationBar
-            } else if subview is UIToolbar {
-                toolbar = subview as! UIToolbar
+            } else if subview is ModeSelectSegmentedControl {
+                modeSegmentedControl = subview as! ModeSelectSegmentedControl
             } else if subview is UIVisualEffectView {
                 statusBarBackground = subview as! UIVisualEffectView
             } else {
                 continue
             }
         }
-        if toolbar != nil && navigationBar != nil && statusBarBackground != nil {
+        if modeSegmentedControl != nil && navigationBar != nil && statusBarBackground != nil {
             // fade out toolbar and navbar            
             if shouldHide {
                 UIView.beginAnimations("fade", context: nil)
                 navigationBar!.alpha = 0.0
-                toolbar!.alpha = 0.0
+                modeSegmentedControl!.alpha = 0.0
                 statusBarBackground!.alpha = 0.0
                 UIView.commitAnimations()
             } else {
                 UIView.beginAnimations("fade", context: nil)
                 navigationBar!.alpha = 1.0
-                toolbar!.alpha = 1.0
+                modeSegmentedControl!.alpha = 1.0
                 statusBarBackground!.alpha = 1.0
                 UIView.commitAnimations()
             }
         }
+    }
+    
+    func showStopButton() {
+        let stopButton = self.viewWithTag(5109)
+        if stopButton != nil && stopButton is UIButton {
+            // fade in stopButton
+            let animation = CATransition()
+            animation.type = kCATransitionFade
+            animation.duration = 0.2
+            stopButton!.layer.addAnimation(animation, forKey: nil)
+            stopButton!.hidden = false
+        }
+    }
+    
+    func hideStopButton() {
+        let stopButton = self.viewWithTag(5109)
+        let anyTracksPLaying = tracksPlaying()
+        if !anyTracksPLaying && stopButton != nil && stopButton is UIButton {
+            // fade out stopButton if all tracks have finished playing.
+            let animation = CATransition()
+            animation.type = kCATransitionFade
+            animation.duration = 0.2
+            stopButton!.layer.addAnimation(animation, forKey: nil)
+            stopButton!.hidden = true
+        }
+    }
+    
+    func tracksPlaying() -> Bool {
+        for subview in self.subviews {
+            if subview is Track {
+                if (subview as! Track).audioPlayer.playing {
+                    return true
+                }
+            }
+        }
+        return false
     }
     
     func changeTrackToEditMode(gestureRecognizer: UIGestureRecognizer) {

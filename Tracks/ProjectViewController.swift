@@ -23,17 +23,20 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     var context: NSManagedObjectContext!
     var tracks: NSMutableArray = []
     var notesView: NotesView!
-    var statusBarBackgroundView: UIVisualEffectView!
+    var statusBarBackgroundView: UIView!
     var sideBarOpenBackgroundView: UIView!
     var notesOpenBackgroundView: UIView!
     var drawView: DrawView!
-    var seqLinksButton: UIButton!
+
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var navigationBar: UINavigationBar!
     @IBOutlet weak var navBarVertConstraint: NSLayoutConstraint!
     @IBOutlet weak var linkManager: LinkManager!
-    @IBOutlet weak var toolbar: UIToolbar!
-    @IBOutlet weak var toolbarVertConstraint: NSLayoutConstraint!
+    @IBOutlet weak var addTrackButton: UIButton!
+    @IBOutlet weak var modeSegmentedControl: ModeSelectSegmentedControl!
+    @IBOutlet weak var seqLinkButton: UIButton!
+    @IBOutlet weak var simulLinkButton: UIButton!
+    @IBOutlet weak var stopButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,29 +44,47 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         // Add draw view
         drawView = DrawView(frame: self.view.frame)
         drawView.backgroundColor = UIColor.clearColor()
-        drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
-        self.view.addSubview(self.drawView)
+        drawView.layer.backgroundColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 1.0).CGColor
+        self.view.addSubview(drawView)
         
-        //Make toolbar transparent
-        self.toolbar.setBackgroundImage(UIImage(),
-            forToolbarPosition: UIBarPosition.Any,
-            barMetrics: UIBarMetrics.Default)
-        self.toolbar.setShadowImage(UIImage(),
-            forToolbarPosition: UIBarPosition.Any)
-        
-        // Create effect
-        let blur = UIBlurEffect(style: UIBlurEffectStyle.ExtraLight)
-        
-        // Add effect to an effect view
-        statusBarBackgroundView = UIVisualEffectView(effect: blur)
-        statusBarBackgroundView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20 + navigationBar.frame.height);
-        
-        // Add the effect view
+        // Create background view for styling status bar
+        statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20 + navigationBar.frame.height))
+        statusBarBackgroundView.backgroundColor = navigationBar.backgroundColor
+        // Add bottom border of slightly darker color
+        let lowerBorder = CALayer()
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        if let bool = statusBarBackgroundView.backgroundColor?.getRed(&r, green: &g, blue: &b, alpha: &a) {
+            lowerBorder.backgroundColor = UIColor(red: max(r - 0.1, 0.0), green: max(g - 0.1, 0.0), blue: max(b - 0.1, 0.0), alpha: a).CGColor
+        }
+        lowerBorder.frame = CGRectMake(0, statusBarBackgroundView.frame.height - 1.0, statusBarBackgroundView.frame.width, 1.0)
+        statusBarBackgroundView.layer.addSublayer(lowerBorder)
         self.view.addSubview(statusBarBackgroundView)
         
-        self.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
-        self.navigationBar.shadowImage = UIImage()
-        self.navigationBar.translucent = true
+        // remove shadow line on navigation bar
+        navigationBar.shadowImage = UIImage()
+        navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
+        
+        // add border to addTrackButton
+        addTrackButton.layer.borderWidth = 1.0
+        addTrackButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
+        
+        // add border to simul/seq link and stop buttons (initially hidden)
+        simulLinkButton.layer.borderWidth = 1.0
+        simulLinkButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
+        
+        seqLinkButton.layer.borderWidth = 1.0
+        seqLinkButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
+        
+        stopButton.layer.borderWidth = 1.0
+        stopButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
+        
+        //set some tags so it's easy to find from LinkManager
+        stopButton.tag = 5109
+        navigationBar.tag = 847
+        modeSegmentedControl.tag = 306
         
         // Create notesView
         notesView = NotesView(frame: self.view.bounds)
@@ -127,18 +148,16 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         loadLinks()
         self.view.bringSubviewToFront(statusBarBackgroundView)
         self.view.bringSubviewToFront(navigationBar)
-        self.view.bringSubviewToFront(toolbar)
-        
+        self.view.bringSubviewToFront(modeSegmentedControl)
+        self.view.sendSubviewToBack(drawView)
     }
     
     override func viewDidLayoutSubviews() {
         titleTextField.text = projectName
         titleTextField.textAlignment = NSTextAlignment.Center
         titleTextField.delegate = self
-        
-        // Make navigationBar clear
-        navigationBar.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
 
+        // realigns frame for drawview after all subviews were laid out.
         drawView.frame = self.view.frame
     }
     
@@ -147,7 +166,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func addTrack(sender: UIBarButtonItem) {
+    @IBAction func addTrack(sender: UIButton) {
         //Create new Track and set project directory where sound files will be stored.
         let newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
         newTrack.projectDirectory = projectDirectory
@@ -157,11 +176,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         newTrack.setLabelNameText("untitled")
         newTrack.saveTrackCoreData(projectEntity)
         
-        print("IN FOR LOOP")
-        for subview in self.view.subviews {
-            print(subview)
-        }
-        print("END FOR LOOP")
         tracks.addObject(newTrack)
         self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 3)
     }
@@ -199,72 +213,103 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    @IBAction func addLinkMode(sender: UIBarButtonItem) {
-        if linkManager.mode != "ADD_SIMUL_LINK" {
-            linkManager.mode = "ADD_SIMUL_LINK"
-            for link in linkManager.allTrackLinks {
-                link.mode = "ADD_SIMUL_LINK"
-            }
-            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                //change background color and remove toolbars to show current mode
-                self.drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor
-                self.navBarVertConstraint.constant = -100
-                self.toolbarVertConstraint.constant = -100
-                self.statusBarBackgroundView.frame.origin.y = -100
-                self.view.layoutIfNeeded()
-                }) { (bool:Bool) -> Void in
-            }
+    @IBAction func changeMode(sender: ModeSelectSegmentedControl) {        
+        // for fading out/in buttons particular to each mode
+        let animation = CATransition()
+        animation.type = kCATransitionFade
+        animation.duration = 0.2
+        
+        switch sender.selectedIndex {
+        case 0:
+            print("normal mode")
+            simulLinkButton.layer.addAnimation(animation, forKey: nil)
+            simulLinkButton.hidden = true
+            seqLinkButton.layer.addAnimation(animation, forKey: nil)
+            seqLinkButton.hidden = true
+            addTrackButton.layer.addAnimation(animation, forKey: nil)
+            addTrackButton.hidden = false
+            enterMoveMode()
+        case 1:
+            print("link mode")
+            simulLinkButton.layer.addAnimation(animation, forKey: nil)
+            simulLinkButton.hidden = false
+            seqLinkButton.layer.addAnimation(animation, forKey: nil)
+            seqLinkButton.hidden = false
+            addTrackButton.hidden = true
+            addLinkMode()
+        case 2:
+            print("trash mode")
+            simulLinkButton.layer.addAnimation(animation, forKey: nil)
+            simulLinkButton.hidden = true
+            seqLinkButton.layer.addAnimation(animation, forKey: nil)
+            seqLinkButton.hidden = true
+            addTrackButton.layer.addAnimation(animation, forKey: nil)
+            addTrackButton.hidden = true
+            addTrackButton.layer.addAnimation(animation, forKey: nil)
+            enterTrashMode()
+        default:
+            print("mode index out of range")
         }
-        
-        //create exit button and add to view
-        let exitButton = UIButton(frame: CGRect(x: 20, y: self.view.frame.height - 40, width: 20, height: 20))
-        let image = UIImage(named: "close-button")
-        exitButton.setImage(image, forState: UIControlState.Normal)
-        exitButton.addTarget(self, action: "exitAddLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
-        exitButton.adjustsImageWhenHighlighted = true
-        self.view.insertSubview(exitButton, atIndex: 4)
-        
-        //create sequential links button to allow creation of seq links
-        seqLinksButton = UIButton(frame: CGRect(x: 60, y: self.view.frame.height - 40, width: 40, height: 20))
-        seqLinksButton.setTitle("Seq Links", forState: UIControlState.Normal)
-        seqLinksButton.addTarget(self, action: "changeToSeqLinkMode:", forControlEvents: UIControlEvents.TouchUpInside)
-        seqLinksButton.adjustsImageWhenHighlighted = true
-        self.view.insertSubview(seqLinksButton, atIndex: 4)
-        
     }
     
-    func exitAddLinkMode(sender: UIButton) {
-        if linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SEQ_LINK" {
+    func enterMoveMode() {
+        if linkManager.mode != "" {
             linkManager.mode = ""
             for link in linkManager.allTrackLinks {
                 link.mode = ""
             }
-            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
-                self.navBarVertConstraint.constant = 20
-                self.toolbarVertConstraint.constant = 15
-                self.statusBarBackgroundView.frame.origin.y = 0
-                self.view.layoutIfNeeded()
+            UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                self.drawView.layer.backgroundColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 1.0).CGColor
                 }) { (bool:Bool) -> Void in
             }
-            self.view.bringSubviewToFront(navigationBar)
-            seqLinksButton.removeFromSuperview()
-            sender.removeFromSuperview()
         }
     }
     
-    func changeToSeqLinkMode(sender: UIButton) {
+    func addLinkMode() {
+        if linkManager.mode != "ADD_SIMUL_LINK" && linkManager.mode != "ADD_SEQ_LINK" {
+            linkManager.mode = "ADD_SIMUL_LINK"
+            for link in linkManager.allTrackLinks {
+                link.mode = "ADD_SIMUL_LINK"
+            }
+            UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+                // animate change background color to emphasize current mode
+                self.drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor
+                }) { (bool:Bool) -> Void in
+            }
+            seqLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
+            simulLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
+        }
+    }
+    
+    @IBAction func changeToSeqLinkMode(sender: UIButton) {
         print("changing to seq link mode")
         linkManager.mode = "ADD_SEQ_LINK"
         for link in linkManager.allTrackLinks {
             link.mode = "ADD_SEQ_LINK"
         }
+        seqLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
+        simulLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
     }
     
-    @IBAction func stopAudio(sender: UIBarButtonItem) {
+    @IBAction func changeToSimLinkMode(sender: UIButton) {
+        print("changing to simul link mode")
+        linkManager.mode = "ADD_SIMUL_LINK"
+        for link in linkManager.allTrackLinks {
+            link.mode = "ADD_SIMUL_LINK"
+        }
+        seqLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
+        simulLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
+    }
+    
+    @IBAction func stopAudio(sender: UIButton) {
         for track in tracks {
             (track as! Track).stopAudio()
         }
+        let animation = CATransition()
+        animation.type = kCATransitionFade
+        animation.duration = 0.2
+        stopButton.layer.addAnimation(animation, forKey: nil)
+        stopButton.hidden = true
     }
     
     @IBAction func undoDraw(sender: UIBarButtonItem) {
@@ -286,38 +331,16 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         notesView.openNotes(tmpFrame)
     }
     
-    @IBAction func enterTrashMode(sender: UIBarButtonItem) {
+    func enterTrashMode() {
         if linkManager.mode != "TRASH" {
             linkManager.mode = "TRASH"
-            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+            for link in linkManager.allTrackLinks {
+                link.mode = "TRASH"
+            }
+            UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                     self.drawView.layer.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.5).CGColor
-                    self.navBarVertConstraint.constant = -100
-                    self.toolbarVertConstraint.constant = -100
-                    self.statusBarBackgroundView.frame.origin.y = -100
-                    self.view.layoutIfNeeded()
                 }) { (bool:Bool) -> Void in
             }
-            let exitTrashModeButton = UIButton(frame: CGRect(x: self.view.frame.width - 40, y: self.view.frame.height - 40, width: 20, height: 20))
-            let image = UIImage(named: "close-button")
-            exitTrashModeButton.setImage(image, forState: UIControlState.Normal)
-            exitTrashModeButton.addTarget(self, action: "exitTrashMode:", forControlEvents: UIControlEvents.TouchUpInside)
-            exitTrashModeButton.adjustsImageWhenHighlighted = true
-            self.view.insertSubview(exitTrashModeButton, atIndex: 4)
-        }
-    }
-    
-    func exitTrashMode(sender: UIButton) {
-        if linkManager.mode == "TRASH" {
-            linkManager.mode = ""
-            UIView.animateWithDuration(0.25, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                self.drawView.layer.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 1.0).CGColor
-                self.navBarVertConstraint.constant = 20
-                self.toolbarVertConstraint.constant = 15
-                self.statusBarBackgroundView.frame.origin.y = 0
-                self.view.layoutIfNeeded()
-                }) { (bool:Bool) -> Void in
-            }
-            sender.removeFromSuperview()
         }
     }
     

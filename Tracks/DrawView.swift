@@ -62,6 +62,7 @@ class DrawView: UIView {
         }
         CGContextSetRGBStrokeColor(context, 0.341, 0.341, 0.341, 1)
         CGContextSetLineWidth(context, 5)
+        CGContextSetLineCap(context, CGLineCap.Round)
         CGContextStrokePath(context)
     }
     
@@ -71,6 +72,27 @@ class DrawView: UIView {
             self.updateAllPaths()
             self.setNeedsDisplay()
         }
+    }
+    
+    func deleteLineContainingTouch(touch: CGPoint) -> Line? {
+        var deleted = false
+        for (index, path) in allPaths.enumerate().reverse() {
+            if deleted {
+                break
+            }
+            for line in path {
+                if line.containsPoint(touch) {
+                    print("delete path")
+                    allPaths.removeAtIndex(index)
+                    updateAllPaths()
+                    self.setNeedsDisplay()
+                    deleted = true
+                    break
+                }
+            }
+        }
+        
+        return nil
     }
     
     func updateAllPaths() {

@@ -28,6 +28,7 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     
     var cancelTrimButton: UIButton!
     var trimAudioButton: UIButton!
+    @IBOutlet weak var playInTrimModeButton: UIButton!
 
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var curTimeLabel: UILabel!
@@ -211,7 +212,8 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         cancelTrimButton.addTarget(self, action: "cancelTrimMode:", forControlEvents: UIControlEvents.TouchUpInside)
         cancelTrimButton.adjustsImageWhenHighlighted = true;
         cancelTrimButton.sizeToFit()
-        
+        cancelTrimButton.frame.origin.x = self.view.frame.width - cancelTrimButton.frame.width - 20 // adjust to match trailing constraint
+
         self.addSubview(cancelTrimButton)
         // animate fade in
         cancelTrimButton.hidden = true
@@ -231,6 +233,11 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         trimAudioButton.hidden = true
         trimAudioButton.layer.addAnimation(animation, forKey: nil)
         trimAudioButton.hidden = false
+        
+        // animate fade in button for playing from start bar to end bar
+        playInTrimModeButton.hidden = true
+        playInTrimModeButton.layer.addAnimation(animation, forKey: nil)
+        playInTrimModeButton.hidden = false
     }
     
     func cancelTrimMode(sender: UIButton) {
@@ -252,6 +259,8 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         cancelTrimButton.hidden = true
         trimAudioButton.layer.addAnimation(animation, forKey: nil)
         trimAudioButton.hidden = true
+        playInTrimModeButton.layer.addAnimation(animation, forKey: nil)
+        playInTrimModeButton.hidden = true
         
         // fade in play buttons, time label, and timeline
         cropButton.layer.addAnimation(animation, forKey: nil)
@@ -496,7 +505,6 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         if audioPlayer.isPlaying {
             audioPlayer.pause()
             playButton.setTitle("Play", forState: UIControlState.Normal)
-            playButton.sizeToFit()
         } else {
             if curTime >= audioPlayer.duration {
                 curTime = NSTimeInterval(0.0)
@@ -506,6 +514,28 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
             playButton.setTitle("Pause", forState: UIControlState.Normal)
             playButton.sizeToFit()
         }
+    }
+    
+    @IBAction func playAudioWithStartEnd(sender: UIButton) {
+    
+        let startTime = timeSelectorView.currentStartTime()
+        let endTime = timeSelectorView.currentEndTime()
+        
+        if audioPlayer.isPlaying {
+            audioPlayer.pause()
+            playInTrimModeButton.setTitle("Play", forState: UIControlState.Normal)
+        } else {
+            if curTime >= endTime.seconds {
+                curTime = NSTimeInterval(startTime.seconds)
+            } else if curTime < startTime.seconds {
+                curTime = startTime.seconds
+            }
+            audioPlayer.currentTime = curTime
+            audioPlayer.play()
+            playInTrimModeButton.setTitle("Pause", forState: UIControlState.Normal)
+            playInTrimModeButton.sizeToFit()
+        }
+        
     }
     
     func audioPlayer(audioPlayer: EZAudioPlayer!, reachedEndOfAudioFile audioFile: EZAudioFile!) {
@@ -540,7 +570,28 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                 self.scrollView.contentOffset.x = self.audioPlot.frame.width * (CGFloat(self.curTime) / CGFloat(self.audioPlayer.duration))
             })
         } else {
-            //TODO: add play capabilities during trim to hear how new audio will sound.
+            if fileEnded {
+                curTime = timeSelectorView.currentEndTime().seconds
+                fileEnded = false
+            } else {
+                curTime = NSTimeInterval(Double(framePosition) / Double(audioPlayer.totalFrames)) * audioPlayer.duration
+            }
+            if curTime >= timeSelectorView.currentEndTime().seconds {
+                // reached end of play interval, reset bars, buttons, and pause.
+                curTime = 0.0
+                audioPlayer.pause()
+                playInTrimModeButton.setTitle("Play", forState: UIControlState.Normal)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.timeSelectorView.playBarTime = nil
+                    self.timeSelectorView.setNeedsDisplay()
+                })
+            } else {
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    // update playback bar
+                    self.timeSelectorView.playBarTime = CMTime(seconds: self.curTime, preferredTimescale: 10000)
+                    self.timeSelectorView.setNeedsDisplay()
+                })
+            }
         }
     }
     

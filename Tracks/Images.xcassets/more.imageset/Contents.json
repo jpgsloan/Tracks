@@ -6,11 +6,12 @@
     },
     {
       "idiom" : "universal",
-      "scale" : "2x",
-      "filename" : "threeBarsIcon.png"
+      "filename" : "icon_list_44 2.png",
+      "scale" : "2x"
     },
     {
       "idiom" : "universal",
+      "filename" : "icon_list_66 2.png",
       "scale" : "3x"
     }
   ],

@@ -26,4 +26,16 @@ class Line: NSObject {
         aCoder.encodeCGPoint(self.end, forKey: "end")
     }
     
+    func containsPoint(point: CGPoint) -> Bool {
+        var path = UIBezierPath()
+        path.moveToPoint(start)
+        path.addLineToPoint(end)
+        let tmp = CGPathCreateCopyByStrokingPath(path.CGPath, nil, 10, CGLineCap(rawValue: 0)!, CGLineJoin(rawValue: 0)!, 1)
+        let fatPath = UIBezierPath(CGPath: tmp!)
+        if fatPath.containsPoint(point) {
+            return true
+        }
+        return false
+    }
+    
 }

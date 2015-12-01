@@ -13,6 +13,7 @@
                 <outlet property="cropButton" destination="dxa-Jn-SAB" id="ffa-l5-kxA"/>
                 <outlet property="curTimeLabel" destination="RZm-21-Kjg" id="v9V-w2-wBP"/>
                 <outlet property="playButton" destination="zcD-bq-bW7" id="dEu-rj-qyF"/>
+                <outlet property="playInTrimModeButton" destination="crb-M5-sou" id="7aI-jI-u8P"/>
                 <outlet property="scrollContentView" destination="0T9-OT-dOl" id="wYn-Ji-GQc"/>
                 <outlet property="scrollView" destination="MBH-C5-OE1" id="t2Y-pu-qEn"/>
                 <outlet property="timeSelectorView" destination="fmi-3Z-vqI" id="buE-N8-fKY"/>
@@ -137,6 +138,16 @@
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="crb-M5-sou">
+                    <rect key="frame" x="277" y="451" width="46" height="30"/>
+                    <animations/>
+                    <state key="normal" title="Play">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="playAudioWithStartEnd:" destination="-1" eventType="touchUpInside" id="SOM-JP-Ugr"/>
+                    </connections>
+                </button>
             </subviews>
             <animations/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -153,13 +164,16 @@
                 <constraint firstAttribute="bottom" secondItem="dxa-Jn-SAB" secondAttribute="bottom" id="Vkr-Qo-q5I"/>
                 <constraint firstItem="XUn-Tv-R5B" firstAttribute="top" secondItem="MeN-DE-yuR" secondAttribute="bottom" id="dwy-z3-oGG"/>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="top" secondItem="MeN-DE-yuR" secondAttribute="top" id="fMD-wW-1Br"/>
+                <constraint firstItem="crb-M5-sou" firstAttribute="centerY" secondItem="zcD-bq-bW7" secondAttribute="centerY" id="ffK-LK-ETX"/>
                 <constraint firstItem="zcD-bq-bW7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="fwf-sK-bmD"/>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="height" secondItem="MBH-C5-OE1" secondAttribute="height" constant="3" id="jJS-2c-iob"/>
                 <constraint firstItem="zcD-bq-bW7" firstAttribute="top" secondItem="MBH-C5-OE1" secondAttribute="bottom" constant="13" id="jQ3-gB-btU"/>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="rGV-qy-QJ0"/>
                 <constraint firstItem="XUn-Tv-R5B" firstAttribute="leading" secondItem="fmi-3Z-vqI" secondAttribute="leading" id="rXV-oF-mBl"/>
                 <constraint firstItem="XUn-Tv-R5B" firstAttribute="bottom" secondItem="zcD-bq-bW7" secondAttribute="top" constant="-13" id="t4N-Tb-R4h"/>
+                <constraint firstItem="crb-M5-sou" firstAttribute="centerX" secondItem="XUn-Tv-R5B" secondAttribute="centerX" id="tvs-PC-0Qu"/>
                 <constraint firstItem="MBH-C5-OE1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="ubZ-he-LZb"/>
+                <constraint firstAttribute="bottom" secondItem="crb-M5-sou" secondAttribute="bottom" id="uiB-r9-sNz"/>
                 <constraint firstAttribute="bottom" secondItem="RZm-21-Kjg" secondAttribute="bottom" id="ujr-di-EfM"/>
                 <constraint firstAttribute="trailing" secondItem="fmi-3Z-vqI" secondAttribute="trailing" id="wkD-fN-AEN"/>
                 <constraint firstItem="fmi-3Z-vqI" firstAttribute="height" secondItem="qE7-zS-pLL" secondAttribute="height" constant="3" id="yQX-w9-vh2"/>

@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 import CoreData
 
-class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
+class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextFieldDelegate {
 
     var recordedAudio: RecordedAudio = RecordedAudio()
     var audioRecorder:AVAudioRecorder!
@@ -313,10 +313,9 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
     func playAudio() {
         if !isInEditMode {
             print("playing")
-        
+            (superview as! LinkManager).showStopButton()
             stopAudio()
             audioPlayer.play()
-            
             //reset the progress view to beginning
             UIView.animateWithDuration(0.001, delay: 0.0, options: [UIViewAnimationOptions.BeginFromCurrentState, UIViewAnimationOptions.CurveLinear], animations: { () -> Void in
                 self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
@@ -348,12 +347,20 @@ class Track: UIView, AVAudioRecorderDelegate, UITextFieldDelegate {
             }, completion: nil)
     }
     
+    func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
+        if superview is LinkManager {
+            print("attempting to stop")
+            (superview as! LinkManager).hideStopButton()
+        }
+    }
+    
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
         if ( flag ) {
             recordedAudio.filePathUrl = recorder.url
             recordedAudio.title = recorder.url.lastPathComponent
             audioPlayer = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl)
             audioPlayer.prepareToPlay()
+            audioPlayer.delegate = self
             readyToPlay = true
             print("recording ready for playback!")
             

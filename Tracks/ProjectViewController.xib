@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ProjectViewController" customModule="Tracks" customModuleProvider="target">
             <connections>
+                <outlet property="addTrackButton" destination="Ib7-eh-B5C" id="ohQ-8d-uPt"/>
                 <outlet property="drawView" destination="VlB-rb-Dnd" id="0lg-7z-2vW"/>
                 <outlet property="linkManager" destination="VlB-rb-Dnd" id="VJO-BD-brM"/>
+                <outlet property="modeSegmentedControl" destination="i6i-JX-C7N" id="cCu-Uu-kCs"/>
                 <outlet property="navBarVertConstraint" destination="FOG-3E-gh9" id="sjE-jA-Ow0"/>
                 <outlet property="navigationBar" destination="sFj-OS-djo" id="HsW-SP-h28"/>
+                <outlet property="seqLinkButton" destination="TQM-cn-I1D" id="QVg-IY-CwO"/>
+                <outlet property="simulLinkButton" destination="5sq-3b-XQt" id="oiA-we-JHc"/>
+                <outlet property="stopButton" destination="Mz0-MG-9fD" id="ib2-ek-eAK"/>
                 <outlet property="titleTextField" destination="OMg-Am-R1n" id="P31-5s-dbF"/>
-                <outlet property="toolbar" destination="Ho8-CF-OdV" id="6lX-4n-07Z"/>
-                <outlet property="toolbarVertConstraint" destination="4SV-yq-AWo" id="2D6-Re-52q"/>
                 <outlet property="view" destination="VlB-rb-Dnd" id="U9p-mm-Rb3"/>
             </connections>
         </placeholder>
@@ -22,98 +26,137 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <navigationBar opaque="NO" contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sFj-OS-djo">
-                    <rect key="frame" x="0.0" y="20" width="600" height="44"/>
+                    <rect key="frame" x="5" y="10" width="590" height="44"/>
                     <animations/>
-                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                    <color key="barTintColor" white="1" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" red="0.2627450980392157" green="0.29019607843137252" blue="0.32941176470588235" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="barTintColor" red="0.2627450980392157" green="0.29019607843137252" blue="0.32941176470588235" alpha="0.0" colorSpace="calibratedRGB"/>
                     <textAttributes key="titleTextAttributes">
-                        <color key="textColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                        <color key="textShadowColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="14"/>
                     </textAttributes>
                     <items>
                         <navigationItem id="HiJ-n2-KnX">
                             <nil key="title"/>
-                            <barButtonItem key="leftBarButtonItem" image="threeBars" id="bds-Ba-LVj">
-                                <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <barButtonItem key="leftBarButtonItem" image="more" id="bds-Ba-LVj">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
                                     <action selector="openSideBarVC:" destination="-1" id="zeD-zG-hsD"/>
                                 </connections>
                             </barButtonItem>
-                            <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="My Project" textAlignment="center" minimumFontSize="17" id="OMg-Am-R1n">
-                                <rect key="frame" x="180" y="7" width="240" height="30"/>
+                            <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" usesAttributedText="YES" minimumFontSize="17" clearButtonMode="whileEditing" id="OMg-Am-R1n">
+                                <rect key="frame" x="175" y="7" width="240" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <animations/>
-                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="My Project">
+                                        <attributes>
+                                            <color key="NSColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <font key="NSFont" size="18" name="Avenir-Medium"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <barButtonItem key="rightBarButtonItem" systemItem="add" id="Phg-tz-chl">
-                                <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <barButtonItem key="rightBarButtonItem" image="notes" id="Phg-tz-chl">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
-                                    <action selector="addTrack:" destination="-1" id="YaB-JP-Oux"/>
+                                    <action selector="toggleNotes:" destination="-1" id="yUg-7p-UFo"/>
                                 </connections>
                             </barButtonItem>
                         </navigationItem>
                     </items>
                 </navigationBar>
-                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ho8-CF-OdV">
-                    <rect key="frame" x="0.0" y="541" width="600" height="44"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i6i-JX-C7N" customClass="ModeSelectSegmentedControl" customModule="Tracks" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="64" width="600" height="44"/>
                     <animations/>
-                    <items>
-                        <barButtonItem image="links" id="R21-oU-qYV">
-                            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <action selector="addLinkMode:" destination="-1" id="M2L-XH-toF"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem width="12" style="plain" systemItem="fixedSpace" id="ZXW-KA-iBn"/>
-                        <barButtonItem systemItem="trash" id="p1Y-R5-1dv">
-                            <connections>
-                                <action selector="enterTrashMode:" destination="-1" id="lDp-ma-GuS"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="vAa-Rn-pWg"/>
-                        <barButtonItem image="stop" id="S0b-Uk-Vdt">
-                            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <action selector="stopAudio:" destination="-1" id="HZU-CX-aVF"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="MpO-ow-CMO"/>
-                        <barButtonItem systemItem="reply" id="KjE-bQ-Daj">
-                            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <action selector="undoDraw:" destination="-1" id="UbD-dm-gTP"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem width="12" style="plain" systemItem="fixedSpace" id="Dat-rL-AiT"/>
-                        <barButtonItem systemItem="compose" id="JDi-9G-5nR">
-                            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <action selector="toggleNotes:" destination="-1" id="eNZ-5O-POX"/>
-                            </connections>
-                        </barButtonItem>
-                    </items>
-                </toolbar>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="E6J-cC-oYb"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="selectedLabelColor">
+                            <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="unselectedLabelColor">
+                            <color key="value" red="0.2627450980392157" green="0.29019607843137252" blue="0.32941176470588235" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="thumbColor">
+                            <color key="value" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="changeMode:" destination="-1" eventType="valueChanged" id="sa1-oa-TR9"/>
+                    </connections>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ib7-eh-B5C">
+                    <rect key="frame" x="570" y="107" width="30" height="30"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="2jt-JV-f2W"/>
+                        <constraint firstAttribute="width" constant="30" id="LL0-sF-NYm"/>
+                    </constraints>
+                    <state key="normal" image="add"/>
+                    <connections>
+                        <action selector="addTrack:" destination="-1" eventType="touchUpInside" id="qc5-qc-K0g"/>
+                    </connections>
+                </button>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TQM-cn-I1D">
+                    <rect key="frame" x="570" y="107" width="30" height="30"/>
+                    <animations/>
+                    <state key="normal" title="Seq"/>
+                    <connections>
+                        <action selector="changeToSeqLinkMode:" destination="-1" eventType="touchUpInside" id="DVA-ch-bs4"/>
+                    </connections>
+                </button>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5sq-3b-XQt">
+                    <rect key="frame" x="541" y="107" width="30" height="30"/>
+                    <animations/>
+                    <state key="normal" title="Sim"/>
+                    <connections>
+                        <action selector="changeToSimLinkMode:" destination="-1" eventType="touchUpInside" id="ul1-Y4-fKg"/>
+                    </connections>
+                </button>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mz0-MG-9fD">
+                    <rect key="frame" x="0.0" y="107" width="30" height="30"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="30" id="fmY-JV-EJs"/>
+                        <constraint firstAttribute="height" constant="30" id="x17-cV-waT"/>
+                    </constraints>
+                    <inset key="contentEdgeInsets" minX="3" minY="3" maxX="3" maxY="3"/>
+                    <state key="normal" image="stop"/>
+                    <connections>
+                        <action selector="stopAudio:" destination="-1" eventType="touchUpInside" id="9iG-gI-k0R"/>
+                    </connections>
+                </button>
             </subviews>
             <animations/>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-            <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="Ho8-CF-OdV" secondAttribute="bottom" constant="15" id="4SV-yq-AWo"/>
-                <constraint firstItem="sFj-OS-djo" firstAttribute="top" secondItem="VlB-rb-Dnd" secondAttribute="top" constant="20" id="FOG-3E-gh9"/>
-                <constraint firstAttribute="trailing" secondItem="sFj-OS-djo" secondAttribute="trailing" id="NtZ-WN-RPV"/>
-                <constraint firstItem="Ho8-CF-OdV" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="U8n-el-6Ga"/>
-                <constraint firstAttribute="trailing" secondItem="Ho8-CF-OdV" secondAttribute="trailing" id="gcs-n6-Knr"/>
-                <constraint firstItem="sFj-OS-djo" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="iXv-GK-Nps"/>
+                <constraint firstItem="Ib7-eh-B5C" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="CZL-Gp-jn5"/>
+                <constraint firstItem="sFj-OS-djo" firstAttribute="top" secondItem="VlB-rb-Dnd" secondAttribute="top" constant="10" id="FOG-3E-gh9"/>
+                <constraint firstItem="Mz0-MG-9fD" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="MFA-dF-CkL"/>
+                <constraint firstAttribute="trailing" secondItem="sFj-OS-djo" secondAttribute="trailing" constant="5" id="NtZ-WN-RPV"/>
+                <constraint firstItem="TQM-cn-I1D" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="a3X-7y-jzM"/>
+                <constraint firstAttribute="trailing" secondItem="i6i-JX-C7N" secondAttribute="trailing" id="gYy-Ta-7EV"/>
+                <constraint firstItem="TQM-cn-I1D" firstAttribute="leading" secondItem="5sq-3b-XQt" secondAttribute="trailing" constant="-1" id="gd9-vq-sfX"/>
+                <constraint firstItem="sFj-OS-djo" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" constant="5" id="iXv-GK-Nps"/>
+                <constraint firstItem="i6i-JX-C7N" firstAttribute="top" secondItem="sFj-OS-djo" secondAttribute="bottom" constant="10" id="ldd-oK-SV8"/>
+                <constraint firstItem="5sq-3b-XQt" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="oX7-O0-juC"/>
+                <constraint firstAttribute="trailing" secondItem="Ib7-eh-B5C" secondAttribute="trailing" id="oh0-sh-iVK"/>
+                <constraint firstItem="Mz0-MG-9fD" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="pFe-A9-6Bc"/>
+                <constraint firstAttribute="trailing" secondItem="TQM-cn-I1D" secondAttribute="trailing" id="xTV-Z0-UVw"/>
+                <constraint firstItem="i6i-JX-C7N" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="yek-cV-XeZ"/>
             </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
             <point key="canvasLocation" x="-1401" y="-2305"/>
         </view>
     </objects>
     <resources>
-        <image name="links" width="37" height="22"/>
+        <image name="add" width="20" height="20"/>
+        <image name="more" width="22" height="17"/>
+        <image name="notes" width="14" height="17"/>
         <image name="stop" width="45" height="45"/>
-        <image name="threeBars" width="22" height="15"/>
     </resources>
 </document>

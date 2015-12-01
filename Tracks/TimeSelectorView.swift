@@ -12,6 +12,7 @@ import QuartzCore
 class TimeSelectorView: UIView {
     
     var isInTrimMode = false
+    var playBarTime: CMTime?
     var startBarX: CGFloat!
     var endBarX: CGFloat!
     var didTouchStartTrimBar = false
@@ -37,6 +38,7 @@ class TimeSelectorView: UIView {
     func trimMode() {
         isInTrimMode = true
         self.userInteractionEnabled = true
+        playBarTime = nil
         startBarX = self.frame.width / 10.0
         endBarX = self.frame.width * 9.0 / 10.0
         
@@ -282,7 +284,6 @@ class TimeSelectorView: UIView {
             }
         }
         lastTouch = location
-        // TODO: set a minimum limit for track length. Like .1 of a second possibly.
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -368,7 +369,33 @@ class TimeSelectorView: UIView {
                 }
             }
             attrStrEnd.drawAtPoint(CGPoint(x: endBarX - attrStrEnd.size().width + CGFloat(4) + adjustEndX, y: 1))
-
+            
+            // draw playback bar if necessary
+            if let playBarTime = playBarTime {
+                let playBarX = getBarXFromTime(playBarTime)
+                if startBarX < playBarX && endBarX > playBarX {
+                    let context = UIGraphicsGetCurrentContext()
+                    CGContextBeginPath(context)
+                    CGContextSetStrokeColorWithColor(context, UIColor.blueColor().CGColor)
+                    CGContextSetLineWidth(context, 1)
+                    CGContextMoveToPoint(context, playBarX, 22)
+                    CGContextAddLineToPoint(context, playBarX, self.frame.height - 7)
+                    CGContextStrokePath(context)
+                    
+                    // draw end circles
+                    CGContextSetFillColorWithColor(context, UIColor.blueColor().CGColor)
+                    CGContextBeginPath(context)
+                    CGContextAddArc(context, playBarX, CGFloat(19.0), CGFloat(3.0), CGFloat(0.0), CGFloat(2.0 * M_PI), 1)
+                    CGContextFillPath(context)
+                    
+                    CGContextBeginPath(context)
+                    CGContextAddArc(context, playBarX, self.frame.height - CGFloat(4.0), CGFloat(3.0), CGFloat(0.0), CGFloat(2.0 * M_PI), 1)
+                    CGContextFillPath(context)
+                }
+            } else {
+                print("playbar is NIL")
+            }
+            
         } else {
             // draw playback bar
             let context = UIGraphicsGetCurrentContext()

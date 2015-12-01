@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "14F118B619A365EF00EC8B648CCEDBA18D82BAF2",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "14F118B619A365EF00EC8B648CCEDBA18D82BAF2" : 0,
+    "A1D8C2D58BFB3E22514FE0D3064C63C7FB5B7392" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "2578CFA5-0395-406F-98A2-16D9DB06B801",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "14F118B619A365EF00EC8B648CCEDBA18D82BAF2" : "Tracks",
+    "A1D8C2D58BFB3E22514FE0D3064C63C7FB5B7392" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Tracks",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Tracks.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jpgsloan\/Tracks.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "14F118B619A365EF00EC8B648CCEDBA18D82BAF2"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jpgsloan\/Virtual-Music.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "A1D8C2D58BFB3E22514FE0D3064C63C7FB5B7392"
+    }
+  ]
+}

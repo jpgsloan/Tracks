@@ -8,6 +8,9 @@
 
 import UIKit
 import CoreData
+import QuartzCore
+
+
 
 class TrackLink: UIView, AVAudioPlayerDelegate {
    
@@ -21,6 +24,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     var touchHitEdge: Bool = false
     var wasDragged: Bool = false
     var queuedTrackForAdding: Track!
+    var dashedLinePhase: CGFloat = 0.0
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
     
@@ -43,7 +47,9 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         rootTrackAudioPlayer = track.audioPlayer
         let rootNode = TrackLinkNode(track: track)
         trackNodeIDs[rootTrackAudioPlayer] = rootNode
-        setNeedsDisplay()
+        let displayLink = CADisplayLink(target: self, selector: "updateLinkLayer")
+        displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+        layer.contentsScale = UIScreen.mainScreen().scale
     }
     
     init (frame: CGRect, withTrackNodeIDs trackNodeIDs: [AVAudioPlayer:TrackLinkNode], rootTrackID root: String, linkID: String) {
@@ -56,11 +62,22 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         self.linkID = linkID
         self.rootTrackID = root
         self.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
-        setNeedsDisplay()
+        let displayLink = CADisplayLink(target: self, selector: "updateLinkLayer")
+        displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+        layer.contentsScale = UIScreen.mainScreen().scale
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func updateLinkLayer() {
+        if dashedLinePhase < 12 {
+            dashedLinePhase += 1
+        } else {
+            dashedLinePhase = 0
+        }
+        self.layer.setNeedsDisplay()
     }
     
     func touchBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -112,7 +129,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
                 curTouchedTrack.touchBegan(touches, withEvent: event)
             }
             bringTrackLinkToFront()
-            self.setNeedsDisplay()
+            setNeedsDisplay()
         }
     }
     
@@ -123,7 +140,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             curTouchLoc = touchLoc
-            self.setNeedsDisplay()
+            setNeedsDisplay()
         } else {
             if touchHitEdge {
                 for audioPlayer in trackNodeIDs.keys {
@@ -135,7 +152,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
                 curTouchedTrack.touchMoved(touches, withEvent: event)
             }
             wasDragged = true
-            self.setNeedsDisplay()
+            setNeedsDisplay()
         }
     }
     
@@ -158,10 +175,12 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
                 }
                 wasDragged = false
             } else {
-                beginPlaySequence(fromStartTrack: curTouchedTrack)
-                curTouchedTrack = nil
+                if curTouchedTrack != nil {
+                    beginPlaySequence(fromStartTrack: curTouchedTrack)
+                    curTouchedTrack = nil
+                }
             }
-            self.setNeedsDisplay()
+            setNeedsDisplay()
             bringTrackLinkToFront()
         }
     }
@@ -209,7 +228,14 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
         print("finished playing!!!")
         let node = trackNodeIDs[player]!
-        //Begin plaing each child and each child's siblings, if any.
+        
+        // if there are no other children, attempt to hide the stop button
+        if node.childrenIDs.count == 0 {
+            if superview is LinkManager {
+                (superview as! LinkManager).hideStopButton()// hideStopButton checks that no other tracks are currently playing
+            }
+        }
+        // Begin plaing each child and each child's siblings, if any.
         for childID in node.childrenIDs {
             let child = (self.superview as! LinkManager).getTrackByID(childID)
             child!.audioPlayer.delegate = self
@@ -236,13 +262,12 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
                     }
                 }
             }
-        
         }
     }
     
     func queueTrackForAdding(track: Track) {
         queuedTrackForAdding = track
-        self.setNeedsDisplay()
+        setNeedsDisplay()
     }
     
     func dequeueTrackFromAdding() {
@@ -250,7 +275,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             queuedTrackForAdding.layer.borderWidth = 0
             queuedTrackForAdding.layer.borderColor = UIColor.clearColor().CGColor
             queuedTrackForAdding = nil
-            self.setNeedsDisplay()
+            setNeedsDisplay()
         }
     }
     
@@ -276,49 +301,63 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         }
         dequeueTrackFromAdding()
         updateLinkCoreData()
-        self.setNeedsDisplay()
+        setNeedsDisplay()
     }
     
-    override func drawRect(rect: CGRect) {
-        drawLinkEdges()
-        drawTrackNodeOutlines()
+    override func drawLayer(layer: CALayer, inContext ctx: CGContext) {
+      
+        UIGraphicsPushContext(ctx)
+        let seqPath = UIBezierPath()
+        seqPath.lineWidth = 5
+        seqPath.setLineDash([8.0,4.0], count: 2, phase: -dashedLinePhase)
+        
+        let simPath = UIBezierPath()
+        simPath.lineWidth = 5
+        UIColor.grayColor().setStroke()
+        
+        for audioPlayer in self.trackNodeIDs.keys {
+            
+            let node = self.trackNodeIDs[audioPlayer]!
+            let trackID = node.rootTrackID
+            if let startTrack = (superview as? LinkManager)?.getTrackByID(trackID) {
+                
+                for childTrackID in node.childrenIDs {
+                    if let endTrack = (superview as! LinkManager).getTrackByID(childTrackID) {
+                        // Add dashed line for seq edges from center to center.
+                        seqPath.moveToPoint(CGPointMake(startTrack.center.x, startTrack.center.y))
+                        seqPath.addLineToPoint(CGPointMake(endTrack.center.x, endTrack.center.y))
+                        
+                    }
+                }
+                for siblingTrackID in node.siblingIDs {
+                    if let endTrack = (superview as! LinkManager).getTrackByID(siblingTrackID) {
+                        // Add solid line for sim edges from center to center.
+                        simPath.moveToPoint(CGPointMake(startTrack.center.x, startTrack.center.y))
+                        simPath.addLineToPoint(CGPointMake(endTrack.center.x, endTrack.center.y))
+                    }
+                }
+            }
+        }
+        simPath.stroke()
+        seqPath.stroke()
+        
+        // after stroking edges, add blended clear rects to remove lines over tracks.
+        for audioPlayer in self.trackNodeIDs.keys {
+            
+            let node = self.trackNodeIDs[audioPlayer]!
+            let trackID = node.rootTrackID
+            if let track = (superview as? LinkManager)?.getTrackByID(trackID) {
+                eraseLineOnTrack(track)
+            }
+        }
+        
+        // if in link mode, draw the link currently being added.
         if (mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK") && curTouchedTrack != nil {
             drawCurLinkAdd()
         }
-    }
-    
-    func drawLinkEdges() {
-        let context = UIGraphicsGetCurrentContext()
-        
-        for audioPlayer in trackNodeIDs.keys {
-            
-            let node = trackNodeIDs[audioPlayer]!
-            let trackID = node.rootTrackID
-            let startTrack = (self.superview as! LinkManager).getTrackByID(trackID)
-            
-            for childTrackID in node.childrenIDs {
-                let endTrack = (self.superview as! LinkManager).getTrackByID(childTrackID)
-                //For each child, paint line from parent track node.
-                CGContextSetStrokeColorWithColor(context, UIColor.redColor().colorWithAlphaComponent(1).CGColor)
-                CGContextSetLineWidth(context, 8)
-                CGContextBeginPath(context)
-                CGContextMoveToPoint(context, startTrack!.center.x, startTrack!.center.y)
-                CGContextAddLineToPoint(context, endTrack!.center.x, endTrack!.center.y)
-                CGContextStrokePath(context)
-            }
-            
-            for siblingTrackID in node.siblingIDs {
-                let endTrack = (self.superview as! LinkManager).getTrackByID(siblingTrackID)
-                //For each child, paint line from parent track node.
-                CGContextSetStrokeColorWithColor(context, UIColor.blueColor().colorWithAlphaComponent(1).CGColor)
-                CGContextSetLineWidth(context, 8)
-                CGContextBeginPath(context)
-                CGContextMoveToPoint(context, startTrack!.center.x, startTrack!.center.y)
-                CGContextAddLineToPoint(context, endTrack!.center.x, endTrack!.center.y)
-                CGContextStrokePath(context)
-            }
 
-        }
+        UIGraphicsPopContext()
+        drawTrackNodeOutlines()
     }
     
     func eraseLineOnTrack(track: Track) {
@@ -332,53 +371,55 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         for audioPlayer in trackNodeIDs.keys {
             let node = trackNodeIDs[audioPlayer]!
             let trackID = node.rootTrackID
-            let track = (self.superview as! LinkManager).getTrackByID(trackID)
-            track!.layer.borderWidth = 5
-            if !node.siblingIDs.isEmpty && !node.childrenIDs.isEmpty {
-                track!.layer.borderColor = UIColor.purpleColor().CGColor
-            } else if node.siblingIDs.isEmpty {
-                track!.layer.borderColor = UIColor.redColor().CGColor
-            } else if node.childrenIDs.isEmpty {
-                track!.layer.borderColor = UIColor.blueColor().CGColor
-            } else {
-                track!.layer.borderColor = UIColor.whiteColor().CGColor
+            if let track = (self.superview as? LinkManager)?.getTrackByID(trackID) {
+                track.layer.borderWidth = 3
+                if !node.siblingIDs.isEmpty && !node.childrenIDs.isEmpty {
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                } else if node.siblingIDs.isEmpty {
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                } else if node.childrenIDs.isEmpty {
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                } else {
+                    track.layer.borderColor = UIColor.whiteColor().CGColor
+                }
             }
-            eraseLineOnTrack(track!)
         }
         
         //Also color currently being added/queued nodes based on mode.
         var color: CGColor!
         switch mode {
         case "ADD_SEQ_LINK":
-            color = UIColor.redColor().colorWithAlphaComponent(0.4).CGColor
+            color = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
         case "ADD_SIMUL_LINK":
-            color = UIColor.blueColor().colorWithAlphaComponent(0.4).CGColor
+            color = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
         default:
-            color = UIColor.whiteColor().colorWithAlphaComponent(0.4).CGColor
+            color = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
         }
 
         if queuedTrackForAdding != nil {
             queuedTrackForAdding.layer.borderColor = color
-            queuedTrackForAdding.layer.borderWidth = 5
+            queuedTrackForAdding.layer.borderWidth = 3
         }
         
         if curTouchedTrack != nil {
             curTouchedTrack.layer.borderColor = color
-            curTouchedTrack.layer.borderWidth = 5
+            curTouchedTrack.layer.borderWidth = 3
         }
     }
     
     func drawCurLinkAdd() {
+        //draws line from starting track to current touch location
         let context = UIGraphicsGetCurrentContext()
         CGContextBeginPath(context)
         CGContextMoveToPoint(context, curTouchedTrack.center.x, curTouchedTrack.center.y)
         CGContextAddLineToPoint(context, curTouchLoc.x, curTouchLoc.y)
         if mode == "ADD_SEQ_LINK" {
-            CGContextSetStrokeColorWithColor(context, UIColor.redColor().colorWithAlphaComponent(1).CGColor)
+            CGContextSetStrokeColorWithColor(context, UIColor.grayColor().CGColor)
+            CGContextSetLineDash(context, -dashedLinePhase, [8.0,4.0], 2)
         } else if mode == "ADD_SIMUL_LINK" {
-            CGContextSetStrokeColorWithColor(context, UIColor.blueColor().colorWithAlphaComponent(1).CGColor)
+            CGContextSetStrokeColorWithColor(context, UIColor.grayColor().colorWithAlphaComponent(1).CGColor)
         }
-        CGContextSetLineWidth(context, 8)
+        CGContextSetLineWidth(context, 5)
         CGContextStrokePath(context)
         eraseLineOnTrack(curTouchedTrack)
         if queuedTrackForAdding != nil {
@@ -389,9 +430,11 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     func deleteTrackLink() {
         for audioPlayer in trackNodeIDs.keys {
             let trackID = trackNodeIDs[audioPlayer]!.rootTrackID
-            let track = (self.superview as! LinkManager).getTrackByID(trackID)
-            track!.layer.borderColor = UIColor.clearColor().CGColor
-            track!.layer.borderWidth = 0
+            if let track = (self.superview as! LinkManager).getTrackByID(trackID) {
+                track.layer.borderColor = UIColor.clearColor().CGColor
+                track.layer.borderWidth = 0
+                track.audioPlayer.delegate = track
+            }
         }
         deleteLinkFromCoreData()
         self.removeFromSuperview()
@@ -513,3 +556,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         }
     }    
 }
+    
+
+
+
