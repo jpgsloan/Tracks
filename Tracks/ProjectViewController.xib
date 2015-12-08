@@ -43,10 +43,11 @@
                                 </connections>
                             </barButtonItem>
                             <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" usesAttributedText="YES" minimumFontSize="17" clearButtonMode="whileEditing" id="OMg-Am-R1n">
-                                <rect key="frame" x="175" y="7" width="240" height="30"/>
+                                <rect key="frame" x="167" y="7" width="257" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <animations/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <edgeInsets key="layoutMargins" top="8" left="40" bottom="8" right="20"/>
                                 <attributedString key="attributedText">
                                     <fragment content="My Project">
                                         <attributes>
@@ -88,18 +89,6 @@
                         <action selector="changeMode:" destination="-1" eventType="valueChanged" id="sa1-oa-TR9"/>
                     </connections>
                 </view>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ib7-eh-B5C">
-                    <rect key="frame" x="570" y="107" width="30" height="30"/>
-                    <animations/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="30" id="2jt-JV-f2W"/>
-                        <constraint firstAttribute="width" constant="30" id="LL0-sF-NYm"/>
-                    </constraints>
-                    <state key="normal" image="add"/>
-                    <connections>
-                        <action selector="addTrack:" destination="-1" eventType="touchUpInside" id="qc5-qc-K0g"/>
-                    </connections>
-                </button>
                 <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TQM-cn-I1D">
                     <rect key="frame" x="570" y="107" width="30" height="30"/>
                     <animations/>
@@ -129,22 +118,34 @@
                         <action selector="stopAudio:" destination="-1" eventType="touchUpInside" id="9iG-gI-k0R"/>
                     </connections>
                 </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ib7-eh-B5C">
+                    <rect key="frame" x="0.0" y="570" width="30" height="30"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="2jt-JV-f2W"/>
+                        <constraint firstAttribute="width" constant="30" id="LL0-sF-NYm"/>
+                    </constraints>
+                    <state key="normal" image="add"/>
+                    <connections>
+                        <action selector="addTrack:" destination="-1" eventType="touchUpInside" id="qc5-qc-K0g"/>
+                    </connections>
+                </button>
             </subviews>
             <animations/>
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="Ib7-eh-B5C" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="CZL-Gp-jn5"/>
                 <constraint firstItem="sFj-OS-djo" firstAttribute="top" secondItem="VlB-rb-Dnd" secondAttribute="top" constant="10" id="FOG-3E-gh9"/>
                 <constraint firstItem="Mz0-MG-9fD" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="MFA-dF-CkL"/>
                 <constraint firstAttribute="trailing" secondItem="sFj-OS-djo" secondAttribute="trailing" constant="5" id="NtZ-WN-RPV"/>
+                <constraint firstItem="Ib7-eh-B5C" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="PIb-Ci-nzA"/>
                 <constraint firstItem="TQM-cn-I1D" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="a3X-7y-jzM"/>
+                <constraint firstAttribute="bottom" secondItem="Ib7-eh-B5C" secondAttribute="bottom" id="cy6-cF-cPK"/>
                 <constraint firstAttribute="trailing" secondItem="i6i-JX-C7N" secondAttribute="trailing" id="gYy-Ta-7EV"/>
                 <constraint firstItem="TQM-cn-I1D" firstAttribute="leading" secondItem="5sq-3b-XQt" secondAttribute="trailing" constant="-1" id="gd9-vq-sfX"/>
                 <constraint firstItem="sFj-OS-djo" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" constant="5" id="iXv-GK-Nps"/>
                 <constraint firstItem="i6i-JX-C7N" firstAttribute="top" secondItem="sFj-OS-djo" secondAttribute="bottom" constant="10" id="ldd-oK-SV8"/>
                 <constraint firstItem="5sq-3b-XQt" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="oX7-O0-juC"/>
-                <constraint firstAttribute="trailing" secondItem="Ib7-eh-B5C" secondAttribute="trailing" id="oh0-sh-iVK"/>
                 <constraint firstItem="Mz0-MG-9fD" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="pFe-A9-6Bc"/>
                 <constraint firstAttribute="trailing" secondItem="TQM-cn-I1D" secondAttribute="trailing" id="xTV-Z0-UVw"/>
                 <constraint firstItem="i6i-JX-C7N" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="yek-cV-XeZ"/>

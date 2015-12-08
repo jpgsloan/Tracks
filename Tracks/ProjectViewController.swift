@@ -27,7 +27,8 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     var sideBarOpenBackgroundView: UIView!
     var notesOpenBackgroundView: UIView!
     var drawView: DrawView!
-
+    var lowerBorderTitle: CALayer!
+    
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var navigationBar: UINavigationBar!
     @IBOutlet weak var navBarVertConstraint: NSLayoutConstraint!
@@ -46,6 +47,11 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         drawView.backgroundColor = UIColor.clearColor()
         drawView.layer.backgroundColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 1.0).CGColor
         self.view.addSubview(drawView)
+        
+        // Add lower border to title text
+        lowerBorderTitle = CALayer()
+        lowerBorderTitle.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8).CGColor
+        titleTextField.layer.addSublayer(lowerBorderTitle)
         
         // Create background view for styling status bar
         statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20 + navigationBar.frame.height))
@@ -149,6 +155,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         self.view.bringSubviewToFront(statusBarBackgroundView)
         self.view.bringSubviewToFront(navigationBar)
         self.view.bringSubviewToFront(modeSegmentedControl)
+        self.view.bringSubviewToFront(addTrackButton)
         self.view.sendSubviewToBack(drawView)
     }
     
@@ -159,6 +166,9 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
 
         // realigns frame for drawview after all subviews were laid out.
         drawView.frame = self.view.frame
+        
+        // realign titleText lower border layer.
+        lowerBorderTitle.frame = CGRectMake(titleTextField.frame.width / 6.0, titleTextField.frame.height - 0.5, titleTextField.frame.width * 4.0 / 6.0, 1.0)
     }
     
     override func didReceiveMemoryWarning() {
@@ -168,8 +178,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func addTrack(sender: UIButton) {
         //Create new Track and set project directory where sound files will be stored.
-        let newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0))
-        newTrack.projectDirectory = projectDirectory
+        let newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0), projectDir: projectDirectory)
         
         //Center and add the new track node.
         newTrack.center = self.view.center
@@ -177,7 +186,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         newTrack.saveTrackCoreData(projectEntity)
         
         tracks.addObject(newTrack)
-        self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 3)
+        self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 4) //+1 - 5 since you are adding a new subview not yet counted in subviews.count
     }
         
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
@@ -235,7 +244,8 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
             simulLinkButton.hidden = false
             seqLinkButton.layer.addAnimation(animation, forKey: nil)
             seqLinkButton.hidden = false
-            addTrackButton.hidden = true
+            addTrackButton.layer.addAnimation(animation, forKey: nil)
+            addTrackButton.hidden = false
             addLinkMode()
         case 2:
             print("trash mode")
@@ -245,7 +255,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
             seqLinkButton.hidden = true
             addTrackButton.layer.addAnimation(animation, forKey: nil)
             addTrackButton.hidden = true
-            addTrackButton.layer.addAnimation(animation, forKey: nil)
             enterTrashMode()
         default:
             print("mode index out of range")
@@ -394,13 +403,19 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
                 let linkNodes = NSKeyedUnarchiver.unarchiveObjectWithData(linkEntity.linkNodes) as! [TrackLinkNode]
                 
                 //Create audioplayer dictionary from linkNodes
-                var trackNodeIDs: [AVAudioPlayer:TrackLinkNode] = [AVAudioPlayer:TrackLinkNode]()
+                var trackNodeIDs = [AVAudioPlayer:TrackLinkNode]()
+                var unrecordedTracks = [Track: TrackLinkNode]()
                 for node in linkNodes {
-                    let track = (self.view as! LinkManager).getTrackByID(node.rootTrackID)
-                    trackNodeIDs[track!.audioPlayer] = node
+                    if let track = (self.view as! LinkManager).getTrackByID(node.rootTrackID) {
+                        if track.audioPlayer != nil {
+                            trackNodeIDs[track.audioPlayer!] = node
+                        } else {
+                            unrecordedTracks[track] = node
+                        }
+                    }
                 }
                 
-                let linkToAdd = TrackLink(frame: self.view.frame, withTrackNodeIDs: trackNodeIDs, rootTrackID: linkEntity.rootTrackID, linkID: linkEntity.linkID)
+                let linkToAdd = TrackLink(frame: self.view.frame, withTrackNodeIDs: trackNodeIDs, unrecordedTracks: unrecordedTracks, rootTrackID: linkEntity.rootTrackID, linkID: linkEntity.linkID)
                 linkManager.allTrackLinks.append(linkToAdd)
                 self.view.addSubview(linkToAdd)
             }

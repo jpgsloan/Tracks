@@ -34,7 +34,7 @@ class LinkEdge: NSObject {
         path.addLineToPoint(endTrackNode.center)
         let tmp = CGPathCreateCopyByStrokingPath(path.CGPath, nil, 15, CGLineCap(rawValue: 0)!, CGLineJoin(rawValue: 0)!, 1)
         let fatPath = UIBezierPath(CGPath: tmp!)
-        if fatPath.containsPoint(point) {
+        if fatPath.containsPoint(point) && !startTrackNode.frame.contains(point) && !endTrackNode.frame.contains(point) {
             return true
         }
         return false

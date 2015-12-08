@@ -75,10 +75,8 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         audioPlot.plotType = EZPlotType.Buffer
         audioPlot.opaque = false
         audioPlot.color = UIColor.whiteColor()
-        audioPlot.shouldFill   = true
+        audioPlot.shouldFill   = false
         audioPlot.shouldMirror = true
-        audioPlot.gain = 2.0
-
 
         // auto layout constraints for sizing content inside scrollView
         widthConstraint = NSLayoutConstraint(item: scrollContentView, attribute: NSLayoutAttribute.Width, relatedBy: NSLayoutRelation.Equal, toItem: self.view, attribute: NSLayoutAttribute.Width, multiplier: 1.0, constant: 0.0)

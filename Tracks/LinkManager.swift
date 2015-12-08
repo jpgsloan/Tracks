@@ -71,8 +71,8 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 newLink.mode = mode
                 allTrackLinks.append(newLink)
                 curTrackLinkAdd = newLink
-                self.insertSubview(firstHitSubview, atIndex: self.subviews.count - 4)
-                self.insertSubview(newLink, atIndex: self.subviews.count - 4)
+                self.insertSubview(firstHitSubview, atIndex: self.subviews.count - 5)
+                self.insertSubview(newLink, atIndex: self.subviews.count - 5)
                 newLink.saveLinkCoreData(projectEntity)
                 newLink.touchBegan(touches, withEvent: event)
             } else if firstHitSubview is TrackLink {
@@ -84,7 +84,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             if firstHitSubview is Track {
                 (firstHitSubview as! Track).deleteTrack()
             } else if firstHitSubview is TrackLink {
-                (firstHitSubview as! TrackLink).deleteTrackLink()
+                (firstHitSubview as! TrackLink).deleteLinkEdge(location)
             } else if firstHitSubview is DrawView {
                 //Do nothing
                 (firstHitSubview as! DrawView).deleteLineContainingTouch(location)
@@ -133,11 +133,15 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             
             if curHitSubview is Track {
                 curTrackLinkAdd.dequeueTrackFromAdding()
-                self.insertSubview(curHitSubview, atIndex: self.subviews.count - 6)
+                self.insertSubview(curHitSubview, atIndex: self.subviews.count - 5)
                 curTrackLinkAdd.queueTrackForAdding(curHitSubview as! Track)
             } else if curTrackLinkAdd != nil && curHitSubview == curTrackLinkAdd {
                 print("WAS CURRENT ADDING LINK")
                 curTrackLinkAdd.dequeueTrackFromAdding()
+                if let curTrack = curTrackLinkAdd.trackAtPoint(location) {
+                    print("touched track was: \(curTrack)")
+                    curTrackLinkAdd.queueTrackForAdding(curTrack)
+                }
             } else if curHitSubview is TrackLink {
                 print("DELETE, MOVE, OR CHANGE TRACK LINK", terminator: "")
             } else {
@@ -174,7 +178,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             if curHitSubview is Track {
                 (curHitSubview as! Track).deleteTrack()
             } else if curHitSubview is TrackLink {
-                (curHitSubview as! TrackLink).deleteTrackLink()
+                (curHitSubview as! TrackLink).deleteLinkEdge(location)
             } else if curHitSubview is DrawView {
                 //Do nothing
                 (curHitSubview as! DrawView).deleteLineContainingTouch(location)
@@ -207,7 +211,13 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                     curTrackLinkAdd.commitEdgeToLink()
                     curTrackLinkAdd.bringTrackLinkToFront()
                 } else {
-                    curTrackLinkAdd.deleteTrackLink()
+                    curTrackLinkAdd.dequeueTrackFromAdding()
+                    let hasNoNodes = curTrackLinkAdd.trackNodeIDs.isEmpty && curTrackLinkAdd.unrecordedTracks.isEmpty
+                    let hasOneNode = (curTrackLinkAdd.trackNodeIDs.count == 1 && curTrackLinkAdd.unrecordedTracks.isEmpty) || (curTrackLinkAdd.trackNodeIDs.isEmpty && curTrackLinkAdd.unrecordedTracks.count == 1)
+                    // if tracklink contains one or zero nodes, delete it.
+                    if  hasNoNodes || hasOneNode {
+                        curTrackLinkAdd.deleteTrackLink()
+                    }
                 }
                 
                 curTrackLinkAdd.touchEnded(touches, withEvent: event)
@@ -287,6 +297,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
         let anyTracksPLaying = tracksPlaying()
         if !anyTracksPLaying && stopButton != nil && stopButton is UIButton {
             // fade out stopButton if all tracks have finished playing.
+            print("stopping audio")
             let animation = CATransition()
             animation.type = kCATransitionFade
             animation.duration = 0.2
@@ -298,8 +309,12 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     func tracksPlaying() -> Bool {
         for subview in self.subviews {
             if subview is Track {
-                if (subview as! Track).audioPlayer.playing {
-                    return true
+                if (subview as! Track).audioPlayer != nil {
+                    if (subview as! Track).audioPlayer!.playing {
+                        return true
+                    }
+                } else {
+                    print("audioPlayer is nil")
                 }
             }
         }
@@ -340,6 +355,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     }
     
     func getTrackByID(trackID: String) -> Track? {
+        // Returns track for the given trackID
         for subview in self.subviews {
             if subview is Track && (subview as! Track).trackID == trackID {
                 return (subview as! Track)
@@ -349,6 +365,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     }
     
     func getTrackIndex(track: Track) -> Int {
+        // Gets index of the track in the subviews array, used for knowing which track is on top.
         var trackIndex = -1
         for var i = self.subviews.count - 1; i >= 0; i-- {
             let subview = subviews[i]

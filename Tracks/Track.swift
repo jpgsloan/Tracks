@@ -14,7 +14,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
 
     var recordedAudio: RecordedAudio = RecordedAudio()
     var audioRecorder:AVAudioRecorder!
-    var audioPlayer:AVAudioPlayer!
+    var audioPlayer:AVAudioPlayer?
     var wasDragged = false
     var startLoc: CGPoint!
     var hasStartedRecording = false
@@ -44,10 +44,10 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         let projectDirectory = NSString(string: docDirectory).stringByAppendingPathComponent(projectName)
         let trackName = aDecoder.decodeObjectForKey("trackName") as! String
         if trackName == "" {
-            self.init(frame:bounds)
+            self.init(frame: bounds, projectDir: projectDirectory)
         } else {
             let audioFileUrl = NSString(string: projectDirectory).stringByAppendingPathComponent(trackName)
-            self.init(frame: bounds)
+            self.init(frame: bounds, projectDir: projectDirectory)
             
             recordButton.removeFromSuperview()
             
@@ -56,15 +56,17 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
             hasStartedRecording = true
             hasStoppedRecording = true
         
-            audioPlayer = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl)
-            audioPlayer.prepareToPlay()
+            if let audio = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl) {
+                audioPlayer = audio
+                audioPlayer!.prepareToPlay()
+                audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
+                drawWaveform()
+                readyToPlay = true
+            } else {
+                print("Could not initialize audioPlayer at url: \(recordedAudio.filePathUrl)")
+                readyToPlay = false
+            }
             
-            audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
-        
-            drawWaveform()
-        
-            readyToPlay = true
-    
             labelDate.text = aDecoder.decodeObjectForKey("labelDate") as! String
             labelDuration.text = aDecoder.decodeObjectForKey("labelDuration") as! String
         }
@@ -105,24 +107,34 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+    }
+    
+    convenience init(frame: CGRect, projectDir: String) {
+        self.init(frame: frame)
         
         appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
+        
+        self.projectDirectory = projectDir
         
         self.layer.cornerRadius = 12
         self.clipsToBounds = true
         
         if self.backgroundColor == nil {
             print("picking color")
-            self.backgroundColor = tealColor()
+            //self.backgroundColor = tealColor()
+            self.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
         }
         
-        //set progressView 
+        self.layer.borderColor = UIColor.grayColor().colorWithAlphaComponent(0.8).CGColor
+        self.layer.borderWidth = 0.5
+        
+        //set progressView
         progressView = UIView(frame: CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 1, height: self.bounds.height))
-        progressView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        progressView.backgroundColor = UIColor.grayColor() //UIColor.whiteColor().colorWithAlphaComponent(0.6)
         progressView.layer.cornerRadius = 2
         
-        //Set the track id
+        // Set the track id
         if trackID.isEmpty {
             let currentDateTime = NSDate()
             let formatter = NSDateFormatter()
@@ -130,25 +142,36 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
             trackID = formatter.stringFromDate(currentDateTime)
         }
         
-        //Frequently reused bounds values
+        // Frequently reused bounds values
         let originX = self.bounds.origin.x
         let originY = self.bounds.origin.y
         let trackHeight = self.bounds.height
         let trackWidth = self.bounds.width
         
-        //using EZAudio for now
+        // Initialize audio recorder with filepath as date
+        let currentDateTime = NSDate()
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "ddMMyyyy-HHmmss-SSS"
+        let recordingName = formatter.stringFromDate(currentDateTime) + ".wav"
+        let pathArray = [projectDirectory!, recordingName]
+        let filePath = NSURL.fileURLWithPathComponents(pathArray)
+        audioRecorder = try? AVAudioRecorder(URL: filePath!, settings: [String : AnyObject]())
+        audioRecorder.delegate = self
+        audioRecorder.meteringEnabled = true
+        
+        // Using EZAudio for now
         audioPlot = EZAudioPlot(frame: CGRect(x: originX, y: originY + trackHeight/4.2, width: trackWidth, height: trackHeight - trackHeight/4.2 - (trackHeight * 1.4 / 7.0)))
         audioPlot.plotType = EZPlotType.Buffer
         audioPlot.backgroundColor = UIColor.clearColor()
         audioPlot.opaque = false
-        audioPlot.color = UIColor.whiteColor()
+        audioPlot.color = UIColor.grayColor() //UIColor.whiteColor()
         audioPlot.shouldFill   = false
         audioPlot.shouldMirror = true
         
         //Add label for file name
         labelName = UILabel(frame: CGRect(x: originX + 5, y: originY, width: trackWidth - 10, height: trackHeight/4.2))
         labelName.textAlignment = NSTextAlignment.Center
-        labelName.textColor = UIColor.whiteColor()
+        labelName.textColor = UIColor.grayColor() //UIColor.whiteColor()
         labelName.userInteractionEnabled = true
         
         //Add label for date
@@ -158,7 +181,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         let dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
         labelDate = UILabel(frame: CGRect(x: originX + (trackWidth / 12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth, height: trackHeight * 1.4 / 7.0))
         labelDate.textAlignment = NSTextAlignment.Left
-        labelDate.textColor = UIColor.whiteColor()
+        labelDate.textColor = UIColor.grayColor() //UIColor.whiteColor()
         labelDate.text = dateInFormat
         labelDate.font = UIFont(name: labelDate.font.fontName, size: 10)
         
@@ -166,10 +189,10 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         //Add label for duration (0:00:00 until audio is recorded)
         labelDuration = UILabel(frame: CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth - (trackWidth * 2.0 / 12.0) , height: trackHeight * 1.4 / 7.0))
         labelDuration.textAlignment = NSTextAlignment.Right
-        labelDuration.textColor = UIColor.whiteColor()
+        labelDuration.textColor = UIColor.grayColor() //UIColor.whiteColor()
         labelDuration.text = "0:00:00"
         labelDuration.font = UIFont(name: labelDuration.font.fontName, size: 10)
-    
+        
         //Add record button (as UIView)
         recordButton = UIView(frame: CGRect(x: originX + trackWidth / 4, y:     originY + trackHeight / 4, width: trackWidth / 2, height: trackHeight / 2))
         recordButton.layer.cornerRadius = recordButton.bounds.width / 2
@@ -202,7 +225,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
     
     func bringTrackToFront() {
         let supervw = self.superview!
-        supervw.insertSubview(self, atIndex: supervw.subviews.count - 4)
+        supervw.insertSubview(self, atIndex: supervw.subviews.count - 5)
     }
     
     func touchBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -238,91 +261,87 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         if (!wasDragged) {
             if (!hasStartedRecording) {
                 print("started recording")
-                
-                var originX = self.bounds.origin.x
-                var originY = self.bounds.origin.y
-                var trackHeight = self.bounds.height
-                var trackWidth = self.bounds.width
-                
-                var animation = CABasicAnimation(keyPath: "cornerRadius")
-                animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
-                animation.fromValue = recordButton.bounds.width / 2
-                animation.toValue = 6.0
-                animation.duration = 0.5
-                recordButton.layer.cornerRadius = 6
-                recordButton.layer.addAnimation(animation, forKey: "cornerRadius")
-                
-                Track.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-                    self.recordButton.transform = CGAffineTransformMakeScale(0.9, 0.9)
-                    }, completion: nil )
-                
-                let currentDateTime = NSDate()
-                let formatter = NSDateFormatter()
-                formatter.dateFormat = "ddMMyyyy-HHmmss-SSS"
-                let recordingName = formatter.stringFromDate(currentDateTime) + ".wav"
-                let pathArray = [projectDirectory!, recordingName]
-                let filePath = NSURL.fileURLWithPathComponents(pathArray)
-                
-                var session = AVAudioSession.sharedInstance()
-                do {
-                    try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
-                } catch _ {
-                }
-                do {
-                    try session.overrideOutputAudioPort(AVAudioSessionPortOverride.Speaker)
-                } catch _ {
-                }
-                
-                audioRecorder = try? AVAudioRecorder(URL: filePath!, settings: [String : AnyObject]())
-                audioRecorder.delegate = self
-                audioRecorder.meteringEnabled = true
-                audioRecorder.prepareToRecord()
-                audioRecorder.record()
-                
-                hasStartedRecording = true
-                hasStoppedRecording = false
+                startRecording()
             } else if (!hasStoppedRecording) {
                 print("stopping recording")
-                Track.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-                    self.recordButton.transform = CGAffineTransformMakeScale(0.01, 0.01)
-                    }, completion: { (Bool) -> Void in
-                        self.recordButton.removeFromSuperview()
-                        self.addSubview(self.audioPlot)
-                        self.addSubview(self.labelName)
-                        self.addSubview(self.labelDate)
-                        self.addSubview(self.labelDuration)
-                })
-                
-                audioRecorder.stop()
-                var audioSession = AVAudioSession.sharedInstance()
-                do {
-                    try audioSession.setActive(false)
-                } catch _ {
-                }
-                hasStoppedRecording = true
+                stopRecording()
             } else if (readyToPlay) {
                 playAudio()
             }
-            
         } else {
             updateTrackCoreData()
             wasDragged = false
         }
     }
     
+    func startRecording() {
+        var originX = self.bounds.origin.x
+        var originY = self.bounds.origin.y
+        var trackHeight = self.bounds.height
+        var trackWidth = self.bounds.width
+        
+        var animation = CABasicAnimation(keyPath: "cornerRadius")
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+        animation.fromValue = recordButton.bounds.width / 2
+        animation.toValue = 6.0
+        animation.duration = 0.5
+        recordButton.layer.cornerRadius = 6
+        recordButton.layer.addAnimation(animation, forKey: "cornerRadius")
+        
+        Track.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+            self.recordButton.transform = CGAffineTransformMakeScale(0.9, 0.9)
+            }, completion: nil )
+        
+        var session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        } catch _ {
+        }
+        do {
+            try session.overrideOutputAudioPort(AVAudioSessionPortOverride.Speaker)
+        } catch _ {
+        }
+        
+        audioRecorder.prepareToRecord()
+        audioRecorder.record()
+        
+        hasStartedRecording = true
+        hasStoppedRecording = false
+    }
+    
+    func stopRecording() {
+        Track.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
+            self.recordButton.transform = CGAffineTransformMakeScale(0.01, 0.01)
+            }, completion: { (Bool) -> Void in
+                self.recordButton.removeFromSuperview()
+                self.addSubview(self.audioPlot)
+                self.addSubview(self.labelName)
+                self.addSubview(self.labelDate)
+                self.addSubview(self.labelDuration)
+        })
+        
+        audioRecorder.stop()
+        var audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setActive(false)
+        } catch _ {
+        }
+        hasStoppedRecording = true
+    }
+    
     func playAudio() {
-        if !isInEditMode {
+        if !isInEditMode && audioPlayer != nil {
             print("playing")
             (superview as! LinkManager).showStopButton()
             stopAudio()
-            audioPlayer.play()
+            audioPlayer!.play()
             //reset the progress view to beginning
             UIView.animateWithDuration(0.001, delay: 0.0, options: [UIViewAnimationOptions.BeginFromCurrentState, UIViewAnimationOptions.CurveLinear], animations: { () -> Void in
                 self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
             }, completion: nil)
         
             progressView = UIView(frame: CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 1, height: self.bounds.height))
-            progressView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
+            progressView.backgroundColor = UIColor.grayColor() //UIColor.whiteColor().colorWithAlphaComponent(0.6)
             progressView.layer.cornerRadius = 2
         
             self.addSubview(progressView)
@@ -331,20 +350,53 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
             self.bringSubviewToFront(labelDate)
         
             //play progress view
-            UIView.animateWithDuration(audioPlayer.duration, delay: 0.1, options:[UIViewAnimationOptions.CurveLinear, UIViewAnimationOptions.BeginFromCurrentState], animations: { () -> Void in
+            UIView.animateWithDuration(audioPlayer!.duration, delay: 0.1, options:[UIViewAnimationOptions.CurveLinear, UIViewAnimationOptions.BeginFromCurrentState], animations: { () -> Void in
                 var tmpFrame: CGRect = self.progressView.frame
                 tmpFrame.origin.x += self.bounds.width + 1
                 self.progressView.frame = tmpFrame
             }, completion: nil)
+        } else {
+            print("could not play audio")
+        }
+    }
+    
+    func playAudioAtTime(time: NSTimeInterval) {
+        if !isInEditMode && audioPlayer != nil {
+            print("playing")
+            (superview as! LinkManager).showStopButton()
+            stopAudio()
+            audioPlayer!.playAtTime(time)
+            //reset the progress view to beginning
+            UIView.animateWithDuration(0.001, delay: 0.0, options: [UIViewAnimationOptions.BeginFromCurrentState, UIViewAnimationOptions.CurveLinear], animations: { () -> Void in
+                self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
+                }, completion: nil)
+            
+            progressView = UIView(frame: CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 1, height: self.bounds.height))
+            progressView.backgroundColor = UIColor.grayColor() //UIColor.whiteColor().colorWithAlphaComponent(0.6)
+            progressView.layer.cornerRadius = 2
+            
+            self.addSubview(progressView)
+            self.bringSubviewToFront(labelName)
+            self.bringSubviewToFront(labelDuration)
+            self.bringSubviewToFront(labelDate)
+            
+            //play progress view
+            UIView.animateWithDuration(audioPlayer!.duration, delay: 0.1, options:[UIViewAnimationOptions.CurveLinear, UIViewAnimationOptions.BeginFromCurrentState], animations: { () -> Void in
+                var tmpFrame: CGRect = self.progressView.frame
+                tmpFrame.origin.x += self.bounds.width + 1
+                self.progressView.frame = tmpFrame
+                }, completion: nil)
         }
     }
     
     func stopAudio() {
-        audioPlayer.stop()
-        audioPlayer.currentTime = 0.0
-        UIView.animateWithDuration(0.001, delay: 0.0, options: [UIViewAnimationOptions.BeginFromCurrentState, UIViewAnimationOptions.CurveLinear], animations: { () -> Void in
-            self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
-            }, completion: nil)
+        if audioPlayer != nil {
+            audioPlayer!.stop()
+            audioPlayer!.currentTime = 0.0
+            UIView.animateWithDuration(0.001, delay: 0.0, options: [UIViewAnimationOptions.BeginFromCurrentState, UIViewAnimationOptions.CurveLinear], animations: { () -> Void in
+                self.progressView.frame = CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 0, height: self.bounds.height)
+                }, completion: nil)
+        }
     }
     
     func audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully flag: Bool) {
@@ -355,27 +407,32 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
     }
     
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
-        if ( flag ) {
+        if flag {
             recordedAudio.filePathUrl = recorder.url
             recordedAudio.title = recorder.url.lastPathComponent
-            audioPlayer = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl)
-            audioPlayer.prepareToPlay()
-            audioPlayer.delegate = self
-            readyToPlay = true
-            print("recording ready for playback!")
+            if let audio = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl) {
+                audioPlayer = audio
+                audioPlayer!.prepareToPlay()
+                audioPlayer!.delegate = self
+                readyToPlay = true
+                print("recording ready for playback!")
             
-            audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
-            drawWaveform()
+                audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
+                drawWaveform()
             
-            //Set the duration label text
-            let durationSec = audioFile.duration
-            let format = NSDateFormatter()
-            format.dateFormat = "H:mm:ss"
-            let durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
-            format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
-            let text = format.stringFromDate(durationDate)
-            setLabelDurationText(text)
-            updateTrackCoreData()
+                //Set the duration label text
+                let durationSec = audioFile.duration
+                let format = NSDateFormatter()
+                format.dateFormat = "H:mm:ss"
+                let durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
+                format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+                let text = format.stringFromDate(durationDate)
+                setLabelDurationText(text)
+                updateTrackCoreData()
+            } else {
+                print("could not init audioPlayer with url: \(recordedAudio.filePathUrl)")
+                readyToPlay = false
+            }
         } else {
             print("did not record successfully")
         }
@@ -390,14 +447,16 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         if !self.isInEditMode {
             self.isInEditMode = true
             let editView = TrackEditView(frame: self.frame, track: self)
-            (self.superview as! LinkManager).mode = "NOTOUCHES"
-            self.superview?.addSubview(editView)
-            editView.animateOpen()
+            if (self.superview as? LinkManager) != nil {
+                (self.superview as! LinkManager).mode = "NOTOUCHES"
+                self.superview?.addSubview(editView)
+                editView.animateOpen()
+            }
         }
         
         //self.frame = CGRectMake(frame.origin.x - 15, frame.origin.y - 15, frame.width + 30, frame.height + 30)
         
-        if !self.isInEditMode && false {
+        /*if !self.isInEditMode && false {
         self.isInEditMode = true
         self.savedBoundsDuringEdit = self.frame
         let supervw = self.superview!
@@ -509,11 +568,11 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
             self.addSubview(colorButton)
             i++
         }
-        }
+        }*/
     }
     
     func exitEditMode(sender: UIButton) {
-        isInEditMode = false
+        /*isInEditMode = false
         (self.superview as! LinkManager).hideToolbars(false)
         bringTrackToFront()
         
@@ -552,7 +611,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
             self.progressView.frame = CGRect(x: self.bounds.width + 1, y: self.bounds.origin.y, width: 1, height: self.bounds.height)
             }, completion: { (bool:Bool) -> Void in
                 self.updateTrackCoreData()
-        })
+        })*/
     }
     
     func updateTrackSubviews(newTrackUrl newTrackUrl: String) {
@@ -561,21 +620,23 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         
         recordedAudio.filePathUrl = filePath
         recordedAudio.title = filePath!.lastPathComponent
-        audioPlayer = try? AVAudioPlayer(contentsOfURL: filePath!)
-        audioPlayer.prepareToPlay()
+        if let audioPlayer = try? AVAudioPlayer(contentsOfURL: filePath!) {
+            audioPlayer.prepareToPlay()
+            audioFile = EZAudioFile(URL: filePath)
+            drawWaveform()
         
-        audioFile = EZAudioFile(URL: filePath)
-        drawWaveform()
-        
-        //Set the duration label text
-        var durationSec = audioFile.duration
-        var format = NSDateFormatter()
-        format.dateFormat = "H:mm:ss"
-        var durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
-        format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
-        var text = format.stringFromDate(durationDate)
-        setLabelDurationText(text)
-        updateTrackCoreData()
+            //Set the duration label text
+            var durationSec = audioFile.duration
+            var format = NSDateFormatter()
+            format.dateFormat = "H:mm:ss"
+            var durationDate = NSDate(timeIntervalSinceReferenceDate: durationSec)
+            format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+            var text = format.stringFromDate(durationDate)
+            setLabelDurationText(text)
+            updateTrackCoreData()
+        } else {
+            print("could not init audioPlayer with url: \(recordedAudio.filePathUrl)")
+        }
     }
     
     func changeColor(sender: UIButton) {
