@@ -6,28 +6,27 @@ STILL UNDER DEVELOPMENT, CORE FEATURES ALMOST COMPLETE!
 Tracks gives musicians the power to quickly create, organize, and arrange their music recordings into songs. 
   - Import or record live audio into "track" nodes. 
   - Edit Track volumes and trim recordings.
-  - Conncect track nodes together with links to play them simultaneously or sequentially.
+  - Connect track nodes together with links to play them simultaneously or sequentially.
   - Save song lyrics or notes about the recordings.
   - Use hand drawing, color-coordination, or dragging to organize tracks into groups.
-  - Unlimited projects auto-saved via CoreData
-
-Tracks is a stripped-down alternative to using Digital Audio Workstations geared towards quickly creating rough demos or beats. 
+  
+Tracks is a stripped-down alternative to using a Digital Audio Workstation geared towards quickly creating rough demos or beats. 
 There is no timeline the way that traditional DAWs layout tracks. Links are used between tracks to
 either trigger the next track when the current has completed or trigger several tracks simultaneously. 
-There are also special tracks for "silence" that can be used when needed for timing. 
 
 Many more features to come! 
  - midi support
  - audiobus / inter-app audio
  - input monitoring
+ - audio effects
+ - group editing for linked tracks
  - export options
- - maybe audio effects one day.
 
 **IMPORTANT CLASSES:**
 
-**Track** - custom UIView for an individual Track. Contains code for recording audio, displaying relevant track data and waveforms, and track edit mode via long-press gesture recognizer.
+**Track** - custom UIView for an individual Track. Contains code for recording/playing audio and displaying relevant track data and waveforms.
 
-**ProjectViewController** - custom UIViewController specific for an individual project. Contains code for adding new tracks, displaying notes, adding track links.
+**ProjectViewController** - custom UIViewController specific for an individual project. Contains code for adding new tracks, displaying notes, switching tool mode (play, link, delete).
 
 **SelectProjectViewController** - custom UIViewController for opening other projects or settings. Contains code for adding new projects, tableView of projects, and settings.
 
@@ -35,10 +34,12 @@ Many more features to come!
 
 **LinkManager** - custom UIView for facilitating the adding of track links as well as the deleting of links and tracks. It is the base view for ProjectViewController, and does some work to delegate touches appropriately. Basically the glue between links and tracks.
 
-**SimulTrackLink** - in progress. Custom UIView that sits on top of n track nodes and plays all linked tracks simultaneously. Drag from one track to another in Add link mode to add a link! Work to be done: add to coredata model, iterate on visuals.
+**TrackLink** - custom UIView that sits on top of n track nodes and plays through linked tracks starting at a given node and following the link edges (simultaneous or sequential) thereafter. Drag from one track to another in Add link mode to add a link.
 
-**SeqTrackLink** - unimplemented. Same as SimulTrackLinks but plays linked tracks sequentially.
+**TrackEditView** - view for editing a track node. Added as subview when a track is long-pressed. In edit mode, it is possible to trim audio, adjust volumn/pan, change track node name and color. 
 
-**Example snapshot:**
+**WaveformEditView** - used as subview within TrackEditView to handle the waveform and audio trim portion of edit mode. 
 
-![Alt text](/exampleSnapshot.png?raw=true)
+**Design mock-ups:**
+
+![Alt text](/mockups.png?raw=true)
