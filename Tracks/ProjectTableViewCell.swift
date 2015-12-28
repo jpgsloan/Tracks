@@ -9,9 +9,11 @@
 import UIKit
 
 class ProjectTableViewCell: UITableViewCell {
+    
     @IBOutlet weak var projectName: UILabel!
-
     @IBOutlet weak var projectDate: UILabel!
+    @IBOutlet weak var selectionImage: UIImageView!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

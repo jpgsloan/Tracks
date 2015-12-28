@@ -24,8 +24,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     var tracks: NSMutableArray = []
     var notesView: NotesView!
     var statusBarBackgroundView: UIView!
-    var sideBarOpenBackgroundView: UIView!
-    var notesOpenBackgroundView: UIView!
+    var sideBarOpenBackgroundView: UIVisualEffectView!
     var drawView: DrawView!
     var lowerBorderTitle: CALayer!
     
@@ -45,7 +44,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         // Add draw view
         drawView = DrawView(frame: self.view.frame)
         drawView.backgroundColor = UIColor.clearColor()
-        drawView.layer.backgroundColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 1.0).CGColor
+        drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor //UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 1.0).CGColor
         self.view.addSubview(drawView)
         
         // Add lower border to title text
@@ -190,15 +189,26 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     }
         
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
-        sideBarOpenBackgroundView = UIView(frame: self.view.frame)
-        sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
+        if titleTextField.isFirstResponder() {
+            titleTextField.resignFirstResponder()
+            if let projectName = titleTextField.text {
+                (parentViewController as! ProjectManagerViewController).updateProjectName(projectID, projectName: projectName)
+                self.projectName = projectName
+            }
+        }
+        
+        let effect = UIBlurEffect(style: UIBlurEffectStyle.Light)
+        sideBarOpenBackgroundView = UIVisualEffectView(frame: self.view.frame)
+        sideBarOpenBackgroundView.effect = effect
+        sideBarOpenBackgroundView.alpha = 0.0
+        
         let tapGesture = UITapGestureRecognizer(target: self, action: "closeSideBarVC:")
         tapGesture.numberOfTapsRequired = 1
         sideBarOpenBackgroundView.addGestureRecognizer(tapGesture)
         (self.view as! LinkManager).mode = "NOTOUCHES"
         self.view.addSubview(sideBarOpenBackgroundView)
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            self.sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.5)
+            self.sideBarOpenBackgroundView.alpha = 1.0
             }, completion: { (bool:Bool) -> Void in
         })
         
@@ -207,13 +217,27 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         
     func closeSideBarVC(gestureRecognizer:UIGestureRecognizer) {
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                self.sideBarOpenBackgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
+            self.sideBarOpenBackgroundView.alpha = 0.0
             }, completion: { (bool:Bool) -> Void in
                 self.sideBarOpenBackgroundView.removeFromSuperview()
         })
         
         (parentViewController as! ProjectManagerViewController).closeSideBarVC()
         (self.view as! LinkManager).mode = ""
+    }
+    
+    func sideBarOpened() {
+        // called when project is opened in background with side bar already open.
+        let effect = UIBlurEffect(style: UIBlurEffectStyle.Light)
+        sideBarOpenBackgroundView = UIVisualEffectView(frame: self.view.frame)
+        sideBarOpenBackgroundView.effect = effect
+        sideBarOpenBackgroundView.alpha = 1.0
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: "closeSideBarVC:")
+        tapGesture.numberOfTapsRequired = 1
+        sideBarOpenBackgroundView.addGestureRecognizer(tapGesture)
+        (self.view as! LinkManager).mode = "NOTOUCHES"
+        self.view.addSubview(sideBarOpenBackgroundView)
     }
     
     func sideBarClosed() {
@@ -355,8 +379,17 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         titleTextField.resignFirstResponder()
-        let projectName = titleTextField.text
-        (parentViewController as! ProjectManagerViewController).updateProjectName(projectID, projectName: projectName!)
+        if let projectName = titleTextField.text {
+            (parentViewController as! ProjectManagerViewController).updateProjectName(projectID, projectName: projectName)
+            self.projectName = projectName
+        }
+        return true
+    }
+    
+    func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
+        print("made IT")
+        print(self.parentViewController)
+        print(self)
         return true
     }
     

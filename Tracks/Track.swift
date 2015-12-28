@@ -122,16 +122,16 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         
         if self.backgroundColor == nil {
             print("picking color")
-            //self.backgroundColor = tealColor()
-            self.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
+            self.backgroundColor = tealColor()
+            //self.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.8)
         }
         
-        self.layer.borderColor = UIColor.grayColor().colorWithAlphaComponent(0.8).CGColor
+        self.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.8).CGColor
         self.layer.borderWidth = 0.5
         
         //set progressView
         progressView = UIView(frame: CGRect(x: self.bounds.origin.x, y: self.bounds.origin.y, width: 1, height: self.bounds.height))
-        progressView.backgroundColor = UIColor.grayColor() //UIColor.whiteColor().colorWithAlphaComponent(0.6)
+        progressView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6)
         progressView.layer.cornerRadius = 2
         
         // Set the track id
@@ -164,14 +164,14 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         audioPlot.plotType = EZPlotType.Buffer
         audioPlot.backgroundColor = UIColor.clearColor()
         audioPlot.opaque = false
-        audioPlot.color = UIColor.grayColor() //UIColor.whiteColor()
+        audioPlot.color = UIColor.whiteColor() //UIColor.grayColor()
         audioPlot.shouldFill   = false
         audioPlot.shouldMirror = true
         
         //Add label for file name
         labelName = UILabel(frame: CGRect(x: originX + 5, y: originY, width: trackWidth - 10, height: trackHeight/4.2))
         labelName.textAlignment = NSTextAlignment.Center
-        labelName.textColor = UIColor.grayColor() //UIColor.whiteColor()
+        labelName.textColor = /*UIColor.grayColor()*/ UIColor.whiteColor()
         labelName.userInteractionEnabled = true
         
         //Add label for date
@@ -181,7 +181,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         let dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
         labelDate = UILabel(frame: CGRect(x: originX + (trackWidth / 12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth, height: trackHeight * 1.4 / 7.0))
         labelDate.textAlignment = NSTextAlignment.Left
-        labelDate.textColor = UIColor.grayColor() //UIColor.whiteColor()
+        labelDate.textColor = UIColor.whiteColor()
         labelDate.text = dateInFormat
         labelDate.font = UIFont(name: labelDate.font.fontName, size: 10)
         
@@ -189,7 +189,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, UITextField
         //Add label for duration (0:00:00 until audio is recorded)
         labelDuration = UILabel(frame: CGRect(x: originX + (trackWidth/12.0), y: originY + (trackHeight * 5.6 / 7.0), width: trackWidth - (trackWidth * 2.0 / 12.0) , height: trackHeight * 1.4 / 7.0))
         labelDuration.textAlignment = NSTextAlignment.Right
-        labelDuration.textColor = UIColor.grayColor() //UIColor.whiteColor()
+        labelDuration.textColor = /*UIColor.grayColor()*/ UIColor.whiteColor()
         labelDuration.text = "0:00:00"
         labelDuration.font = UIFont(name: labelDuration.font.fontName, size: 10)
         

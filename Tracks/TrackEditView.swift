@@ -19,7 +19,7 @@ class TrackEditView: UIView {
     convenience init(frame: CGRect, track: Track) {
         self.init(frame: frame)
         self.track = track
-        self.backgroundColor = track.backgroundColor?.colorWithAlphaComponent(0.97)
+        self.backgroundColor = tealColor()//track.backgroundColor?.colorWithAlphaComponent(0.97)
         self.view.backgroundColor = UIColor.clearColor()
         titleTextField.text = track.labelName.text
         waveformEditView.layoutIfNeeded()

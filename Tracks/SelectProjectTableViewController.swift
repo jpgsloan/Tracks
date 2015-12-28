@@ -14,8 +14,14 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     var tableData: Array<NSMutableDictionary> = []
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
+    
+    var indexPathToDelete: NSIndexPath?
         
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var generalBar: UIView!
+    @IBOutlet weak var projectsBar: UIView!
+    @IBOutlet weak var settingsButton: UIView!
+    @IBOutlet weak var aboutButton: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,14 +29,18 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         appDel = UIApplication.sharedApplication().delegate as! AppDelegate
         context = appDel.managedObjectContext!
         
-        self.view.backgroundColor = UIColor.clearColor().colorWithAlphaComponent(0.0)
+        // make views slightly transparent
+        self.view.backgroundColor = view.backgroundColor!.colorWithAlphaComponent(0.9)
+        projectsBar.backgroundColor = projectsBar.backgroundColor?.colorWithAlphaComponent(0.9)
+        generalBar.backgroundColor = generalBar.backgroundColor?.colorWithAlphaComponent(0.9)
+        
         
         tableView.registerNib(UINib(nibName: "ProjectTableViewCell", bundle: nil), forCellReuseIdentifier: "selectProjectCell")
         tableView.dataSource = self
         tableView.delegate = self
         
-        tableView.rowHeight = 55
-        tableView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 0.0)
+        tableView.rowHeight = 75
+        tableView.backgroundColor = UIColor(red: 0.969, green: 0.949, blue: 0.922, alpha: 0.0).colorWithAlphaComponent(0.0)
         
         //Checkif stored tableData exists in CoreData
         let request = NSFetchRequest(entityName: "TableViewDataEntity")
@@ -52,6 +62,7 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
             } catch _ {
             }
         }
+    
     }
 
     override func didReceiveMemoryWarning() {
@@ -60,11 +71,22 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        print("row selected")
         let data = self.tableData[indexPath.row]
         let projectID = data.valueForKey("projectID") as! String
         let projectName = data.valueForKey("projectName") as! String
         (self.parentViewController as! ProjectManagerViewController).openProject(projectID, projectName: projectName)
+        didSelectRow(indexPath)
+    }
+    
+    func didSelectRow(indexPath: NSIndexPath) {
+        print("row selected")
+        // set cell as selected.
+        for (var i = 0; i < tableData.count; i++) {
+            tableData[i].setValue(false, forKey: "selected")
+        }
+        tableData[indexPath.row].setValue(true, forKey: "selected")
+        self.tableView.reloadData()
+        self.updateTableData()
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -87,9 +109,21 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         cell.projectName.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
         
         cell.projectDate.text = (data.valueForKey("projectDate") as! String)
+        var bgColorView = UIView()
+        bgColorView.backgroundColor = self.view.backgroundColor
+        cell.selectedBackgroundView = bgColorView
         
-        cell.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.3)
-
+        if let bool = data.valueForKey("selected") {
+            if bool is Bool && (bool as! Bool) {
+                cell.selectionImage.image = UIImage(named: "selected-project")
+                print("selected image set")
+            } else {
+                cell.selectionImage.image = UIImage(named: "unselected-project")
+            }
+        } else {
+            cell.selectionImage.image = UIImage(named: "unselected-project")
+        }
+        
         return cell
     }
 
@@ -100,18 +134,98 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         return true
     }
     
-
-    
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             // Delete the row from the data source
-            self.tableData.removeAtIndex(indexPath.row)
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            self.updateTableData()
+            if let projectName = self.tableData[indexPath.row].valueForKey("projectName") {
+                indexPathToDelete = indexPath
+                confirmDelete(projectName as! String)
+            }
         } else if editingStyle == .Insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
+    }
+    
+    func confirmDelete(projectName: String) {
+        
+        let alert = UIAlertController(title: "Delete Project", message: "Are you sure you want to permanently delete \(projectName)?", preferredStyle: .ActionSheet)
+        
+        let DeleteAction = UIAlertAction(title: "Delete", style: .Destructive, handler: handleDeleteProject)
+        let CancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: cancelDeleteProject)
+        
+        alert.addAction(DeleteAction)
+        alert.addAction(CancelAction)
+        
+        // Support display in iPad
+        alert.popoverPresentationController?.sourceView = self.view
+        alert.popoverPresentationController?.sourceRect = CGRectMake(self.view.bounds.size.width / 2.0, self.view.bounds.size.height / 2.0, 1.0, 1.0)
+        
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func handleDeleteProject(alertAction: UIAlertAction!) {
+        if let indexPathToDelete = indexPathToDelete {
+            let selectedBool = self.tableData[indexPathToDelete.row].valueForKey("selected")
+            let projectID = self.tableData[indexPathToDelete.row].valueForKey("projectID") as! String
+            self.tableData.removeAtIndex(indexPathToDelete.row)
+            tableView.deleteRowsAtIndexPaths([indexPathToDelete], withRowAnimation: .Fade)
+            
+            // delete project files
+            let filemgr = NSFileManager.defaultManager()
+            let dirPaths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory,
+                .UserDomainMask, true)
+            let docsDir = dirPaths[0] as! String
+            let projDir = NSString(string: docsDir).stringByAppendingPathComponent(projectID)
+            
+            var error: NSError?
+            
+            do {
+                try filemgr.removeItemAtPath(projDir)
+            } catch {
+                print("Failed to delete directory: \(projDir)")
+            }
+            
+            if self.tableData.count == 0 {
+                if let parent = self.parentViewController as? ProjectManagerViewController {
+                        // since all project were deleted, create empty new project and open it. 
+                        parent.openNewProject()
+                }
+    
+            } else if selectedBool is Bool {
+                if selectedBool as! Bool {
+                    // since there are other projects, and current selected one was deleted, open next project in table (or previous).
+                    if indexPathToDelete.row < self.tableData.count {
+                        // open next project in background.
+                        let data = self.tableData[indexPathToDelete.row]
+                        let projectID = data.valueForKey("projectID") as! String
+                        let projectName = data.valueForKey("projectName") as! String
+                        (self.parentViewController as! ProjectManagerViewController).openProjectInBackground(projectID, projectName: projectName)
+                        
+                        // select next project in tableview.
+                        self.didSelectRow(indexPathToDelete)
+                    } else if indexPathToDelete.row - 1 < self.tableData.count {
+                        let newIndex = NSIndexPath(forRow: indexPathToDelete.row - 1, inSection: indexPathToDelete.section)
+                        // open previous project in background.
+                        let data = self.tableData[newIndex.row]
+                        let projectID = data.valueForKey("projectID") as! String
+                        let projectName = data.valueForKey("projectName") as! String
+                        (self.parentViewController as! ProjectManagerViewController).openProjectInBackground(projectID, projectName: projectName)
+                        
+                        // select previous project in tableview.
+
+                        self.didSelectRow(newIndex)
+                    }
+                }
+            } else {
+                self.updateTableData()
+            }
+        }
+        indexPathToDelete = nil
+    }
+    
+    func cancelDeleteProject(alertAction: UIAlertAction!) {
+        indexPathToDelete = nil
     }
     
     @IBAction func addProject(sender: UIButton) {
@@ -121,7 +235,7 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         
         let todaysDate:NSDate = NSDate()
         let dateFormatter:NSDateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yy"
+        dateFormatter.dateFormat = "MM.dd.yy"
         var dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
         data.setValue(dateInFormat, forKey: "projectDate")
         
@@ -129,7 +243,14 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         dateInFormat = dateFormatter.stringFromDate(todaysDate)
         data.setValue(dateInFormat, forKey: "projectID")
         
-        self.tableData.append(data)
+        if self.tableData.count == 0 {
+            // if only project, mark as selected.
+            data.setValue(true, forKey: "selected")
+        } else {
+            data.setValue(false, forKey: "selected")
+        }
+        self.tableData.insert(data, atIndex: 0)
+        //self.tableData.append(data)
         self.tableView.reloadData()
         self.updateTableData()
     }
@@ -143,9 +264,16 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         
         let todaysDate:NSDate = NSDate()
         let dateFormatter:NSDateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yy"
+        dateFormatter.dateFormat = "MM.dd.yy"
         let dateInFormat:String = dateFormatter.stringFromDate(todaysDate)
         data.setValue(dateInFormat, forKey: "projectDate")
+        
+        if self.tableData.count == 0 {
+            // if only project, mark as selected.
+            data.setValue(true, forKey: "selected")
+        } else {
+            data.setValue(false, forKey: "selected")
+        }
         
         self.tableData.append(data)
         self.tableView.reloadData()
@@ -186,13 +314,11 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     }
     
     func updateTableData() {
-        for (var i = 0; i < self.tableData.count; i++) {
-            let cell: ProjectTableViewCell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as! ProjectTableViewCell
-                
-            self.tableData[i].setValue(cell.projectName.text, forKey: "projectName")
-            print("inforloop:", terminator: "")
-            print(i)
-        }
+        /*for (var i = 0; i < self.tableData.count; i++) {
+            if let cell: ProjectTableViewCell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as! ProjectTableViewCell {
+                self.tableData[i].setValue(cell.projectName.text, forKey: "projectName")
+            }
+        }*/
     
         let request = NSFetchRequest(entityName: "TableViewDataEntity")
         request.returnsObjectsAsFaults = false

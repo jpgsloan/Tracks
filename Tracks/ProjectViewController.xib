@@ -16,7 +16,7 @@
                 <outlet property="seqLinkButton" destination="TQM-cn-I1D" id="QVg-IY-CwO"/>
                 <outlet property="simulLinkButton" destination="5sq-3b-XQt" id="oiA-we-JHc"/>
                 <outlet property="stopButton" destination="Mz0-MG-9fD" id="ib2-ek-eAK"/>
-                <outlet property="titleTextField" destination="OMg-Am-R1n" id="P31-5s-dbF"/>
+                <outlet property="titleTextField" destination="OMg-Am-R1n" id="WPD-fm-Zw7"/>
                 <outlet property="view" destination="VlB-rb-Dnd" id="U9p-mm-Rb3"/>
             </connections>
         </placeholder>

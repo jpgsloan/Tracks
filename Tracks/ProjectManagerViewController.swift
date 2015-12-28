@@ -25,7 +25,7 @@ class ProjectManagerViewController: UIViewController {
         sideBarVC = SelectProjectTableViewController(nibName: "SelectProjectViewController",bundle: nil)
         var frame = self.view.frame
         frame.origin.x = self.view.frame.origin.x - self.view.frame.width
-        frame.size.width = self.view.frame.width - (self.view.frame.width / 4.5)
+        frame.size.width = self.view.frame.width - (self.view.frame.width / 3.3)
         sideBarVC.view.frame = frame
         self.addChildViewController(sideBarVC)
         self.view.addSubview(sideBarVC.view)
@@ -62,6 +62,12 @@ class ProjectManagerViewController: UIViewController {
     
     func openSideBarVC() {
         print("OPEN SIDEBAR")
+        // add bottom border to settings button
+        let lowerBorder = CALayer()
+        lowerBorder.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.7).CGColor
+        lowerBorder.frame = CGRectMake(15, sideBarVC.settingsButton.frame.height - 0.5, sideBarVC.settingsButton.frame.width - 15, 0.5)
+        sideBarVC.settingsButton.layer.addSublayer(lowerBorder)
+
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
                 self.sideBarVC.view.frame.origin.x = self.view.frame.origin.x
             }, completion: { (bool:Bool) -> Void in
@@ -77,23 +83,59 @@ class ProjectManagerViewController: UIViewController {
         })
     }
     
+    func openNewProject() {
+        print("opening new project")
+        let todaysDate:NSDate = NSDate()
+        let dateFormatter:NSDateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "MMddyy-HHmmss-SSS"
+        let projectID = dateFormatter.stringFromDate(todaysDate)
+        let projectName = "Untitled Project"
+        sideBarVC.addProject(projectID, projectName: projectName)
+        openProject(projectID, projectName: projectName)
+    }
+    
     func openProject(projectID: String, projectName: String) {
         print("opening project")
-        closeSideBarVC()
         let newProjVC = ProjectViewController(nibName: "ProjectViewController",bundle: nil)
         newProjVC.projectID = projectID
         newProjVC.projectName = projectName
         
         newProjVC.view.frame = self.view.frame
-        self.addChildViewController(newProjVC)
-        self.view.addSubview(newProjVC.view)
-        newProjVC.didMoveToParentViewController(self)
-        self.updateLastOpenProjectCoreData(projectID,projectName: projectName)
         
+        self.updateLastOpenProjectCoreData(projectID,projectName: projectName)
         self.projVC.view.removeFromSuperview()
         self.projVC.removeFromParentViewController()
         self.projVC = newProjVC
+        
+        self.addChildViewController(self.projVC)
+        self.view.addSubview(self.projVC.view)
+        self.projVC.didMoveToParentViewController(self)
         self.view.sendSubviewToBack(self.projVC.view)
+        
+        // inform new project view controller that sidebar is currently open, then close it (for animation purposes).
+        self.projVC.sideBarOpened()
+        self.projVC.closeSideBarVC(UIGestureRecognizer())
+    }
+    
+    func openProjectInBackground(projectID: String, projectName: String) {
+        print("opening project in background")
+        let newProjVC = ProjectViewController(nibName: "ProjectViewController",bundle: nil)
+        newProjVC.projectID = projectID
+        newProjVC.projectName = projectName
+        
+        newProjVC.view.frame = self.view.frame
+        
+        self.updateLastOpenProjectCoreData(projectID,projectName: projectName)
+        self.projVC.view.removeFromSuperview()
+        self.projVC.removeFromParentViewController()
+        self.projVC = newProjVC
+        
+        self.addChildViewController(self.projVC)
+        self.view.addSubview(self.projVC.view)
+        self.projVC.didMoveToParentViewController(self)
+        self.view.sendSubviewToBack(self.projVC.view)
+        
+        self.projVC.sideBarOpened()
     }
 
     func updateProjectName(projectID: String, projectName: String) {
@@ -164,6 +206,8 @@ class ProjectManagerViewController: UIViewController {
             let res = results[0] as! LastOpenProjectEntity
             res.projectID = projectID
             res.projectName = projectName
+        } else {
+            print("MANY LAST OPEN PROJECT ENTITIES")
         }
         do {
             try self.context.save()
