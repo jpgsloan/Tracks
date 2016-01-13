@@ -60,7 +60,8 @@ class DrawView: UIView {
             CGContextMoveToPoint(context, line.start.x, line.start.y)
             CGContextAddLineToPoint(context, line.end.x, line.end.y)
         }
-        CGContextSetRGBStrokeColor(context, 0.341, 0.341, 0.341, 1)
+        CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().CGColor)
+        //CGContextSetRGBStrokeColor(context, 0.341, 0.341, 0.341, 1)
         CGContextSetLineWidth(context, 5)
         CGContextSetLineCap(context, CGLineCap.Round)
         CGContextStrokePath(context)

@@ -25,6 +25,8 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     var view: UIView!
     var track: Track!
     var scrollTimer: NSTimer!
+    var volume: Float = 1.0
+    var pan: Float = 0.0
     
     var cancelTrimButton: UIButton!
     var trimAudioButton: UIButton!
@@ -508,6 +510,8 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                 curTime = NSTimeInterval(0.0)
             }
             audioPlayer.currentTime = curTime
+            audioPlayer.volume = volume
+            audioPlayer.pan = pan
             audioPlayer.play()
             playButton.setTitle("Pause", forState: UIControlState.Normal)
             playButton.sizeToFit()
@@ -529,6 +533,8 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                 curTime = startTime.seconds
             }
             audioPlayer.currentTime = curTime
+            audioPlayer.volume = volume
+            audioPlayer.pan = pan
             audioPlayer.play()
             playInTrimModeButton.setTitle("Pause", forState: UIControlState.Normal)
             playInTrimModeButton.sizeToFit()
@@ -638,6 +644,16 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     func drawWaveform() {
         let waveformData = self.audioFile!.getWaveformData()
         self.audioPlot.updateBuffer(waveformData.buffers[0], withBufferSize: waveformData.bufferSize)
+    }
+    
+    func adjustVolume(value: Float) {
+        volume = value
+        audioPlayer.volume = value
+    }
+    
+    func adjustPan(value: Float) {
+        pan = value
+        audioPlayer.pan = value
     }
     
     override func drawRect(rect: CGRect) {

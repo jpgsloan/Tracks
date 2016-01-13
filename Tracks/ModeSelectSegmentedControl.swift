@@ -18,7 +18,7 @@ import UIKit
     
     var thumbView = UIView()
     
-    var items: [item] = [ item(labelText: "MOVE", image: UIImageView(image: UIImage(named: "move"))), item(labelText: "LINK", image: UIImageView(image: UIImage(named: "links"))), item(labelText: "SNIP", image: UIImageView(image: UIImage(named: "snip"))) ] {
+    var items: [item] = [ item(labelText: "PLAY", image: UIImageView(image: UIImage(named: "move")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate))), item(labelText: "LINK", image: UIImageView(image: UIImage(named: "links")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate))), item(labelText: "ERASE", image: UIImageView(image: UIImage(named: "snip")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate))) ] {
         didSet {
             setupLabels()
         }
@@ -72,20 +72,6 @@ import UIKit
     }
     
     func setupView(){
-        self.backgroundColor = UIColor(red: 225.0/255.0, green: 225.0/255.0, blue: 225.0/255.0, alpha: 1.0)
-        
-        // Add bottom border of slightly darker color than background
-        let lowerBorder = CALayer()
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        if let bool = self.backgroundColor?.getRed(&r, green: &g, blue: &b, alpha: &a) {
-            lowerBorder.backgroundColor = UIColor(red: max(r - 0.1, 0.0), green: max(g - 0.1, 0.0), blue: max(b - 0.1, 0.0), alpha: a).CGColor
-        }
-        lowerBorder.frame = CGRectMake(0, self.frame.height - 1.0, self.frame.width, 1.0)
-        layer.addSublayer(lowerBorder)
-        
         // set up the labels, constraints, and add thumbview to selected
         setupLabels()
         
@@ -229,6 +215,8 @@ import UIKit
             for subview in item.subviews {
                 if subview is UILabel {
                     (subview as! UILabel).textColor = unselectedLabelColor
+                } else if subview is UIImageView {
+                    (subview as! UIImageView).tintColor = unselectedLabelColor
                 }
             }
         }
@@ -237,6 +225,8 @@ import UIKit
         for subview in selItem.subviews {
             if subview is UILabel {
                 (subview as! UILabel).textColor = selectedLabelColor
+            } else if subview is UIImageView {
+                (subview as! UIImageView).tintColor = selectedLabelColor
             }
         }
         self.thumbView.frame = selItem.frame
@@ -247,6 +237,8 @@ import UIKit
             for subview in item.subviews {
                 if subview is UILabel {
                     (subview as! UILabel).textColor = unselectedLabelColor
+                } else if subview is UIImageView {
+                    (subview as! UIImageView).tintColor = unselectedLabelColor
                 }
             }
         }
@@ -256,6 +248,8 @@ import UIKit
             for subview in itemViews[0].subviews {
                 if subview is UILabel {
                     (subview as! UILabel).textColor = selectedLabelColor
+                } else if subview is UIImageView {
+                    (subview as! UIImageView).tintColor = selectedLabelColor
                 }
             }
         }

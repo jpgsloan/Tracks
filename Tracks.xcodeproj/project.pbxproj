@@ -28,6 +28,7 @@
 		1158542C1BAB9E7B007C0131 /* TimeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1158542B1BAB9E7B007C0131 /* TimeSelectorView.swift */; };
 		1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */; };
 		1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3801AA6EBB10066A52E /* TrackEntity.swift */; };
+		1163B5601C40BD7F002183E5 /* Track.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1163B55F1C40BD7F002183E5 /* Track.xib */; settings = {ASSET_TAGS = (); }; };
 		116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */; };
 		116A71371AD8D5D9003CD4C7 /* ProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */; };
 		1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */; };
@@ -44,6 +45,8 @@
 		11DCE8C41AFD90750099BFEE /* LinkEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DCE8C31AFD90750099BFEE /* LinkEdge.swift */; };
 		11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */; };
 		11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */; };
+		11F9526E1BFABEEB00F8586F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 11F9526D1BFABEEB00F8586F /* Info.plist */; settings = {ASSET_TAGS = (); }; };
+		11F952721BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F952711BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift */; settings = {ASSET_TAGS = (); }; };
 		B82C0A99A676B1A859871BB0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F0EFB2F40011E4A9B70B6F4 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -61,7 +64,6 @@
 		111302FD1AFC8421002EA4B1 /* LinkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkManager.swift; sourceTree = "<group>"; };
 		11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LastOpenProjectEntity.swift; sourceTree = "<group>"; };
 		11493AC11A9EB13900E09069 /* Tracks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracks.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		11493AC51A9EB13900E09069 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		11493AC61A9EB13900E09069 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		11493ACD1A9EB13900E09069 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		11493AD01A9EB13900E09069 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 		1158542B1BAB9E7B007C0131 /* TimeSelectorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeSelectorView.swift; sourceTree = "<group>"; };
 		1162B37A1AA2C9E00066A52E /* TracksDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TracksDataModel.xcdatamodel; sourceTree = "<group>"; };
 		1162B3801AA6EBB10066A52E /* TrackEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrackEntity.swift; sourceTree = "<group>"; };
+		1163B55F1C40BD7F002183E5 /* Track.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Track.xib; sourceTree = "<group>"; };
 		116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectManagerViewController.swift; sourceTree = "<group>"; };
 		116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectViewController.xib; sourceTree = "<group>"; };
 		1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SelectProjectViewController.xib; sourceTree = "<group>"; };
@@ -100,6 +103,8 @@
 		11DCE8C31AFD90750099BFEE /* LinkEdge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkEdge.swift; sourceTree = "<group>"; };
 		11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectProjectTableViewController.swift; sourceTree = "<group>"; };
 		11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewDataEntity.swift; sourceTree = "<group>"; };
+		11F9526D1BFABEEB00F8586F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		11F952711BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModeSelectSegmentedControl.swift; sourceTree = "<group>"; };
 		3AD75F2E0A8E254275688B01 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		4F0EFB2F40011E4A9B70B6F4 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B73C169CBD4E32C05F39A9F4 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -155,6 +160,7 @@
 				1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */,
 				11493AE71A9EB19800E09069 /* ProjectViewController.swift */,
 				116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */,
+				11F952711BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift */,
 				111302FD1AFC8421002EA4B1 /* LinkManager.swift */,
 				11C8F5EE1B7406B100BDD37C /* TrackLink.swift */,
 				11C8F5F01B74081B00BDD37C /* TrackLinkNode.swift */,
@@ -164,6 +170,7 @@
 				11493AF31A9EB1B000E09069 /* DrawView.swift */,
 				11493AE61A9EB19800E09069 /* Line.swift */,
 				11493AE91A9EB19800E09069 /* Track.swift */,
+				1163B55F1C40BD7F002183E5 /* Track.xib */,
 				115854251BA39586007C0131 /* TrackEditView.swift */,
 				115854271BA39DCB007C0131 /* TrackEditView.xib */,
 				115854131B9FB80C007C0131 /* WaveformEditView.swift */,
@@ -192,7 +199,7 @@
 		11493AC41A9EB13900E09069 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				11493AC51A9EB13900E09069 /* Info.plist */,
+				11F9526D1BFABEEB00F8586F /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -277,6 +284,8 @@
 		11493AB91A9EB13900E09069 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "JPGS inc.";
 				TargetAttributes = {
@@ -322,7 +331,9 @@
 				115854281BA39DCB007C0131 /* TrackEditView.xib in Resources */,
 				115854121B9F91F3007C0131 /* WaveformEditView.xib in Resources */,
 				1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */,
+				11F9526E1BFABEEB00F8586F /* Info.plist in Resources */,
 				11ABD84B1B98D9B70048F1F9 /* NotesView.xib in Resources */,
+				1163B5601C40BD7F002183E5 /* Track.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -400,6 +411,7 @@
 				11C8F5EF1B7406B100BDD37C /* TrackLink.swift in Sources */,
 				11493AF01A9EB19800E09069 /* Track.swift in Sources */,
 				11DC217A1AA8F9E000471052 /* DrawViewEntity.swift in Sources */,
+				11F952721BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -467,7 +479,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -504,7 +516,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -521,7 +533,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Tracks/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -540,7 +552,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Tracks/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";

@@ -44,7 +44,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         // Add draw view
         drawView = DrawView(frame: self.view.frame)
         drawView.backgroundColor = UIColor.clearColor()
-        drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor //UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 1.0).CGColor
+        drawView.layer.backgroundColor = UIColor(red: 75.0/255.0, green: 84.0/255.0, blue: 90.0/255.0, alpha: 1.0).CGColor
         self.view.addSubview(drawView)
         
         // Add lower border to title text
@@ -55,26 +55,32 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         // Create background view for styling status bar
         statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20 + navigationBar.frame.height))
         statusBarBackgroundView.backgroundColor = navigationBar.backgroundColor
-        // Add bottom border of slightly darker color
-        let lowerBorder = CALayer()
-        var r: CGFloat = 0
-        var g: CGFloat = 0
-        var b: CGFloat = 0
-        var a: CGFloat = 0
-        if let bool = statusBarBackgroundView.backgroundColor?.getRed(&r, green: &g, blue: &b, alpha: &a) {
-            lowerBorder.backgroundColor = UIColor(red: max(r - 0.1, 0.0), green: max(g - 0.1, 0.0), blue: max(b - 0.1, 0.0), alpha: a).CGColor
-        }
-        lowerBorder.frame = CGRectMake(0, statusBarBackgroundView.frame.height - 1.0, statusBarBackgroundView.frame.width, 1.0)
-        statusBarBackgroundView.layer.addSublayer(lowerBorder)
         self.view.addSubview(statusBarBackgroundView)
         
         // remove shadow line on navigation bar
         navigationBar.shadowImage = UIImage()
         navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
         
-        // add border to addTrackButton
-        addTrackButton.layer.borderWidth = 1.0
-        addTrackButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
+        
+        
+        // add background circle to addTrackButton and stopButton
+        addTrackButton.layer.cornerRadius = addTrackButton.frame.width / 2.0
+        let circleLayer = CAShapeLayer()
+        let path = UIBezierPath(roundedRect: addTrackButton.bounds, cornerRadius: addTrackButton.layer.cornerRadius)
+        circleLayer.path = path.CGPath
+        circleLayer.fillColor = modeSegmentedControl.backgroundColor?.CGColor
+        circleLayer.strokeColor = modeSegmentedControl.backgroundColor?.CGColor
+        circleLayer.frame = addTrackButton.layer.bounds
+        addTrackButton.layer.insertSublayer(circleLayer, below: addTrackButton.imageView!.layer)
+        
+        stopButton.layer.cornerRadius = stopButton.frame.width / 2.0
+        let circleStopLayer = CAShapeLayer()
+        let stopPath = UIBezierPath(roundedRect: stopButton.bounds, cornerRadius: stopButton.layer.cornerRadius)
+        circleStopLayer.path = stopPath.CGPath
+        circleStopLayer.fillColor = modeSegmentedControl.backgroundColor?.CGColor
+        circleStopLayer.strokeColor = modeSegmentedControl.backgroundColor?.CGColor
+        circleStopLayer.frame = stopButton.layer.bounds
+        stopButton.layer.insertSublayer(circleStopLayer, below: stopButton.imageView!.layer)
         
         // add border to simul/seq link and stop buttons (initially hidden)
         simulLinkButton.layer.borderWidth = 1.0
@@ -82,9 +88,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         
         seqLinkButton.layer.borderWidth = 1.0
         seqLinkButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
-        
-        stopButton.layer.borderWidth = 1.0
-        stopButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
         
         //set some tags so it's easy to find from LinkManager
         stopButton.tag = 5109
@@ -185,7 +188,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         newTrack.saveTrackCoreData(projectEntity)
         
         tracks.addObject(newTrack)
-        self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 4) //+1 - 5 since you are adding a new subview not yet counted in subviews.count
+        self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 4) //+1 - 5 since you are adding a new subview not yet counted in subviews.count*/
     }
         
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
@@ -291,10 +294,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
             for link in linkManager.allTrackLinks {
                 link.mode = ""
             }
-            UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                self.drawView.layer.backgroundColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 1.0).CGColor
-                }) { (bool:Bool) -> Void in
-            }
         }
     }
     
@@ -303,11 +302,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
             linkManager.mode = "ADD_SIMUL_LINK"
             for link in linkManager.allTrackLinks {
                 link.mode = "ADD_SIMUL_LINK"
-            }
-            UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                // animate change background color to emphasize current mode
-                self.drawView.layer.backgroundColor = UIColor.darkGrayColor().CGColor
-                }) { (bool:Bool) -> Void in
             }
             seqLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
             simulLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
@@ -370,10 +364,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
             for link in linkManager.allTrackLinks {
                 link.mode = "TRASH"
             }
-            UIView.animateWithDuration(0.2, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                    self.drawView.layer.backgroundColor = UIColor.redColor().colorWithAlphaComponent(0.5).CGColor
-                }) { (bool:Bool) -> Void in
-            }
         }
     }
     
@@ -387,9 +377,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
-        print("made IT")
-        print(self.parentViewController)
-        print(self)
         return true
     }
     

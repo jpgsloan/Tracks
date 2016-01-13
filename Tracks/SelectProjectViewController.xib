@@ -40,7 +40,7 @@
                         </label>
                     </subviews>
                     <animations/>
-                    <color key="backgroundColor" red="0.27450980392156865" green="0.27450980392156865" blue="0.27450980392156865" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="0.21568627450980393" green="0.25098039215686274" blue="0.27450980392156865" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstItem="M5P-fR-qdF" firstAttribute="centerY" secondItem="bIy-Lb-8e4" secondAttribute="centerY" id="86h-tC-4Vx"/>
                         <constraint firstItem="M5P-fR-qdF" firstAttribute="leading" secondItem="bIy-Lb-8e4" secondAttribute="leading" constant="20" id="NCo-zz-iEF"/>
@@ -128,7 +128,7 @@
                         </label>
                     </subviews>
                     <animations/>
-                    <color key="backgroundColor" red="0.27450980392156865" green="0.27450980392156865" blue="0.27450980392156865" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="0.21568627450980393" green="0.25098039215686274" blue="0.27450980392156865" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstItem="05G-Xg-XnN" firstAttribute="centerY" secondItem="lkC-R0-ZjJ" secondAttribute="centerY" id="96M-Oa-HS9"/>
                         <constraint firstItem="1qG-L8-hQZ" firstAttribute="height" secondItem="lkC-R0-ZjJ" secondAttribute="height" multiplier="0.3" id="GEU-j6-IXK"/>
@@ -140,7 +140,7 @@
                 </view>
             </subviews>
             <animations/>
-            <color key="backgroundColor" red="0.39806651536312854" green="0.39806651536312854" blue="0.39806651536312854" alpha="1" colorSpace="calibratedRGB"/>
+            <color key="backgroundColor" red="0.29411764705882354" green="0.32941176470588235" blue="0.3529411764705882" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
                 <constraint firstItem="2cG-0R-qO5" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="3ec-x6-IZY"/>
                 <constraint firstAttribute="trailing" secondItem="2cG-0R-qO5" secondAttribute="trailing" id="6q8-K2-Acf"/>

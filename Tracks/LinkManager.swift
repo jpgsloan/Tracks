@@ -339,6 +339,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                     }
                 } else if subview is TrackLink {
                     if subview.pointInside(location, withEvent: nil) {
+                        (subview as! TrackLink).bringTrackToEditMode(location, gestureRecognizer: gestureRecognizer)
                         break
                     }
                 }

@@ -8,23 +8,40 @@
 
 import UIKit
 
-class TrackEditView: UIView {
+class TrackEditView: UIView, UITextFieldDelegate {
     // contains code for all edit elements.
     var view: UIView!
     var track: Track!
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var exitButton: UIButton!
     @IBOutlet weak var waveformEditView: WaveformEditView!
-    
+    @IBOutlet weak var volSlider: UISlider!
+    @IBOutlet weak var panSlider: UISlider!
+   
     convenience init(frame: CGRect, track: Track) {
         self.init(frame: frame)
         self.track = track
-        self.backgroundColor = tealColor()//track.backgroundColor?.colorWithAlphaComponent(0.97)
-        self.view.backgroundColor = UIColor.clearColor()
+        self.view.backgroundColor = track.view.backgroundColor?.colorWithAlphaComponent(0.97)
+        self.backgroundColor = UIColor.clearColor()
+        
+        // set title text and delegate
         titleTextField.text = track.labelName.text
+        titleTextField.delegate = self
+        
+        // init waveform view with audio
         waveformEditView.layoutIfNeeded()
         waveformEditView.setTrackRef(track)
-        waveformEditView.setAudio(track.recordedAudio.filePathUrl)
+        if let url = track.recordedAudio.filePathUrl {
+            waveformEditView.setAudio(url)
+        }
+        // set volume
+        volSlider.value = track.volume
+        waveformEditView.adjustVolume(track.volume)
+        
+        // set pan
+        let mappedPanValue = (track.pan + 1.0) / 2.0
+        panSlider.value = mappedPanValue
+        waveformEditView.adjustPan(track.pan)
     }
     
     override init(frame: CGRect) {
@@ -59,7 +76,9 @@ class TrackEditView: UIView {
             let newFrame = self.superview!.frame
             self.frame = newFrame
             self.layoutIfNeeded()
-            self.waveformEditView.setAudio(self.track.recordedAudio.filePathUrl)
+            if let url = self.track.recordedAudio.filePathUrl {
+                self.waveformEditView.setAudio(url)
+            }
         }, completion: { (bool:Bool) -> Void in
         })
     }
@@ -76,17 +95,40 @@ class TrackEditView: UIView {
     }
     
     func setAudio() {
-        waveformEditView.setAudio(track.recordedAudio.filePathUrl)
+        if let url = track.recordedAudio.filePathUrl {
+            waveformEditView.setAudio(url)
+        }
+    }
+    
+    @IBAction func adjustAudio(sender: UISlider) {
+        waveformEditView.adjustVolume(sender.value)
+    }
+    
+    @IBAction func adjustPan(sender: UISlider) {
+        let mappedValue = -1 + (sender.value * 2)
+        waveformEditView.adjustPan(mappedValue)
+    }
+    
+    @IBAction func changeColor(sender: UIButton) {
+        self.view.backgroundColor = sender.backgroundColor?.colorWithAlphaComponent(0.97)
     }
     
     @IBAction func exitEditMode(sender: UIButton) {
-        //TODO: animate close, update track with any new info if not done already
+        // animates closing of edit view, updates edited info to track
         (self.superview as! LinkManager).hideToolbars(false)
+        track.exitEditMode(volSlider.value, pan: -1 + (panSlider.value * 2), color: self.view.backgroundColor!.colorWithAlphaComponent(0.85), titleText: titleTextField.text!)
         animateClose()
         for subview in self.subviews {
             subview.removeFromSuperview()
         }
         track.isInEditMode = false
         (self.superview as! LinkManager).mode = ""
+        
     }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        titleTextField.resignFirstResponder()
+        return true
+    }
+    
 }

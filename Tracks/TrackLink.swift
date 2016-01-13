@@ -337,6 +337,10 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         
         
         if let curTrack = (self.superview as? LinkManager)?.getTrackByID(node.rootTrackID) {
+            // reset progress view of track that just finished playing
+            curTrack.progressViewConstraint.constant = 5
+            curTrack.view.layoutIfNeeded()
+            
             if curTrack.audioPlayer != nil {
                 let shortStartDelay: NSTimeInterval = 0.05
                 let now = curTrack.audioPlayer!.deviceCurrentTime
@@ -467,15 +471,20 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     
     func dequeueTrackFromAdding() {
         if queuedTrackForAdding != nil {
-            queuedTrackForAdding.layer.borderWidth = 0
-            queuedTrackForAdding.layer.borderColor = UIColor.clearColor().CGColor
+            queuedTrackForAdding.layer.borderWidth = 1
+            queuedTrackForAdding.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
             queuedTrackForAdding = nil
             layer.setNeedsDisplay()
         }
     }
     
+    func bringTrackToEditMode(location: CGPoint, gestureRecognizer: UIGestureRecognizer) {
+        let trackToEdit = trackAtPoint(location)
+        trackToEdit?.editMode(gestureRecognizer)
+    }
+    
     func trackAtPoint(location: CGPoint) -> Track? {
-        
+        // returns the track contained in the tracklink at a given touch loc (picks highest in subviews array).
         var highestIndex = -1
         var highestTrack: Track?
         for audioPlayer in trackNodeIDs.keys {
@@ -554,12 +563,12 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
       
         UIGraphicsPushContext(ctx)
         let seqPath = UIBezierPath()
-        seqPath.lineWidth = 5
+        seqPath.lineWidth = 4
         seqPath.setLineDash([8.0,4.0], count: 2, phase: -dashedLinePhase)
         
         let simPath = UIBezierPath()
-        simPath.lineWidth = 5
-        UIColor.grayColor().setStroke()
+        simPath.lineWidth = 4
+        UIColor.whiteColor().setStroke()
         
         for audioPlayer in self.trackNodeIDs.keys {
             
@@ -654,15 +663,15 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             let node = trackNodeIDs[audioPlayer]!
             let trackID = node.rootTrackID
             if let track = (self.superview as? LinkManager)?.getTrackByID(trackID) {
-                track.layer.borderWidth = 3
+                track.layer.borderWidth = 1
                 if !node.siblingIDs.isEmpty && !node.childrenIDs.isEmpty {
-                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 } else if node.siblingIDs.isEmpty {
-                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 } else if node.childrenIDs.isEmpty {
-                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 } else {
-                    track.layer.borderColor = UIColor.whiteColor().CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 }
             }
         }
@@ -671,15 +680,15 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             let node = unrecordedTracks[track]!
             let trackID = node.rootTrackID
             if let track = (self.superview as? LinkManager)?.getTrackByID(trackID) {
-                track.layer.borderWidth = 3
+                track.layer.borderWidth = 1
                 if !node.siblingIDs.isEmpty && !node.childrenIDs.isEmpty {
-                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 } else if node.siblingIDs.isEmpty {
-                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 } else if node.childrenIDs.isEmpty {
-                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 } else {
-                    track.layer.borderColor = UIColor.whiteColor().CGColor
+                    track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
                 }
             }
         }
@@ -688,21 +697,21 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         var color: CGColor!
         switch mode {
         case "ADD_SEQ_LINK":
-            color = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+            color = UIColor.whiteColor().colorWithAlphaComponent(0.9).CGColor
         case "ADD_SIMUL_LINK":
-            color = UIColor.whiteColor().colorWithAlphaComponent(0.35).CGColor
+            color = UIColor.whiteColor().colorWithAlphaComponent(0.9).CGColor
         default:
-            color = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+            color = UIColor.whiteColor().colorWithAlphaComponent(0.9).CGColor
         }
 
         if queuedTrackForAdding != nil {
             queuedTrackForAdding.layer.borderColor = color
-            queuedTrackForAdding.layer.borderWidth = 3
+            queuedTrackForAdding.layer.borderWidth = 2
         }
         
         if curTouchedTrack != nil {
             curTouchedTrack.layer.borderColor = color
-            curTouchedTrack.layer.borderWidth = 3
+            curTouchedTrack.layer.borderWidth = 2
         }
     }
     
@@ -713,12 +722,12 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         CGContextMoveToPoint(context, curTouchedTrack.center.x, curTouchedTrack.center.y)
         CGContextAddLineToPoint(context, curTouchLoc.x, curTouchLoc.y)
         if mode == "ADD_SEQ_LINK" {
-            CGContextSetStrokeColorWithColor(context, UIColor.grayColor().CGColor)
+            CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().CGColor)
             CGContextSetLineDash(context, -dashedLinePhase, [8.0,4.0], 2)
         } else if mode == "ADD_SIMUL_LINK" {
-            CGContextSetStrokeColorWithColor(context, UIColor.grayColor().colorWithAlphaComponent(1).CGColor)
+            CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().colorWithAlphaComponent(1).CGColor)
         }
-        CGContextSetLineWidth(context, 5)
+        CGContextSetLineWidth(context, 4)
         CGContextStrokePath(context)
         eraseLineOnTrack(curTouchedTrack)
         if queuedTrackForAdding != nil {
@@ -757,8 +766,8 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             }
             if shouldRemoveTrack {
                 unrecordedTracks[track] = nil
-                track.layer.borderColor = UIColor.clearColor().CGColor
-                track.layer.borderWidth = 0.0
+                track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+                track.layer.borderWidth = 1.0
                 
                 if track.audioPlayer != nil {
                     trackNodeIDs[track.audioPlayer!] = nil
@@ -844,16 +853,16 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         for audioPlayer in trackNodeIDs.keys {
             let trackID = trackNodeIDs[audioPlayer]!.rootTrackID
             if let track = (self.superview as! LinkManager).getTrackByID(trackID) {
-                track.layer.borderColor = UIColor.clearColor().CGColor
-                track.layer.borderWidth = 0
+                track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+                track.layer.borderWidth = 1
                 if track.audioPlayer != nil {
                     track.audioPlayer!.delegate = track
                 }
             }
         }
         for track in unrecordedTracks.keys {
-            track.layer.borderColor = UIColor.clearColor().CGColor
-            track.layer.borderWidth = 0
+            track.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+            track.layer.borderWidth = 1
             if track.audioPlayer != nil {
                 track.audioPlayer!.delegate = track
             }
