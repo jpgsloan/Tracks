@@ -28,6 +28,15 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     var hasStoppedRecording = false
     var readyToPlay = false
     var isInEditMode: Bool = false
+    var hasBeenDeleted: Bool = false
+    var alertWindow: UIWindow?
+
+    enum Mode {
+        case Play
+        case Link
+        case Trash
+    }
+    var mode = Mode.Play
     
     var volume: Float = 1.0
     var pan: Float = 0.0
@@ -38,9 +47,12 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     @IBOutlet weak var audioPlot: EZAudioPlot!
     @IBOutlet weak var progressView: UIView!
     @IBOutlet weak var progressViewConstraint: NSLayoutConstraint!
+    @IBOutlet weak var linkImageView: UIView!
+    @IBOutlet weak var trashImageView: UIView!
     
     // view for loading xib
     var view: UIView!
+    var outlineView: UIView!
     
     override init (frame: CGRect){
         super.init(frame: frame)
@@ -52,10 +64,16 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         self.clipsToBounds = true
         self.backgroundColor = UIColor.clearColor()
         
-        // create border outline
-        self.layer.borderColor = UIColor(red: 204.0 / 255.0, green: 204.0 / 255.0, blue: 204.0 / 255.0, alpha: 1.0).CGColor
-        self.layer.borderWidth = 1
-        
+        // create border outline (uses separate view so border appears behind subviews)
+        outlineView = UIView()
+        outlineView.frame = self.bounds
+        outlineView.backgroundColor = UIColor.clearColor()
+        outlineView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+        outlineView.layer.borderWidth = 1
+        outlineView.layer.cornerRadius = self.layer.cornerRadius
+        self.view.addSubview(outlineView)
+        self.view.sendSubviewToBack(outlineView)
+
         // using EZAudio for waveform plot
         audioPlot.plotType = EZPlotType.Buffer
         audioPlot.clipsToBounds = true
@@ -206,16 +224,18 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     
     func bringTrackToFront() {
         let supervw = self.superview!
-        supervw.insertSubview(self, atIndex: supervw.subviews.count - 5)
+        supervw.insertSubview(self, atIndex: supervw.subviews.count - 6)
     }
     
     func touchBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         print("track touched began")
+    
         let touch: UITouch = touches.first!
         startLoc = touch.locationInView(self)
         if !isInEditMode {
             bringTrackToFront()
         }
+        selectTrack(startLoc)
     }
     
     func touchMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
@@ -239,20 +259,21 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     
     func touchEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         print("track touched ended")
-        if (!wasDragged) {
-            if (!hasStartedRecording) {
+        if !wasDragged && mode != .Trash {
+            if !hasStartedRecording {
                 print("started recording")
                 startRecording()
-            } else if (!hasStoppedRecording) {
+            } else if !hasStoppedRecording {
                 print("stopping recording")
                 stopRecording()
-            } else if (readyToPlay) {
+            } else if readyToPlay {
                 playAudio()
             }
         } else {
             updateTrackCoreData()
             wasDragged = false
         }
+        deselectTrack()
     }
     
     func startRecording() {
@@ -350,7 +371,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     }
     
     func playAudio() {
-        if !isInEditMode && audioPlayer != nil {
+        if !isInEditMode && mode != .Trash && readyToPlay && audioPlayer != nil {
             print("playing")
             
             (superview as! LinkManager).showStopButton()
@@ -372,7 +393,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     }
     
     func playAudioAtTime(time: NSTimeInterval) {
-        if !isInEditMode && audioPlayer != nil {
+        if !isInEditMode && mode != .Trash && readyToPlay && audioPlayer != nil {
             print("playing")
             
             (superview as! LinkManager).showStopButton()
@@ -444,6 +465,156 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         updateTrackCoreData()
     }
     
+    func moveMode() {
+        mode = .Play
+        hideTrashImageView(true)
+        hideProgressView(false)
+        hideLinkImage(true)
+        focusTrackContent()
+        
+    }
+    
+    func linkMode() {
+        mode = .Link
+        hideTrashImageView(true)
+        hideProgressView(true)
+        hideLinkImage(false)
+        dimTrackContent()
+    }
+    
+    func trashMode() {
+        mode = .Trash
+        hideProgressView(true)
+        hideLinkImage(true)
+        dimTrackContent()
+        hideTrashImageView(false)
+    }
+    
+    func hideProgressView(bool: Bool) {
+        // hides or shows the progress bar of the track (shown only in play mode)
+        if hasStoppedRecording {
+            let animation = CATransition()
+            animation.type = kCATransitionFade
+            animation.duration = 0.2
+            progressView.layer.addAnimation(animation, forKey: nil)
+            progressView.hidden = bool
+        }
+    }
+
+    func hideLinkImage(bool:Bool) {
+        // hides or shows center crosshairs image for link mode
+        let animation = CATransition()
+        animation.type = kCATransitionFade
+        animation.duration = 0.2
+        linkImageView.layer.addAnimation(animation, forKey: nil)
+        linkImageView.hidden = bool
+        self.view.bringSubviewToFront(linkImageView)
+        linkImageView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.7)
+        linkImageView.clipsToBounds = true
+        linkImageView.layer.cornerRadius = linkImageView.frame.width / 2.0
+    }
+    
+    func hideTrashImageView(bool: Bool) {
+        self.view.clipsToBounds = bool
+        self.clipsToBounds = bool
+        let animation = CATransition()
+        animation.type = kCATransitionFade
+        animation.duration = 0.1
+        trashImageView.layer.addAnimation(animation, forKey: nil)
+        trashImageView.hidden = bool
+        
+        trashImageView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.9)
+        trashImageView.clipsToBounds = true
+        trashImageView.layer.cornerRadius = linkImageView.frame.width / 2.0
+    }
+    
+    func dimTrackContent() {
+        // lowers opacity of content on track to show inactive
+        labelName.textColor = labelName.textColor.colorWithAlphaComponent(0.5)
+        labelDate.textColor = labelDate.textColor.colorWithAlphaComponent(0.5)
+        labelDuration.textColor = labelDuration.textColor.colorWithAlphaComponent(0.5)
+        audioPlot.color = audioPlot.color.colorWithAlphaComponent(0.5)
+        
+        if !hasStoppedRecording {
+            // lower opacity for record button if it is displaying
+            let animation = CATransition()
+            animation.type = kCATransitionFade
+            animation.duration = 0.2
+            recordButton.layer.addAnimation(animation, forKey: nil)
+            recordButton.alpha = 0.5
+            self.view.insertSubview(recordButton, belowSubview: linkImageView)
+        }
+    }
+    
+    func focusTrackContent() {
+        // raises opacity of content to show active
+        labelName.textColor = labelName.textColor.colorWithAlphaComponent(1)
+        labelDate.textColor = labelDate.textColor.colorWithAlphaComponent(1)
+        labelDuration.textColor = labelDuration.textColor.colorWithAlphaComponent(1)
+        audioPlot.color = audioPlot.color.colorWithAlphaComponent(1)
+        
+        if !hasStoppedRecording {
+            let animation = CATransition()
+            animation.type = kCATransitionFade
+            animation.duration = 0.2
+            recordButton.layer.addAnimation(animation, forKey: nil)
+            recordButton.alpha = 1.0
+            self.view.bringSubviewToFront(recordButton)
+        }
+    }
+    
+    func selectTrack(touch: CGPoint) {
+        switch mode {
+        case .Play:
+            // change track border to show selected
+            outlineView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.9).CGColor
+            outlineView.layer.borderWidth = 2
+            self.view.sendSubviewToBack(outlineView)
+        case .Link:
+            if linkImageView.frame.contains(touch) {
+                // change link image border (middle circle + crosshairs) to show adding link
+                linkImageView.layer.borderColor = UIColor.whiteColor().CGColor
+                linkImageView.layer.borderWidth = 3
+            } else {
+                // change track border to show selected
+                outlineView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.9).CGColor
+                outlineView.layer.borderWidth = 2
+                self.view.sendSubviewToBack(outlineView)
+            }
+        case .Trash:
+            if !trashImageView.frame.contains(touch) {
+                // change track border to show selected
+                outlineView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.9).CGColor
+                outlineView.layer.borderWidth = 2
+                self.view.sendSubviewToBack(outlineView)
+            }
+        }
+    }
+    
+    func deselectTrack() {
+        switch mode {
+        case .Play:
+            // return track border to normal
+            outlineView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+            outlineView.layer.borderWidth = 1
+            self.view.sendSubviewToBack(outlineView)
+            
+        case .Link:
+            // return track and link image border to normal
+            linkImageView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+            linkImageView.layer.borderWidth = 0
+            outlineView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+            outlineView.layer.borderWidth = 1
+            self.view.sendSubviewToBack(outlineView)
+            
+        case .Trash:
+            // return track border to normal
+            outlineView.layer.borderColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+            outlineView.layer.borderWidth = 1
+            self.view.sendSubviewToBack(outlineView)
+        }
+    }
+    
     func updateTrackSubviews(newTrackUrl newTrackUrl: String) {
         let pathArray = [projectDirectory!, NSString(string: newTrackUrl).lastPathComponent]
         let filePath = NSURL.fileURLWithPathComponents(pathArray)
@@ -477,6 +648,36 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         updateTrackCoreData()
     }
     
+    class BasicViewController: UIViewController {
+        override func prefersStatusBarHidden() -> Bool {
+            return true
+        }
+    }
+    
+    func confirmDelete() {
+        alertWindow = UIWindow(frame: UIScreen.mainScreen().bounds)
+        let actionSheetController: UIAlertController = UIAlertController(title: "Delete Track?", message: "This track will be permanently deleted.", preferredStyle: .ActionSheet)
+        
+        let cancelAction: UIAlertAction = UIAlertAction(title: "Cancel", style: .Cancel) { action -> Void in
+            self.alertWindow?.hidden = true
+            self.alertWindow = nil
+        }
+        actionSheetController.addAction(cancelAction)
+        
+        let simulAction: UIAlertAction = UIAlertAction(title: "Delete", style: .Destructive) { action -> Void in
+           print("delete TRACKKKK")
+            self.alertWindow?.hidden = true
+            self.alertWindow = nil
+            self.deleteTrack()
+        }
+        actionSheetController.addAction(simulAction)
+        
+        alertWindow!.makeKeyAndVisible()
+        alertWindow!.rootViewController = BasicViewController()
+        alertWindow!.windowLevel = UIWindowLevelAlert + 1
+        alertWindow!.rootViewController!.presentViewController(actionSheetController, animated: true, completion: nil)
+    }
+    
     func deleteTrack() {
         print("DELETE TRACK")
         deleteTrackFromCoreData()
@@ -489,6 +690,8 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
             let curCenter = self.center
             self.frame = CGRect(x: curCenter.x, y: curCenter.y, width: 0.0, height: 0.0)
             
+            self.outlineView.removeFromSuperview()
+            
             if self.readyToPlay {
                 // resize waveform plot
                 self.drawWaveform()
@@ -498,6 +701,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
             }
             }, completion: { (bool:Bool) -> Void in
                 self.removeFromSuperview()
+                self.hasBeenDeleted = true
         })
         
     }

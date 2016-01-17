@@ -14,6 +14,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     var mode: String = ""
     var allTrackLinks: [TrackLink] = [TrackLink]()
     var firstHitSubview = UIView()
+    var draggingInTrashMode = false
     var addLinkStartLoc: CGPoint!
     var addLinkCurMovedLoc: CGPoint!
     var curTrackLinkAdd: TrackLink!
@@ -34,6 +35,8 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if touches.count < 2 {
+        
         let touch = touches.first!
         let location: CGPoint = touch.locationInView(touch.window)
         print("TOUCHED IN LINK MANAGER BEGAN")
@@ -67,24 +70,52 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     
         if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
             if firstHitSubview is Track {
-                let newLink = TrackLink(frame: self.frame, withTrack: firstHitSubview as! Track)
-                newLink.mode = mode
-                allTrackLinks.append(newLink)
-                curTrackLinkAdd = newLink
-                self.insertSubview(firstHitSubview, atIndex: self.subviews.count - 5)
-                self.insertSubview(newLink, atIndex: self.subviews.count - 5)
-                newLink.saveLinkCoreData(projectEntity)
-                newLink.touchBegan(touches, withEvent: event)
+                let convertedLoc = self.convertPoint(location, toView: (firstHitSubview as! Track))
+                if (firstHitSubview as! Track).linkImageView.frame.contains(convertedLoc) {
+                    print("adding new link!")
+                    let newLink = TrackLink(frame: self.frame, withTrack: firstHitSubview as! Track)
+                    newLink.mode = mode
+                    allTrackLinks.append(newLink)
+                    curTrackLinkAdd = newLink
+                    self.insertSubview(newLink, atIndex: self.subviews.count - 6)
+                    self.insertSubview(firstHitSubview, belowSubview: newLink)
+                    newLink.saveLinkCoreData(projectEntity)
+                    newLink.touchBegan(touches, withEvent: event)
+                } else {
+                    print("MOVING TRACK INSTEAD")
+                    (firstHitSubview as! Track).touchBegan(touches, withEvent: event)
+                }
+                
             } else if firstHitSubview is TrackLink {
                 print("DELETE, MOVE, OR CHANGE TRACK LINK")
+                // TODO: check if move track or add link            
                 curTrackLinkAdd = (firstHitSubview as! TrackLink)
                 curTrackLinkAdd.touchBegan(touches, withEvent: event)
             }
         } else if mode == "TRASH" {
             if firstHitSubview is Track {
-                (firstHitSubview as! Track).deleteTrack()
+                let convertedLoc = self.convertPoint(location, toView: (firstHitSubview as! Track))
+                let track = (firstHitSubview as! Track)
+                if track.trashImageView.frame.contains(convertedLoc) {
+                    track.confirmDelete()
+                } else {
+                    track.touchBegan(touches, withEvent: event)
+                }
             } else if firstHitSubview is TrackLink {
-                (firstHitSubview as! TrackLink).deleteLinkEdge(location)
+                let link = (firstHitSubview as! TrackLink)
+                if let track = link.trackAtPoint(location) {
+                    let convertedLoc = self.convertPoint(location, toView: (track))
+                    if track.trashImageView.frame.contains(convertedLoc) {
+                        // delete node from link
+                        link.confirmDeleteTrackAtPoint(location)
+                    } else {
+                        // drag node
+                        link.touchBegan(touches, withEvent: event)
+                        draggingInTrashMode = true
+                    }
+                } else {
+                    link.deleteLinkEdge(location)
+                }
             } else if firstHitSubview is DrawView {
                 //Do nothing
                 (firstHitSubview as! DrawView).deleteLineContainingTouch(location)
@@ -102,14 +133,17 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 print("not important view for link manager")
             }
         }
+        }
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         print("TOUCHES MOVED LINK MANAGER")
+        if touches.count < 2 {
+        
         let touch = touches.first!
         let location: CGPoint = touch.locationInView(self)
 
-        if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
+        if curTrackLinkAdd != nil && (mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK") {
             //determine the subview that is currently hit by moved touch
             var curHitSubview = UIView()
             for var i = self.subviews.count - 1; i >= 0; i-- {
@@ -133,14 +167,17 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             
             if curHitSubview is Track {
                 curTrackLinkAdd.dequeueTrackFromAdding()
-                self.insertSubview(curHitSubview, atIndex: self.subviews.count - 5)
-                curTrackLinkAdd.queueTrackForAdding(curHitSubview as! Track)
+                if curHitSubview != curTrackLinkAdd.curTouchedTrack {
+                    self.insertSubview(curHitSubview, belowSubview: curTrackLinkAdd)
+                    curTrackLinkAdd.queueTrackForAdding(curHitSubview as! Track)
+                }
             } else if curTrackLinkAdd != nil && curHitSubview == curTrackLinkAdd {
                 print("WAS CURRENT ADDING LINK")
                 curTrackLinkAdd.dequeueTrackFromAdding()
                 if let curTrack = curTrackLinkAdd.trackAtPoint(location) {
-                    print("touched track was: \(curTrack)")
-                    curTrackLinkAdd.queueTrackForAdding(curTrack)
+                    if curTrack != curTrackLinkAdd.curTouchedTrack {
+                        curTrackLinkAdd.queueTrackForAdding(curTrack)
+                    }
                 }
             } else if curHitSubview is TrackLink {
                 print("DELETE, MOVE, OR CHANGE TRACK LINK", terminator: "")
@@ -176,12 +213,23 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             }
             
             if curHitSubview is Track {
-                (curHitSubview as! Track).deleteTrack()
+                // do nothing
             } else if curHitSubview is TrackLink {
-                (curHitSubview as! TrackLink).deleteLinkEdge(location)
+                if draggingInTrashMode {
+                    if firstHitSubview is TrackLink {
+                        // continue to drag tracklink
+                        (firstHitSubview as! TrackLink).touchMoved(touches, withEvent: event)
+                    }
+                } else {
+                    // if not currently dragging something, attempt to delete link edge
+                    (curHitSubview as! TrackLink).deleteLinkEdge(location)
+                }
             } else if curHitSubview is DrawView {
-                //Do nothing
                 (curHitSubview as! DrawView).deleteLineContainingTouch(location)
+            }
+            
+            if firstHitSubview is Track {
+                (firstHitSubview as! Track).touchMoved(touches, withEvent: event)
             }
         } else if mode == "NOTOUCHES" {
             //Do nothing
@@ -199,16 +247,19 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 print("UIVIEW")
             }
         }
+        }
     }
    
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         print("TOUCHES ENDED LINK MANAGER")
+        if touches.count < 2 {
         
-        if mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK" {
+        if curTrackLinkAdd != nil && (mode == "ADD_SEQ_LINK" || mode == "ADD_SIMUL_LINK") {
             print("add link mode: \(mode)")
             if curTrackLinkAdd != nil {
                 if curTrackLinkAdd.queuedTrackForAdding != nil {
-                    curTrackLinkAdd.commitEdgeToLink()
+                    // commit new edge
+                    curTrackLinkAdd.commitEdgeToLink(touches)
                     curTrackLinkAdd.bringTrackLinkToFront()
                 } else {
                     curTrackLinkAdd.dequeueTrackFromAdding()
@@ -218,14 +269,27 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                     if  hasNoNodes || hasOneNode {
                         curTrackLinkAdd.deleteTrackLink()
                     }
+                    
+                    curTrackLinkAdd.touchEnded(touches, withEvent: event)
                 }
                 
-                curTrackLinkAdd.touchEnded(touches, withEvent: event)
                 curTrackLinkAdd = nil
             }
         } else if mode == "TRASH" {
             print("trash mode")
             //do nothing
+            if firstHitSubview is Track {
+                hideToolbars(false)
+                (firstHitSubview as! Track).touchEnded(touches, withEvent: event)
+            }
+            
+            if draggingInTrashMode {
+                if firstHitSubview is TrackLink {
+                    (firstHitSubview as! TrackLink).touchEnded(touches, withEvent: event)
+                }
+            }
+            
+            draggingInTrashMode = false
         } else if mode == "NOTOUCHES" {
             print("no touches mode (used for open notes, sidebar, edit mode)")
             //Do nothing
@@ -243,6 +307,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             } else {
                 print("OTHER UIVIEW")
             }
+        }
         }
     }
     

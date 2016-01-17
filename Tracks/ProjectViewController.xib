@@ -9,12 +9,11 @@
             <connections>
                 <outlet property="addTrackButton" destination="Ib7-eh-B5C" id="ohQ-8d-uPt"/>
                 <outlet property="drawView" destination="VlB-rb-Dnd" id="0lg-7z-2vW"/>
+                <outlet property="linkBackgroundTextView" destination="Rfn-8z-kHI" id="WaS-dt-oSt"/>
                 <outlet property="linkManager" destination="VlB-rb-Dnd" id="VJO-BD-brM"/>
                 <outlet property="modeSegmentedControl" destination="i6i-JX-C7N" id="cCu-Uu-kCs"/>
                 <outlet property="navBarVertConstraint" destination="FOG-3E-gh9" id="sjE-jA-Ow0"/>
                 <outlet property="navigationBar" destination="sFj-OS-djo" id="HsW-SP-h28"/>
-                <outlet property="seqLinkButton" destination="TQM-cn-I1D" id="QVg-IY-CwO"/>
-                <outlet property="simulLinkButton" destination="5sq-3b-XQt" id="oiA-we-JHc"/>
                 <outlet property="stopButton" destination="Mz0-MG-9fD" id="ib2-ek-eAK"/>
                 <outlet property="titleTextField" destination="OMg-Am-R1n" id="WPD-fm-Zw7"/>
                 <outlet property="view" destination="VlB-rb-Dnd" id="U9p-mm-Rb3"/>
@@ -90,22 +89,6 @@
                         <action selector="changeMode:" destination="-1" eventType="valueChanged" id="sa1-oa-TR9"/>
                     </connections>
                 </view>
-                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TQM-cn-I1D">
-                    <rect key="frame" x="570" y="107" width="30" height="30"/>
-                    <animations/>
-                    <state key="normal" title="Seq"/>
-                    <connections>
-                        <action selector="changeToSeqLinkMode:" destination="-1" eventType="touchUpInside" id="DVA-ch-bs4"/>
-                    </connections>
-                </button>
-                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5sq-3b-XQt">
-                    <rect key="frame" x="541" y="107" width="30" height="30"/>
-                    <animations/>
-                    <state key="normal" title="Sim"/>
-                    <connections>
-                        <action selector="changeToSimLinkMode:" destination="-1" eventType="touchUpInside" id="ul1-Y4-fKg"/>
-                    </connections>
-                </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ib7-eh-B5C">
                     <rect key="frame" x="-15" y="530" width="85" height="85"/>
                     <animations/>
@@ -133,6 +116,17 @@
                         <action selector="stopAudio:" destination="-1" eventType="touchUpInside" id="9iG-gI-k0R"/>
                     </connections>
                 </button>
+                <textView hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" verticalHuggingPriority="249" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rfn-8z-kHI">
+                    <rect key="frame" x="0.0" y="108" width="600" height="492"/>
+                    <animations/>
+                    <string key="text"> to enable
+ links, create
+ two or more
+ tracks.</string>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="48"/>
+                    <textInputTraits key="textInputTraits"/>
+                </textView>
             </subviews>
             <animations/>
             <color key="backgroundColor" red="0.40872165356903167" green="0.45732796513542262" blue="0.49151484965494574" alpha="1" colorSpace="calibratedRGB"/>
@@ -141,16 +135,16 @@
                 <constraint firstItem="sFj-OS-djo" firstAttribute="top" secondItem="VlB-rb-Dnd" secondAttribute="top" constant="10" id="FOG-3E-gh9"/>
                 <constraint firstAttribute="trailing" secondItem="Mz0-MG-9fD" secondAttribute="trailing" constant="-15" id="FrI-B4-VkT"/>
                 <constraint firstAttribute="bottom" secondItem="Mz0-MG-9fD" secondAttribute="bottom" constant="-15" id="JIA-ev-LMj"/>
+                <constraint firstItem="Rfn-8z-kHI" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="MZ2-rh-rxn"/>
                 <constraint firstAttribute="trailing" secondItem="sFj-OS-djo" secondAttribute="trailing" constant="5" id="NtZ-WN-RPV"/>
                 <constraint firstItem="Ib7-eh-B5C" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" constant="-15" id="PIb-Ci-nzA"/>
-                <constraint firstItem="TQM-cn-I1D" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="a3X-7y-jzM"/>
+                <constraint firstAttribute="trailing" secondItem="Rfn-8z-kHI" secondAttribute="trailing" id="ZEg-4e-McE"/>
                 <constraint firstAttribute="bottom" secondItem="Ib7-eh-B5C" secondAttribute="bottom" constant="-15" id="cy6-cF-cPK"/>
                 <constraint firstAttribute="trailing" secondItem="i6i-JX-C7N" secondAttribute="trailing" id="gYy-Ta-7EV"/>
-                <constraint firstItem="TQM-cn-I1D" firstAttribute="leading" secondItem="5sq-3b-XQt" secondAttribute="trailing" constant="-1" id="gd9-vq-sfX"/>
                 <constraint firstItem="sFj-OS-djo" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" constant="5" id="iXv-GK-Nps"/>
+                <constraint firstAttribute="bottom" secondItem="Rfn-8z-kHI" secondAttribute="bottom" id="ipT-uf-XOL"/>
                 <constraint firstItem="i6i-JX-C7N" firstAttribute="top" secondItem="sFj-OS-djo" secondAttribute="bottom" constant="10" id="ldd-oK-SV8"/>
-                <constraint firstItem="5sq-3b-XQt" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" constant="-1" id="oX7-O0-juC"/>
-                <constraint firstAttribute="trailing" secondItem="TQM-cn-I1D" secondAttribute="trailing" id="xTV-Z0-UVw"/>
+                <constraint firstItem="Rfn-8z-kHI" firstAttribute="top" secondItem="i6i-JX-C7N" secondAttribute="bottom" id="rPa-Up-TlO"/>
                 <constraint firstItem="i6i-JX-C7N" firstAttribute="leading" secondItem="VlB-rb-Dnd" secondAttribute="leading" id="yek-cV-XeZ"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>

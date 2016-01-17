@@ -34,9 +34,8 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var linkManager: LinkManager!
     @IBOutlet weak var addTrackButton: UIButton!
     @IBOutlet weak var modeSegmentedControl: ModeSelectSegmentedControl!
-    @IBOutlet weak var seqLinkButton: UIButton!
-    @IBOutlet weak var simulLinkButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
+    @IBOutlet weak var linkBackgroundTextView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +61,9 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
         
         
+        // change some background colors
+        linkBackgroundTextView.backgroundColor = UIColor(red: 75.0/255.0, green: 84.0/255.0, blue: 90.0/255.0, alpha: 0.9)
+        modeSegmentedControl.backgroundColor = modeSegmentedControl.backgroundColor?.colorWithAlphaComponent(0.9)
         
         // add background circle to addTrackButton and stopButton
         addTrackButton.layer.cornerRadius = addTrackButton.frame.width / 2.0
@@ -81,13 +83,6 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         circleStopLayer.strokeColor = modeSegmentedControl.backgroundColor?.CGColor
         circleStopLayer.frame = stopButton.layer.bounds
         stopButton.layer.insertSublayer(circleStopLayer, below: stopButton.imageView!.layer)
-        
-        // add border to simul/seq link and stop buttons (initially hidden)
-        simulLinkButton.layer.borderWidth = 1.0
-        simulLinkButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
-        
-        seqLinkButton.layer.borderWidth = 1.0
-        seqLinkButton.layer.borderColor = UIColor(red: max(240.0/255.0 - 0.1, 0.0), green: max(240.0/255.0 - 0.1, 0.0), blue: max(240.0/255.0 - 0.1, 0.0), alpha: 1.0).CGColor
         
         //set some tags so it's easy to find from LinkManager
         stopButton.tag = 5109
@@ -153,12 +148,18 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         linkManager.projectEntity = projectEntity
         
         loadTracks()
-        loadLinks()
+        
         self.view.bringSubviewToFront(statusBarBackgroundView)
         self.view.bringSubviewToFront(navigationBar)
         self.view.bringSubviewToFront(modeSegmentedControl)
         self.view.bringSubviewToFront(addTrackButton)
+        self.view.bringSubviewToFront(stopButton)
         self.view.sendSubviewToBack(drawView)
+        self.view.sendSubviewToBack(linkBackgroundTextView)
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        loadLinks()
     }
     
     override func viewDidLayoutSubviews() {
@@ -186,11 +187,30 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         newTrack.center = self.view.center
         newTrack.setLabelNameText("untitled")
         newTrack.saveTrackCoreData(projectEntity)
-        
+
         tracks.addObject(newTrack)
-        self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 4) //+1 - 5 since you are adding a new subview not yet counted in subviews.count*/
-    }
         
+        if (linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SIMUL_LINK") && tracks.count < 2 {
+            // there are not enough tracks to use links so display message to guide user
+            showLinkBackgroundText()
+            self.view.insertSubview(newTrack, belowSubview: linkBackgroundTextView)
+            newTrack.setNeedsLayout()
+            newTrack.layoutIfNeeded()
+            newTrack.linkMode()
+        } else {
+            hideLinkBackgroundText()
+
+            self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 5)// +1 - 6 since you are adding a new subview not yet counted in subviews.count*/
+            
+            if (linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SIMUL_LINK") {
+                newTrack.setNeedsLayout()
+                newTrack.layoutIfNeeded()
+                newTrack.linkMode()
+            }
+        }
+        
+    }
+    
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
         if titleTextField.isFirstResponder() {
             titleTextField.resignFirstResponder()
@@ -258,28 +278,16 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         switch sender.selectedIndex {
         case 0:
             print("normal mode")
-            simulLinkButton.layer.addAnimation(animation, forKey: nil)
-            simulLinkButton.hidden = true
-            seqLinkButton.layer.addAnimation(animation, forKey: nil)
-            seqLinkButton.hidden = true
             addTrackButton.layer.addAnimation(animation, forKey: nil)
             addTrackButton.hidden = false
             enterMoveMode()
         case 1:
             print("link mode")
-            simulLinkButton.layer.addAnimation(animation, forKey: nil)
-            simulLinkButton.hidden = false
-            seqLinkButton.layer.addAnimation(animation, forKey: nil)
-            seqLinkButton.hidden = false
             addTrackButton.layer.addAnimation(animation, forKey: nil)
             addTrackButton.hidden = false
             addLinkMode()
         case 2:
             print("trash mode")
-            simulLinkButton.layer.addAnimation(animation, forKey: nil)
-            simulLinkButton.hidden = true
-            seqLinkButton.layer.addAnimation(animation, forKey: nil)
-            seqLinkButton.hidden = true
             addTrackButton.layer.addAnimation(animation, forKey: nil)
             addTrackButton.hidden = true
             enterTrashMode()
@@ -289,59 +297,76 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     }
     
     func enterMoveMode() {
+        hideLinkBackgroundText()
+        
         if linkManager.mode != "" {
             linkManager.mode = ""
             for link in linkManager.allTrackLinks {
                 link.mode = ""
             }
         }
+        
+        for var i = tracks.count - 1; i >= 0; i-- {
+            if let track = tracks.objectAtIndex(i) as? Track {
+                if !track.hasBeenDeleted {
+                    track.moveMode()
+                } else {
+                    // remove track from array
+                    tracks.removeObjectAtIndex(i)
+                }
+            }
+        }
     }
     
     func addLinkMode() {
+        // show/hide link background text
+        if tracks.count < 2 {
+            showLinkBackgroundText()
+        } else {
+            hideLinkBackgroundText()
+        }
+        
+        // inform link manager of mode change
         if linkManager.mode != "ADD_SIMUL_LINK" && linkManager.mode != "ADD_SEQ_LINK" {
             linkManager.mode = "ADD_SIMUL_LINK"
             for link in linkManager.allTrackLinks {
                 link.mode = "ADD_SIMUL_LINK"
             }
-            seqLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
-            simulLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
+        }
+        
+        for var i = tracks.count - 1; i >= 0; i-- {
+            if let track = tracks.objectAtIndex(i) as? Track {
+                if !track.hasBeenDeleted {
+                    track.linkMode()
+                } else {
+                    // remove track from array
+                    tracks.removeObjectAtIndex(i)
+                }
+            }
         }
     }
     
-    @IBAction func changeToSeqLinkMode(sender: UIButton) {
-        print("changing to seq link mode")
-        linkManager.mode = "ADD_SEQ_LINK"
-        for link in linkManager.allTrackLinks {
-            link.mode = "ADD_SEQ_LINK"
+    func enterTrashMode() {
+        hideLinkBackgroundText()
+        
+        if linkManager.mode != "TRASH" {
+            linkManager.mode = "TRASH"
+            for link in linkManager.allTrackLinks {
+                link.mode = "TRASH"
+            }
         }
-        seqLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
-        simulLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
-    }
-    
-    @IBAction func changeToSimLinkMode(sender: UIButton) {
-        print("changing to simul link mode")
-        linkManager.mode = "ADD_SIMUL_LINK"
-        for link in linkManager.allTrackLinks {
-            link.mode = "ADD_SIMUL_LINK"
+        
+        for var i = tracks.count - 1; i >= 0; i-- {
+            if let track = tracks.objectAtIndex(i) as? Track {
+                if !track.hasBeenDeleted {
+                    track.trashMode()
+                } else {
+                    // remove track from array
+                    tracks.removeObjectAtIndex(i)
+                }
+            }
         }
-        seqLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
-        simulLinkButton.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
-    }
-    
-    @IBAction func stopAudio(sender: UIButton) {
-        for track in tracks {
-            (track as! Track).stopAudio()
-        }
-        let animation = CATransition()
-        animation.type = kCATransitionFade
-        animation.duration = 0.2
-        stopButton.layer.addAnimation(animation, forKey: nil)
-        stopButton.hidden = true
-    }
-    
-    @IBAction func undoDraw(sender: UIBarButtonItem) {
-        print("UNDODRAW")
-        drawView.undoDraw()
+
     }
    
     @IBAction func toggleNotes(sender: UIBarButtonItem) {
@@ -358,13 +383,43 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         notesView.openNotes(tmpFrame)
     }
     
-    func enterTrashMode() {
-        if linkManager.mode != "TRASH" {
-            linkManager.mode = "TRASH"
-            for link in linkManager.allTrackLinks {
-                link.mode = "TRASH"
-            }
+    func hideLinkBackgroundText() {
+        // hides link background text if currently displayed
+        if !linkBackgroundTextView.hidden {
+            let animation = CATransition()
+            animation.type = kCATransitionFade
+            animation.duration = 0.2
+            animation.delegate = self
+            linkBackgroundTextView.layer.addAnimation(animation, forKey: nil)
+            linkBackgroundTextView.hidden = true
         }
+    }
+    
+    func showLinkBackgroundText() {
+        // there are not enough tracks so display message to guide user
+        if linkBackgroundTextView.hidden {
+            let animation = CATransition()
+            animation.type = kCATransitionFade
+            animation.duration = 0.2
+            linkBackgroundTextView.layer.addAnimation(animation, forKey: nil)
+            self.view.insertSubview(linkBackgroundTextView, atIndex: self.view.subviews.count - 6)
+            linkBackgroundTextView.hidden = false
+        }
+    }
+    
+    override func animationDidStop(anim: CAAnimation, finished flag: Bool) {
+        self.view.sendSubviewToBack(linkBackgroundTextView)
+    }
+    
+    @IBAction func stopAudio(sender: UIButton) {
+        for track in tracks {
+            (track as! Track).stopAudio()
+        }
+        let animation = CATransition()
+        animation.type = kCATransitionFade
+        animation.duration = 0.2
+        stopButton.layer.addAnimation(animation, forKey: nil)
+        stopButton.hidden = true
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
@@ -397,7 +452,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         request.returnsObjectsAsFaults = false
         request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
         let results: NSArray = try! context.executeFetchRequest(request)
-        //for result in results {
+
         if (results.count > 0) {
             let res = results[0] as! ProjectEntity
             for track in res.track {
@@ -437,7 +492,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
                 
                 let linkToAdd = TrackLink(frame: self.view.frame, withTrackNodeIDs: trackNodeIDs, unrecordedTracks: unrecordedTracks, rootTrackID: linkEntity.rootTrackID, linkID: linkEntity.linkID)
                 linkManager.allTrackLinks.append(linkToAdd)
-                self.view.addSubview(linkToAdd)
+                self.view.insertSubview(linkToAdd, atIndex: self.view.subviews.count - 6)
             }
         }
     }

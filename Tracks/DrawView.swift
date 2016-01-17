@@ -34,9 +34,11 @@ class DrawView: UIView {
     
     func touchMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         let newPoint = touches.first!.locationInView(self)
-        curPath.append(Line(start: lastPoint, end: newPoint))
-        lastPoint = newPoint
-        self.setNeedsDisplay()
+        if lastPoint != nil {
+            curPath.append(Line(start: lastPoint, end: newPoint))
+            lastPoint = newPoint
+            self.setNeedsDisplay()
+        }
     }
     
     func touchEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
