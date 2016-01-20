@@ -29,10 +29,12 @@ class DrawView: UIView {
     }
     
     func touchBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("touch began drawview")
         lastPoint = touches.first!.locationInView(self)
     }
     
     func touchMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("touch moved drawview")
         let newPoint = touches.first!.locationInView(self)
         if lastPoint != nil {
             curPath.append(Line(start: lastPoint, end: newPoint))
@@ -42,10 +44,12 @@ class DrawView: UIView {
     }
     
     func touchEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("touch ended drawview")
         if (!curPath.isEmpty) {
             self.allPaths.append(curPath)
             self.updateAllPaths()
         }
+        lastPoint = nil
         curPath = []
     }
 
@@ -63,7 +67,6 @@ class DrawView: UIView {
             CGContextAddLineToPoint(context, line.end.x, line.end.y)
         }
         CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().CGColor)
-        //CGContextSetRGBStrokeColor(context, 0.341, 0.341, 0.341, 1)
         CGContextSetLineWidth(context, 5)
         CGContextSetLineCap(context, CGLineCap.Round)
         CGContextStrokePath(context)

@@ -237,6 +237,26 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         }
     }
     
+    func placeAllTracksBelow() {
+        if let supervw = self.superview {
+            for audioPlayer in trackNodeIDs.keys {
+                let node = trackNodeIDs[audioPlayer]!
+                let trackID = node.rootTrackID
+                if let track = (self.superview as? LinkManager)?.getTrackByID(trackID) {
+                    supervw.insertSubview(track, belowSubview: self)
+                }
+            }
+            
+            for track in unrecordedTracks.keys {
+                let node = unrecordedTracks[track]!
+                let trackID = node.rootTrackID
+                if let track = (self.superview as? LinkManager)?.getTrackByID(trackID) {
+                    supervw.insertSubview(track, belowSubview: self)
+                }
+            }
+        }
+    }
+    
     func beginPlaySequence(fromStartTrack startTrack: Track) {
         var startNode: TrackLinkNode?
         let shortStartDelay: NSTimeInterval = 0.05

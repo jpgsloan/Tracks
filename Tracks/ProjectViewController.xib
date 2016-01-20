@@ -27,8 +27,8 @@
                 <navigationBar opaque="NO" contentMode="scaleToFill" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sFj-OS-djo">
                     <rect key="frame" x="5" y="10" width="590" height="44"/>
                     <animations/>
-                    <color key="backgroundColor" red="0.21568627450980393" green="0.25098039215686274" blue="0.27450980392156865" alpha="1" colorSpace="calibratedRGB"/>
-                    <color key="barTintColor" red="0.21568627450980393" green="0.25098039215686274" blue="0.27450980392156865" alpha="0.0" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="0.1215686275" green="0.14117647059999999" blue="0.1529411765" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="barTintColor" red="0.12156862745098039" green="0.14117647058823529" blue="0.15294117647058825" alpha="0.0" colorSpace="calibratedRGB"/>
                     <textAttributes key="titleTextAttributes">
                         <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="14"/>
                     </textAttributes>
@@ -56,7 +56,7 @@
                                         </attributes>
                                     </fragment>
                                 </attributedString>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardAppearance="alert"/>
                             </textField>
                             <barButtonItem key="rightBarButtonItem" image="notes" id="Phg-tz-chl">
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -70,7 +70,7 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i6i-JX-C7N" customClass="ModeSelectSegmentedControl" customModule="Tracks" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="64" width="600" height="44"/>
                     <animations/>
-                    <color key="backgroundColor" red="0.37724275517558969" green="0.42775759779331596" blue="0.4596007572023223" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="0.24313725490196078" green="0.28627450980392155" blue="0.31372549019607843" alpha="0.90000000000000002" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="44" id="E6J-cC-oYb"/>
                     </constraints>
@@ -79,7 +79,7 @@
                             <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </userDefinedRuntimeAttribute>
                         <userDefinedRuntimeAttribute type="color" keyPath="unselectedLabelColor">
-                            <color key="value" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="value" red="0.64604428538175052" green="0.64604428538175052" blue="0.64604428538175052" alpha="0.80000000000000004" colorSpace="calibratedRGB"/>
                         </userDefinedRuntimeAttribute>
                         <userDefinedRuntimeAttribute type="color" keyPath="thumbColor">
                             <color key="value" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -129,7 +129,7 @@
                 </textView>
             </subviews>
             <animations/>
-            <color key="backgroundColor" red="0.40872165356903167" green="0.45732796513542262" blue="0.49151484965494574" alpha="1" colorSpace="calibratedRGB"/>
+            <color key="backgroundColor" red="0.19215686274509802" green="0.21568627450980393" blue="0.23529411764705882" alpha="1" colorSpace="calibratedRGB"/>
             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="sFj-OS-djo" firstAttribute="top" secondItem="VlB-rb-Dnd" secondAttribute="top" constant="10" id="FOG-3E-gh9"/>

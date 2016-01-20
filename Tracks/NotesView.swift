@@ -8,20 +8,24 @@
 
 import UIKit
 import CoreData
+import QuartzCore
 
 class NotesView: UIView, UITextViewDelegate {
     
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
     var projectEntity: ProjectEntity!
-    @IBOutlet weak var backgroundView: UIView!
     @IBOutlet weak var blurView: UIVisualEffectView!
     @IBOutlet weak var notesTextView: UITextView!
-    // custom view from the XIB file
-    var view: UIView!
+    
+    @IBOutlet weak var doneButton: UIButton!
     
     @IBOutlet weak var notesTextViewBottomContstraint: NSLayoutConstraint!
+    @IBOutlet weak var dateEditedLabel: UILabel!
+    @IBOutlet weak var topBarBackgroundView: UIView!
     
+    // custom view from the XIB file
+    var view: UIView!
     
     override init (frame: CGRect){
         super.init(frame: frame)
@@ -32,19 +36,17 @@ class NotesView: UIView, UITextViewDelegate {
         
         notesTextView.delegate = self
         
-        let imageLayer: CALayer = blurView.layer
-        imageLayer.cornerRadius = 10
-        imageLayer.borderWidth = 2
-        imageLayer.borderColor = UIColor.darkGrayColor().CGColor
-        blurView.clipsToBounds = true
+        // add bottom border, very faint
+        let topBarBorder = CALayer()
+        topBarBorder.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.02).CGColor
+        topBarBorder.frame = CGRectMake(0, topBarBackgroundView.frame.height - 0.5, topBarBackgroundView.frame.width, 0.5)
+        topBarBackgroundView.layer.addSublayer(topBarBorder)
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: "exitNotes:")
-        tapGesture.numberOfTapsRequired = 1
-        backgroundView.addGestureRecognizer(tapGesture)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name:UIKeyboardWillShowNotification, object: nil);
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name:UIKeyboardWillHideNotification, object: nil);
-        
+        // add shadow to top bar
+        topBarBackgroundView.layer.masksToBounds = false
+        topBarBackgroundView.layer.shadowOffset = CGSizeMake(0, 2)
+        topBarBackgroundView.layer.shadowRadius = 5
+        topBarBackgroundView.layer.shadowOpacity = 0.3
     }
     
     required init?(coder aDecoder: NSCoder){
@@ -70,16 +72,16 @@ class NotesView: UIView, UITextViewDelegate {
     }
     
     func openNotes(frame: CGRect) {
+       
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name:UIKeyboardWillShowNotification, object: nil);
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name:UIKeyboardWillHideNotification, object: nil);
         
         (self.superview as! LinkManager).mode = "NOTOUCHES"
         (self.superview as! LinkManager).hideToolbars(true)
         
-        // animate backgroundView color and notesTextView/blurView frames
-        backgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
+        // animate notesTextView/blurView frames
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            self.backgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.5)
-            self.notesTextView.frame = frame
-            self.blurView.frame = frame
+            self.view.frame = frame
             }, completion: { (bool:Bool) -> Void in
         })
         
@@ -90,21 +92,23 @@ class NotesView: UIView, UITextViewDelegate {
         UIView.commitAnimations()
     }
     
-    func exitNotes(gestureRecognizer:UIGestureRecognizer) {
+    @IBAction func exitNotes(sender: AnyObject) {
+        
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+        
         (self.superview as! LinkManager).mode = ""
         (self.superview as! LinkManager).hideToolbars(false)
         
-        // animate removal of background view and notes view
+        // animate removal notes view
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-            self.backgroundView.backgroundColor = UIColor.darkGrayColor().colorWithAlphaComponent(0.0)
-            var tmpFrame: CGRect = self.frame
-            tmpFrame.size.height = 0
+            var tmpFrame: CGRect = self.view.frame
             tmpFrame.origin.y = self.frame.height
-            self.notesTextView.frame = tmpFrame
-            self.blurView.frame = tmpFrame
+            self.view.frame = tmpFrame
             }, completion: { (bool:Bool) -> Void in
                 self.removeFromSuperview()
         })
+
     }
     
     @IBAction func doneTyping(sender: UIButton) {
@@ -116,17 +120,26 @@ class NotesView: UIView, UITextViewDelegate {
         let keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
         
         UIView.animateWithDuration(0.1, animations: { () -> Void in
-            self.notesTextViewBottomContstraint.constant = keyboardFrame.size.height - 50
+            self.notesTextViewBottomContstraint.constant = keyboardFrame.size.height
         })
+        
+        doneButton.hidden = false
     }
     
     func keyboardWillHide(notification: NSNotification) {
         UIView.animateWithDuration(0.1, animations: { () -> Void in
             self.notesTextViewBottomContstraint.constant = 0
         })
+        doneButton.hidden = true
     }
     
     func textViewDidChange(textView: UITextView) {
+        // set last edited date to now.
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "MMMM d, yyyy, h:mm a"
+        let currentDate = NSDate()
+        dateEditedLabel.text = formatter.stringFromDate(currentDate)
+        
         updateNotes()
     }
     
@@ -138,7 +151,7 @@ class NotesView: UIView, UITextViewDelegate {
         let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
             let notesEntity = results[0] as! NotesEntity
-            notesEntity.text = notesTextView.text
+            notesEntity.text = dateEditedLabel.text! + ":~~//~~:" + notesTextView.text
             do {
                 try self.context.save()
             } catch _ {
@@ -155,16 +168,44 @@ class NotesView: UIView, UITextViewDelegate {
         let results: NSArray = try! context.executeFetchRequest(request)
         if results.count == 1 {
             let notesEntity = results[0] as! NotesEntity
-            notesTextView.text = notesEntity.text
+            
+            // split saved text into date label text and notes text
+            let splitText = notesEntity.text.componentsSeparatedByString(":~~//~~:")
+            if splitText.count < 2 {
+                let formatter = NSDateFormatter()
+                formatter.dateFormat = "MMMM d, yyyy, h:mm a"
+                let currentDate = NSDate()
+                dateEditedLabel.text = formatter.stringFromDate(currentDate)
+                notesTextView.text = splitText[0]
+            } else if splitText.count > 2 {
+                dateEditedLabel.text = splitText[0]
+                var notes = ""
+                for var i = 1; i < splitText.count; i++ {
+                    if i > 1 {
+                        notes += ":~~//~~:"
+                    }
+                    notes += splitText[i]
+                }
+                notesTextView.text = notes
+            } else {
+                dateEditedLabel.text = splitText[0]
+                notesTextView.text = splitText[1]
+            }
             self.setNeedsDisplay()
         }
     }
     
     func saveNotes(projectEntity: ProjectEntity) {
+        // set last edited date
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "MMMM d, yyyy, h:mm a"
+        let currentDate = NSDate()
+        dateEditedLabel.text = formatter.stringFromDate(currentDate)
+        
         self.projectEntity = projectEntity
         let notesEntity = NSEntityDescription.insertNewObjectForEntityForName("NotesEntity", inManagedObjectContext: context) as! NotesEntity
         notesEntity.project = projectEntity
-        notesEntity.text = notesTextView.text
+        notesEntity.text = dateEditedLabel.text! + ":~~//~~:" + notesTextView.text
         do {
             try self.context.save()
         } catch _ {

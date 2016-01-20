@@ -62,9 +62,15 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
             } catch _ {
             }
         }
-    
     }
 
+    override func viewDidAppear(animated: Bool) {
+        self.view.layer.masksToBounds = false
+        self.view.layer.shadowOffset = CGSizeMake(3, 0)
+        self.view.layer.shadowRadius = 4
+        self.view.layer.shadowOpacity = 0.3
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -116,7 +122,6 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         if let bool = data.valueForKey("selected") {
             if bool is Bool && (bool as! Bool) {
                 cell.selectionImage.image = UIImage(named: "selected-project")
-                print("selected image set")
             } else {
                 cell.selectionImage.image = UIImage(named: "unselected-project")
             }
@@ -126,7 +131,26 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         
         return cell
     }
+    
+    func tableView(tableView: UITableView, didHighlightRowAtIndexPath indexPath: NSIndexPath) {
+        if let cell = tableView.cellForRowAtIndexPath(indexPath) {
+            cell.contentView.backgroundColor = UIColor.clearColor()
+            cell.backgroundColor = UIColor(red: 52, green: 63, blue: 70, alpha: 1.0)
+        }
+    }
+    
+    func tableView(tableView: UITableView, didUnhighlightRowAtIndexPath indexPath: NSIndexPath) {
+        if let cell = tableView.cellForRowAtIndexPath(indexPath) {
+            cell.contentView.backgroundColor = UIColor.clearColor()
+            cell.backgroundColor = UIColor.clearColor()
+        }
 
+    }
+    
+    func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    
     
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -250,9 +274,13 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
             data.setValue(false, forKey: "selected")
         }
         self.tableData.insert(data, atIndex: 0)
-        //self.tableData.append(data)
-        self.tableView.reloadData()
+        
+        self.didSelectRow(NSIndexPath(forRow: 0, inSection: 0))
         self.updateTableData()
+        
+        let projectID = data.valueForKey("projectID") as! String
+        let projectName = data.valueForKey("projectName") as! String
+        (self.parentViewController as! ProjectManagerViewController).openProject(projectID, projectName: projectName)
     }
 
     func addProject(projectID: String, projectName:String) {
@@ -314,12 +342,6 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     }
     
     func updateTableData() {
-        /*for (var i = 0; i < self.tableData.count; i++) {
-            if let cell: ProjectTableViewCell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: i, inSection: 0)) as! ProjectTableViewCell {
-                self.tableData[i].setValue(cell.projectName.text, forKey: "projectName")
-            }
-        }*/
-    
         let request = NSFetchRequest(entityName: "TableViewDataEntity")
         request.returnsObjectsAsFaults = false
         let results: NSArray = try! context.executeFetchRequest(request)

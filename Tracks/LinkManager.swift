@@ -91,6 +91,8 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 // TODO: check if move track or add link            
                 curTrackLinkAdd = (firstHitSubview as! TrackLink)
                 curTrackLinkAdd.touchBegan(touches, withEvent: event)
+            } else if firstHitSubview is DrawView {
+                (firstHitSubview as! DrawView).touchBegan(touches, withEvent: event)
             }
         } else if mode == "TRASH" {
             if firstHitSubview is Track {
@@ -388,7 +390,7 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
     
     func changeTrackToEditMode(gestureRecognizer: UIGestureRecognizer) {
         print("LONG PRESS RECOGNIZED")
-        if mode == "" {
+        //if mode == "" {
             hideToolbars(true)
             let location = gestureRecognizer.locationInView(self)
             for var i = self.subviews.count - 1; i >= 0; i-- {
@@ -409,11 +411,41 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                     }
                 }
             }
-        }
+        //}
     }
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
         if mode == "NOTOUCHES" {
+            return false
+        } else if mode == "ADD_SIMUL_LINK" || mode == "ADD_SIM_LINK" {
+            let location = touch.locationInView(self)
+            print(location)
+            for var i = self.subviews.count - 1; i >= 0; i-- {
+                let subview = subviews[i]
+                if subview is Track {
+                    if let track = (subview as? Track) where track.hasStoppedRecording && track.frame.contains(location) {
+                        let convertedLoc = self.convertPoint(location, toView: track.view)
+                        if track.linkImageView.frame.contains(convertedLoc) {
+                            return false
+                        } else {
+                            return true
+                        }
+                    }
+                } else if subview is TrackLink {
+                    if let link = (subview as? TrackLink) where link.pointInside(location, withEvent: nil) {
+                        if let track = link.trackAtPoint(location) where track.hasStoppedRecording {
+                            let convertedLoc = self.convertPoint(location, toView: track.view)
+                            if track.linkImageView.frame.contains(convertedLoc) {
+                                return false
+                            } else {
+                                return true
+                            }
+                        } else {
+                            return false
+                        }
+                    }
+                }
+            }
             return false
         } else {
             return true

@@ -8,7 +8,7 @@
 
 import UIKit
 
-var teal:UIColor = UIColor(red: 7.0/255.0, green: 160.0/255.0, blue: 190.0/255.0, alpha: 1).colorWithAlphaComponent(0.9) //UIColor(red: 0.169, green: 0.643, blue: 0.675, alpha: 1).colorWithAlphaComponent(0.9)
+var teal:UIColor = UIColor(red: 11.0/255.0, green: 121.0/255.0, blue: 201.0/255.0, alpha: 1).colorWithAlphaComponent(0.9)
 var orange:UIColor = UIColor(red: 0.961, green: 0.682, blue: 0.318, alpha: 1).colorWithAlphaComponent(0.9)
 var pink:UIColor = UIColor(red: 0.851, green: 0.341, blue: 0.408, alpha: 1).colorWithAlphaComponent(0.9)
 var green:UIColor = UIColor(red: 0.482, green: 0.780, blue: 0.592, alpha: 1).colorWithAlphaComponent(0.9)

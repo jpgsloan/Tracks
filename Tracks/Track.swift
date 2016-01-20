@@ -139,7 +139,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         // add record button (as UIView)
         recordButton = UIView(frame: CGRect(x: bounds.origin.x + bounds.width / 4, y: bounds.origin.y + bounds.height / 4, width: bounds.width / 2, height: bounds.height / 2))
         recordButton.layer.cornerRadius = recordButton.bounds.width / 2
-        recordButton.layer.borderWidth = 3
+        recordButton.layer.borderWidth = 2
         recordButton.layer.borderColor = UIColor.whiteColor().CGColor
         recordButton.backgroundColor = UIColor.lightGrayColor()
         self.addSubview(recordButton)
@@ -286,21 +286,10 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         recordButton.layer.cornerRadius = 6
         recordButton.layer.addAnimation(animation, forKey: "cornerRadius")
         
-        // animate record button size, scaled to 80%
+        // animate record button size, scaled to 85%
         Track.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-            self.recordButton.transform = CGAffineTransformMakeScale(0.8, 0.8)
+            self.recordButton.transform = CGAffineTransformMakeScale(0.85, 0.85)
             }, completion: nil )
-        
-        // TODO: Make sure this doesn't switch from headphones
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
-        } catch _ {
-        }
-        do {
-            try session.overrideOutputAudioPort(AVAudioSessionPortOverride.Speaker)
-        } catch _ {
-        }
         
         // begin recording and update bool values
         audioRecorder.prepareToRecord()
@@ -323,13 +312,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
                 self.progressView.hidden = false
         })
         
-        // deactivate the audio session and update bool values
         audioRecorder.stop()
-        var audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setActive(false)
-        } catch _ {
-        }
         hasStoppedRecording = true
     }
     
@@ -359,6 +342,8 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
                 format.timeZone = NSTimeZone(forSecondsFromGMT: 0)
                 let text = format.stringFromDate(durationDate)
                 setLabelDurationText(text)
+                
+                audioRecorder = nil
                 
                 updateTrackCoreData()
             } else {
@@ -448,9 +433,9 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         if !self.isInEditMode {
             self.isInEditMode = true
             let editView = TrackEditView(frame: self.frame, track: self)
-            if (self.superview as? LinkManager) != nil {
-                (self.superview as! LinkManager).mode = "NOTOUCHES"
-                self.superview!.addSubview(editView)
+            if let supervw = self.superview as? LinkManager {
+                supervw.mode = "NOTOUCHES"
+                supervw.addSubview(editView)
                 editView.animateOpen()
             }
         }
@@ -462,7 +447,19 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         self.pan = pan
         self.view.backgroundColor = color
         setLabelNameText(titleText)
+        deselectTrack()
         updateTrackCoreData()
+        if let _ = (self.superview as? LinkManager) {
+            switch mode {
+            case .Link:
+                (self.superview as! LinkManager).mode = "ADD_SIMUL_LINK"
+            case .Play:
+                (self.superview as! LinkManager).mode = ""
+            case .Trash:
+                (self.superview as! LinkManager).mode = "TRASH"
+            }
+            
+        }
     }
     
     func moveMode() {

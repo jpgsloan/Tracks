@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import QuartzCore
 
 @IBDesignable class ModeSelectSegmentedControl: UIControl {
     
@@ -78,6 +79,18 @@ import UIKit
         addIndividualItemConstraints(itemViews, mainView: self, padding: 0)
         
         insertSubview(thumbView, atIndex: 0)
+        
+        // add bottom border, very faint
+        let modeBarBorder = CALayer()
+        modeBarBorder.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.07).CGColor
+        modeBarBorder.frame = CGRectMake(0, self.frame.height - 0.5, self.frame.width, 0.5)
+        self.layer.addSublayer(modeBarBorder)
+        
+        // add shadow
+        self.layer.masksToBounds = false
+        self.layer.shadowOffset = CGSizeMake(0, 2)
+        self.layer.shadowRadius = 5
+        self.layer.shadowOpacity = 0.3
     }
     
     func setupLabels(){
@@ -185,7 +198,7 @@ import UIKit
         let newWidth = CGRectGetWidth(selectFrame) / CGFloat(items.count)
         selectFrame.size.width = newWidth
         thumbView.frame = selectFrame
-        thumbView.backgroundColor = thumbColor
+        thumbView.backgroundColor = UIColor.clearColor()
         
         displayNewSelectedIndex()
         
@@ -254,7 +267,7 @@ import UIKit
             }
         }
         
-        thumbView.backgroundColor = thumbColor
+        thumbView.backgroundColor = UIColor.clearColor()
     }
     
     func setFont(){

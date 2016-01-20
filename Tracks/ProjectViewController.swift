@@ -11,7 +11,7 @@ import UIKit
 import QuartzCore
 import CoreData
 
-class ProjectViewController: UIViewController, UITextFieldDelegate {
+class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessionDelegate {
     
     var filemanager = NSFileManager.defaultManager()
     var projectDirectory: String!
@@ -43,7 +43,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         // Add draw view
         drawView = DrawView(frame: self.view.frame)
         drawView.backgroundColor = UIColor.clearColor()
-        drawView.layer.backgroundColor = UIColor(red: 75.0/255.0, green: 84.0/255.0, blue: 90.0/255.0, alpha: 1.0).CGColor
+        drawView.layer.backgroundColor = UIColor(red: 49.0/255.0, green: 55.0/255.0, blue: 60.0/255.0, alpha: 1.0).CGColor //75, 84, 90
         self.view.addSubview(drawView)
         
         // Add lower border to title text
@@ -54,18 +54,18 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         // Create background view for styling status bar
         statusBarBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 20 + navigationBar.frame.height))
         statusBarBackgroundView.backgroundColor = navigationBar.backgroundColor
+        navigationBar.backgroundColor = UIColor.clearColor()
+        navigationBar.layer.backgroundColor = UIColor.clearColor().CGColor
         self.view.addSubview(statusBarBackgroundView)
         
         // remove shadow line on navigation bar
         navigationBar.shadowImage = UIImage()
         navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
         
-        
         // change some background colors
         linkBackgroundTextView.backgroundColor = UIColor(red: 75.0/255.0, green: 84.0/255.0, blue: 90.0/255.0, alpha: 0.9)
-        modeSegmentedControl.backgroundColor = modeSegmentedControl.backgroundColor?.colorWithAlphaComponent(0.9)
         
-        // add background circle to addTrackButton and stopButton
+        // add background circle to addTrackButton
         addTrackButton.layer.cornerRadius = addTrackButton.frame.width / 2.0
         let circleLayer = CAShapeLayer()
         let path = UIBezierPath(roundedRect: addTrackButton.bounds, cornerRadius: addTrackButton.layer.cornerRadius)
@@ -74,7 +74,13 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         circleLayer.strokeColor = modeSegmentedControl.backgroundColor?.CGColor
         circleLayer.frame = addTrackButton.layer.bounds
         addTrackButton.layer.insertSublayer(circleLayer, below: addTrackButton.imageView!.layer)
+        // add shadow
+        addTrackButton.layer.masksToBounds = false
+        addTrackButton.layer.shadowOffset = CGSizeMake(2, -2)
+        addTrackButton.layer.shadowRadius = 5
+        addTrackButton.layer.shadowOpacity = 0.3
         
+        // add background circle to stopButton
         stopButton.layer.cornerRadius = stopButton.frame.width / 2.0
         let circleStopLayer = CAShapeLayer()
         let stopPath = UIBezierPath(roundedRect: stopButton.bounds, cornerRadius: stopButton.layer.cornerRadius)
@@ -83,6 +89,11 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         circleStopLayer.strokeColor = modeSegmentedControl.backgroundColor?.CGColor
         circleStopLayer.frame = stopButton.layer.bounds
         stopButton.layer.insertSublayer(circleStopLayer, below: stopButton.imageView!.layer)
+        // add shadow
+        stopButton.layer.masksToBounds = false
+        stopButton.layer.shadowOffset = CGSizeMake(-2, -2)
+        stopButton.layer.shadowRadius = 5
+        stopButton.layer.shadowOpacity = 0.3
         
         //set some tags so it's easy to find from LinkManager
         stopButton.tag = 5109
@@ -156,6 +167,12 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
         self.view.bringSubviewToFront(stopButton)
         self.view.sendSubviewToBack(drawView)
         self.view.sendSubviewToBack(linkBackgroundTextView)
+        
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(AVAudioSessionCategoryPlayAndRecord, withOptions: [AVAudioSessionCategoryOptions.MixWithOthers, AVAudioSessionCategoryOptions.DefaultToSpeaker])
+        } catch _ {
+        }
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -181,34 +198,46 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func addTrack(sender: UIButton) {
         //Create new Track and set project directory where sound files will be stored.
-        let newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0), projectDir: projectDirectory)
-        
-        //Center and add the new track node.
-        newTrack.center = self.view.center
-        newTrack.setLabelNameText("untitled")
-        newTrack.saveTrackCoreData(projectEntity)
+        for var i = tracks.count - 1; i >= 0; i-- {
+            if let track = tracks.objectAtIndex(i) as? Track {
+                if track.hasBeenDeleted {
+                    tracks.removeObjectAtIndex(i)
+                }
+            }
+        }
 
-        tracks.addObject(newTrack)
-        
-        if (linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SIMUL_LINK") && tracks.count < 2 {
-            // there are not enough tracks to use links so display message to guide user
-            showLinkBackgroundText()
-            self.view.insertSubview(newTrack, belowSubview: linkBackgroundTextView)
-            newTrack.setNeedsLayout()
-            newTrack.layoutIfNeeded()
-            newTrack.linkMode()
-        } else {
-            hideLinkBackgroundText()
-
-            self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 5)// +1 - 6 since you are adding a new subview not yet counted in subviews.count*/
+        if tracks.count < 20 {
+            // since less than track limit, add a new track.
+            let newTrack = Track(frame: CGRect(x: self.view.center.x,y: self.view.center.y,width: 100.0,height: 100.0), projectDir: projectDirectory)
             
-            if (linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SIMUL_LINK") {
+            //Center and add the new track node.
+            newTrack.center = self.view.center
+            newTrack.setLabelNameText("untitled")
+            newTrack.saveTrackCoreData(projectEntity)
+            
+            tracks.addObject(newTrack)
+            
+            if (linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SIMUL_LINK") && tracks.count < 2 {
+                // there are not enough tracks to use links so display message to guide user
+                showLinkBackgroundText()
+                self.view.insertSubview(newTrack, belowSubview: linkBackgroundTextView)
                 newTrack.setNeedsLayout()
                 newTrack.layoutIfNeeded()
                 newTrack.linkMode()
+            } else {
+                hideLinkBackgroundText()
+                
+                self.view.insertSubview(newTrack, atIndex: self.view.subviews.count - 5)// +1 - 6 since you are adding a new subview not yet counted in subviews.count*/
+                
+                if (linkManager.mode == "ADD_SIMUL_LINK" || linkManager.mode == "ADD_SIMUL_LINK") {
+                    newTrack.setNeedsLayout()
+                    newTrack.layoutIfNeeded()
+                    newTrack.linkMode()
+                }
             }
+        } else {
+            print("track limit reached, remove tracks before creating more")
         }
-        
     }
     
     @IBAction func openSideBarVC(sender: UIBarButtonItem) {
@@ -220,7 +249,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
             }
         }
         
-        let effect = UIBlurEffect(style: UIBlurEffectStyle.Light)
+        let effect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
         sideBarOpenBackgroundView = UIVisualEffectView(frame: self.view.frame)
         sideBarOpenBackgroundView.effect = effect
         sideBarOpenBackgroundView.alpha = 0.0
@@ -371,16 +400,15 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
    
     @IBAction func toggleNotes(sender: UIBarButtonItem) {
         // add notes view
-        notesView.frame = self.view.frame
-        self.view.addSubview(notesView)
         
-        var tmpFrame: CGRect = notesView.frame
-        tmpFrame.origin.x = 4
-        tmpFrame.origin.y = 50
-        tmpFrame.size.width = self.view.frame.width - 8
-        tmpFrame.size.height = self.view.frame.height - 100
+        var tmpFrame: CGRect = self.view.frame
+        tmpFrame.size.height = 0
+        tmpFrame.origin.y = self.view.frame.height
+        notesView.view.frame = tmpFrame
+        
+        self.view.addSubview(notesView)
 
-        notesView.openNotes(tmpFrame)
+        notesView.openNotes(self.view.frame)
     }
     
     func hideLinkBackgroundText() {
@@ -493,6 +521,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate {
                 let linkToAdd = TrackLink(frame: self.view.frame, withTrackNodeIDs: trackNodeIDs, unrecordedTracks: unrecordedTracks, rootTrackID: linkEntity.rootTrackID, linkID: linkEntity.linkID)
                 linkManager.allTrackLinks.append(linkToAdd)
                 self.view.insertSubview(linkToAdd, atIndex: self.view.subviews.count - 6)
+                linkToAdd.placeAllTracksBelow()
             }
         }
     }

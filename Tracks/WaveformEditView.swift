@@ -27,11 +27,13 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     var scrollTimer: NSTimer!
     var volume: Float = 1.0
     var pan: Float = 0.0
+    var circle: CAShapeLayer?
+    var spinner: UIActivityIndicatorView?
     
     var cancelTrimButton: UIButton!
     var trimAudioButton: UIButton!
-    @IBOutlet weak var playInTrimModeButton: UIButton!
-
+    
+    @IBOutlet weak var backgroundView: UIView!
     @IBOutlet weak var playButton: UIButton!
     @IBOutlet weak var curTimeLabel: UILabel!
     @IBOutlet weak var cropButton: UIButton!
@@ -40,7 +42,7 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var scrollContentView: UIView!
     @IBOutlet weak var timeSelectorView: TimeSelectorView!
-    
+    @IBOutlet weak var bottomBarBackgroundView: UIView!
     @IBOutlet weak var audioPlotLeadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var audioPlotTrailingConstraint: NSLayoutConstraint!
     
@@ -63,7 +65,10 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     
     func commonInit() {
         
+        self.view.backgroundColor = UIColor.clearColor()
         self.backgroundColor = UIColor.clearColor()
+    
+        self.sendSubviewToBack(backgroundView)
         
         // set up current time label
         let format = NSDateFormatter()
@@ -88,6 +93,8 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         self.view.addConstraint(bottomConstraint)
         
         scrollView.delegate = self
+        
+        circle = CAShapeLayer()
     }
     
     func xibSetup() {
@@ -183,6 +190,41 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                 self.scrollView.layoutIfNeeded()
         }
        
+        // first remove old sublayer lines
+        if let sublayerz = backgroundView.layer.sublayers {
+            for layer in sublayerz {
+                layer.removeFromSuperlayer()
+            }
+        }
+        // then add top, bottom, and middle lines for audio plot outline.
+        let lines = CAShapeLayer()
+        let linesPath = UIBezierPath()
+        // bottom
+        linesPath.moveToPoint(CGPointMake(0, backgroundView.frame.height))
+        linesPath.addLineToPoint(CGPointMake(backgroundView.frame.width, backgroundView.frame.height))
+        // middle
+        linesPath.moveToPoint(CGPointMake(0, audioPlot.frame.height / 2.0 + timeline.frame.height + 1))
+        linesPath.addLineToPoint(CGPointMake(self.frame.width, audioPlot.frame.height / 2.0 + timeline.frame.height + 1))
+        // top
+        linesPath.moveToPoint(CGPointMake(0, timeline.frame.height))
+        linesPath.addLineToPoint(CGPointMake(self.frame.width, timeline.frame.height))
+        lines.path = linesPath.CGPath
+        lines.strokeColor = UIColor.whiteColor().CGColor
+        lines.lineWidth = 1
+        backgroundView.layer.addSublayer(lines)
+        
+        
+        // update circle behind play button
+        if let circle = circle {
+            var newBounds = playButton.bounds
+            newBounds.origin.x -= 2
+            circle.frame = newBounds
+            let circlePath = UIBezierPath()
+            circlePath.addArcWithCenter(CGPointMake(playButton.frame.width / 2.0, playButton.frame.height / 2.0), radius:(playButton.frame.width + 12.0) / 2.0, startAngle: 0, endAngle: CGFloat(2 * M_PI), clockwise: true)
+            circle.path = circlePath.CGPath
+            circle.fillColor = UIColor.whiteColor().colorWithAlphaComponent(0.2).CGColor
+            playButton.layer.insertSublayer(circle, atIndex: 0)
+        }
     }
     
     @IBAction func trimMode(sender: UIButton) {
@@ -200,8 +242,6 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         cropButton.hidden = true
         curTimeLabel.layer.addAnimation(animation, forKey: nil)
         curTimeLabel.hidden = true
-        playButton.layer.addAnimation(animation, forKey: nil)
-        playButton.hidden = true
         timeline.layer.addAnimation(animation, forKey: nil)
         timeline.alpha = 0.14
         
@@ -212,32 +252,27 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         cancelTrimButton.addTarget(self, action: "cancelTrimMode:", forControlEvents: UIControlEvents.TouchUpInside)
         cancelTrimButton.adjustsImageWhenHighlighted = true;
         cancelTrimButton.sizeToFit()
+        cancelTrimButton.center.y = cropButton.center.y
         cancelTrimButton.frame.origin.x = self.view.frame.width - cancelTrimButton.frame.width - 20 // adjust to match trailing constraint
-
-        self.addSubview(cancelTrimButton)
+        bottomBarBackgroundView.addSubview(cancelTrimButton)
         // animate fade in
         cancelTrimButton.hidden = true
         cancelTrimButton.layer.addAnimation(animation, forKey: nil)
         cancelTrimButton.hidden = false
     
         // add button to trim
-        trimAudioButton = UIButton(frame: playButton.frame)
+        trimAudioButton = UIButton(frame: curTimeLabel.frame)
         trimAudioButton.titleLabel?.font = UIFont.systemFontOfSize(15)
         trimAudioButton.setTitle("Trim", forState: UIControlState.Normal)
         trimAudioButton.addTarget(self, action: "trimAudio:", forControlEvents: UIControlEvents.TouchUpInside)
         trimAudioButton.adjustsImageWhenHighlighted = true;
         trimAudioButton.sizeToFit()
-        
-        self.addSubview(trimAudioButton)
+        trimAudioButton.center.y = curTimeLabel.center.y
+        bottomBarBackgroundView.addSubview(trimAudioButton)
         // animate fade in
         trimAudioButton.hidden = true
         trimAudioButton.layer.addAnimation(animation, forKey: nil)
         trimAudioButton.hidden = false
-        
-        // animate fade in button for playing from start bar to end bar
-        playInTrimModeButton.hidden = true
-        playInTrimModeButton.layer.addAnimation(animation, forKey: nil)
-        playInTrimModeButton.hidden = false
     }
     
     func cancelTrimMode(sender: UIButton) {
@@ -259,21 +294,17 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         cancelTrimButton.hidden = true
         trimAudioButton.layer.addAnimation(animation, forKey: nil)
         trimAudioButton.hidden = true
-        playInTrimModeButton.layer.addAnimation(animation, forKey: nil)
-        playInTrimModeButton.hidden = true
         
-        // fade in play buttons, time label, and timeline
+        // fade in time label, and timeline
         cropButton.layer.addAnimation(animation, forKey: nil)
         cropButton.hidden = false
         curTimeLabel.layer.addAnimation(animation, forKey: nil)
         curTimeLabel.hidden = false
-        playButton.layer.addAnimation(animation, forKey: nil)
-        playButton.hidden = false
         timeline.layer.addAnimation(animation, forKey: nil)
         timeline.alpha = 1
         
         // set playback to zero
-        //TODO: this should eventually resume playback where it left off and check if still in bounds of trimmed audio
+        // this should eventually resume playback where it left off and check if still in bounds of trimmed audio
         scrollView.contentOffset.x = 0
         curTime = 0
         curTimeLabel.text = "00:00:00"
@@ -414,9 +445,28 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     
     func trimAudio(sender: UIButton) {
         print("TRIM AUDIO")
-        if let asset: AVAsset = AVAsset(URL: audioFile.url) {
-            exportAsset(asset, fileName: audioFile.url.lastPathComponent! + "-tmp-cropping.wav")
+        spinner = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+        spinner?.center = audioPlot.center
+        self.view.addSubview(spinner!)
+        
+        for subview in self.view.subviews {
+            subview.userInteractionEnabled = false
         }
+        
+        //switch to background thread
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+            
+            //back to the main thread to start spinner
+            dispatch_async(dispatch_get_main_queue(), {
+                if let _ = self.spinner {
+                    self.spinner!.startAnimating()
+                }
+                })
+
+            if let asset: AVAsset = AVAsset(URL: self.audioFile.url) {
+                self.exportAsset(asset, fileName: self.audioFile.url.lastPathComponent! + "-tmp-cropping.wav")
+            }
+            })
     }
     
     func exportAsset(asset:AVAsset, fileName:String) {
@@ -467,7 +517,6 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                 print("export cancelled \(exporter.error)")
             default:
                 print("export complete")
-                //TODO: delete the old file, rename cropped file with old name.
                 // on success, delete the old file, rename cropped file with old name.
                 let oldFileURL = self.audioFile.url
                 let filemgr = NSFileManager.defaultManager()
@@ -484,6 +533,12 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                             // update track
                             self.updateTrack(oldFileURL)
                             self.exitTrimMode()
+                            if let _ = self.spinner {
+                                self.spinner!.stopAnimating()
+                                self.spinner!.removeFromSuperview()
+                                self.spinner = nil
+                            }
+
                         })
                     } catch var error1 as NSError {
                         error = error1
@@ -492,40 +547,55 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                 } catch var error1 as NSError {
                     error = error1
                     print("Remove failed: \(error!.localizedDescription)")
-                    //TODO: try removing again or delete trimmed audio and make user try again
+                    // eventually try removing again or delete trimmed audio and make user try again
                 } catch {
                     fatalError()
                 }
+            }
+            for subview in self.view.subviews {
+                subview.userInteractionEnabled = true
             }
         })
         }
     }
     
     @IBAction func playAudio(sender: UIButton) {
-        if audioPlayer.isPlaying {
-            audioPlayer.pause()
-            playButton.setTitle("Play", forState: UIControlState.Normal)
+        if isInTrimMode {
+            playAudioWithStartEnd(sender)
         } else {
-            if curTime >= audioPlayer.duration {
-                curTime = NSTimeInterval(0.0)
+            if audioPlayer.isPlaying {
+                audioPlayer.pause()
+                // set playbutton image to play
+                playButton.setImage(UIImage(named: "play.png"), forState: UIControlState.Normal)
+                playButton.imageEdgeInsets.left += 2
+                playButton.imageEdgeInsets.right -= 2
+            } else {
+                if curTime >= audioPlayer.duration {
+                    curTime = NSTimeInterval(0.0)
+                }
+                audioPlayer.currentTime = curTime
+                audioPlayer.volume = volume
+                audioPlayer.pan = pan
+                audioPlayer.play()
+                // set playbutton image to pause
+                playButton.setImage(UIImage(named: "pause.png"), forState: UIControlState.Normal)
+                playButton.imageEdgeInsets.left -= 2
+                playButton.imageEdgeInsets.right += 2
             }
-            audioPlayer.currentTime = curTime
-            audioPlayer.volume = volume
-            audioPlayer.pan = pan
-            audioPlayer.play()
-            playButton.setTitle("Pause", forState: UIControlState.Normal)
-            playButton.sizeToFit()
         }
     }
     
-    @IBAction func playAudioWithStartEnd(sender: UIButton) {
+    func playAudioWithStartEnd(sender: UIButton) {
     
         let startTime = timeSelectorView.currentStartTime()
         let endTime = timeSelectorView.currentEndTime()
         
         if audioPlayer.isPlaying {
             audioPlayer.pause()
-            playInTrimModeButton.setTitle("Play", forState: UIControlState.Normal)
+            // set playbutton image to play
+            playButton.setImage(UIImage(named: "play.png"), forState: UIControlState.Normal)
+            playButton.imageEdgeInsets.left += 2
+            playButton.imageEdgeInsets.right -= 2
         } else {
             if curTime >= endTime.seconds {
                 curTime = NSTimeInterval(startTime.seconds)
@@ -536,8 +606,10 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
             audioPlayer.volume = volume
             audioPlayer.pan = pan
             audioPlayer.play()
-            playInTrimModeButton.setTitle("Pause", forState: UIControlState.Normal)
-            playInTrimModeButton.sizeToFit()
+           // set playbutton image to pause
+            playButton.setImage(UIImage(named: "pause.png"), forState: UIControlState.Normal)
+            playButton.imageEdgeInsets.left -= 2
+            playButton.imageEdgeInsets.right += 2
         }
         
     }
@@ -545,7 +617,10 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     func audioPlayer(audioPlayer: EZAudioPlayer!, reachedEndOfAudioFile audioFile: EZAudioFile!) {
         print("file ended")
         fileEnded = true
-        playButton.setTitle("Play", forState: UIControlState.Normal)
+        // set playbutton image to play
+        playButton.setImage(UIImage(named: "play.png"), forState: UIControlState.Normal)
+        playButton.imageEdgeInsets.left += 2
+        playButton.imageEdgeInsets.right -= 2
     }
     
     func audioPlayer(audioPlayer: EZAudioPlayer!, updatedPosition framePosition: Int64, inAudioFile audioFile: EZAudioFile!) {
@@ -584,7 +659,10 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                 // reached end of play interval, reset bars, buttons, and pause.
                 curTime = 0.0
                 audioPlayer.pause()
-                playInTrimModeButton.setTitle("Play", forState: UIControlState.Normal)
+                // set playbutton image to play
+                playButton.setImage(UIImage(named: "play.png"), forState: UIControlState.Normal)
+                playButton.imageEdgeInsets.left += 2
+                playButton.imageEdgeInsets.right -= 2
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                     self.timeSelectorView.playBarTime = nil
                     self.timeSelectorView.setNeedsDisplay()
@@ -655,25 +733,4 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
         pan = value
         audioPlayer.pan = value
     }
-    
-    override func drawRect(rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        CGContextBeginPath(context)
-        CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().CGColor)
-        CGContextSetLineWidth(context, 1)
-        
-        // draw bottom line for waveform
-        CGContextMoveToPoint(context, 0, audioPlot.frame.height + timeline.frame.height)
-        CGContextAddLineToPoint(context, self.frame.width, audioPlot.frame.height + timeline.frame.height)
-        
-        // draw middle line for waveform
-        CGContextMoveToPoint(context, 0, audioPlot.frame.height / 2.0 + timeline.frame.height)
-        CGContextAddLineToPoint(context, self.frame.width, audioPlot.frame.height / 2.0 + timeline.frame.height)
-        
-        // draw top line for waveform
-        CGContextMoveToPoint(context, 0, timeline.frame.height)
-        CGContextAddLineToPoint(context, self.frame.width, timeline.frame.height)
-        CGContextStrokePath(context)
-    }
-    
 }
