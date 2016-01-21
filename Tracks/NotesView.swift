@@ -121,7 +121,9 @@ class NotesView: UIView, UITextViewDelegate {
         
         UIView.animateWithDuration(0.1, animations: { () -> Void in
             self.notesTextViewBottomContstraint.constant = keyboardFrame.size.height
-        })
+            }) { (Bool) -> Void in
+                self.notesTextView.setNeedsDisplay()
+        }
         
         doneButton.hidden = false
     }
@@ -129,7 +131,10 @@ class NotesView: UIView, UITextViewDelegate {
     func keyboardWillHide(notification: NSNotification) {
         UIView.animateWithDuration(0.1, animations: { () -> Void in
             self.notesTextViewBottomContstraint.constant = 0
-        })
+            }) { (Bool) -> Void in
+                self.notesTextView.setNeedsDisplay()
+        }
+
         doneButton.hidden = true
     }
     

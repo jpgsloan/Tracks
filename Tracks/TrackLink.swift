@@ -525,8 +525,21 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
     }
     
     func bringTrackToEditMode(location: CGPoint, gestureRecognizer: UIGestureRecognizer) {
-        let trackToEdit = trackAtPoint(location)
-        trackToEdit?.editMode(gestureRecognizer)
+        if let trackToEdit = trackAtPoint(location) {
+            let editView = trackToEdit.editMode(gestureRecognizer)
+            if let editView = editView {
+                editView.trackLink = self
+            }
+        }
+    }
+    
+    func updateTrackWithNewAudioPlayer(oldAudioPlayer: AVAudioPlayer, track: Track) {
+        if let player = track.audioPlayer {
+            trackNodeIDs[player] = trackNodeIDs[oldAudioPlayer]
+            trackNodeIDs[oldAudioPlayer] = nil
+            player.delegate = self
+        }
+        layer.setNeedsDisplay()
     }
     
     func trackAtPoint(location: CGPoint) -> Track? {
@@ -791,7 +804,11 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
             let context = UIGraphicsGetCurrentContext()
             CGContextBeginPath(context)
             CGContextMoveToPoint(context, curTouchedTrack.center.x, curTouchedTrack.center.y)
-            CGContextAddLineToPoint(context, curTouchLoc.x, curTouchLoc.y)
+            if queuedTrackForAdding != nil {
+                CGContextAddLineToPoint(context, queuedTrackForAdding.center.x, queuedTrackForAdding.center.y)
+            } else {
+                CGContextAddLineToPoint(context, curTouchLoc.x, curTouchLoc.y)
+            }
             CGContextSetStrokeColorWithColor(context, UIColor.whiteColor().colorWithAlphaComponent(1).CGColor)
             CGContextSetLineCap(context, CGLineCap.Round)
             CGContextSetLineWidth(context, 4)

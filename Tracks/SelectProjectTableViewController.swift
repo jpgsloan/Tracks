@@ -22,6 +22,8 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     @IBOutlet weak var projectsBar: UIView!
     @IBOutlet weak var settingsButton: UIView!
     @IBOutlet weak var aboutButton: UIView!
+    var settingsView: SettingsView?
+    var aboutView: AboutView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,6 +64,14 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
             } catch _ {
             }
         }
+        
+        let singleTapSettings = UITapGestureRecognizer(target: self, action: "openSettings:")
+        singleTapSettings.numberOfTapsRequired = 1
+        settingsButton.addGestureRecognizer(singleTapSettings)
+        
+        let singleTapAbout = UITapGestureRecognizer(target: self, action: "openAbout:")
+        singleTapAbout.numberOfTapsRequired = 1
+        aboutButton.addGestureRecognizer(singleTapAbout)
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -69,6 +79,9 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
         self.view.layer.shadowOffset = CGSizeMake(3, 0)
         self.view.layer.shadowRadius = 4
         self.view.layer.shadowOpacity = 0.3
+        
+        settingsView = SettingsView(frame: self.view.bounds)
+        aboutView = AboutView(frame: self.view.bounds)
     }
     
     override func didReceiveMemoryWarning() {
@@ -210,6 +223,11 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
                 print("Failed to delete directory: \(projDir)")
             }
             
+            if let parent = self.parentViewController as? ProjectManagerViewController {
+                // since all project were deleted, create empty new project and open it.
+                parent.deleteProjectFromCoreData(projectID)
+            }
+            
             if self.tableData.count == 0 {
                 if let parent = self.parentViewController as? ProjectManagerViewController {
                         // since all project were deleted, create empty new project and open it. 
@@ -329,6 +347,33 @@ class SelectProjectTableViewController: UIViewController, UITableViewDelegate, U
     
     override func shouldAutorotate() -> Bool {
         return false
+    }
+    
+    func openSettings(gestureRecognizer: UITapGestureRecognizer) {
+        settingsView?.frame = self.view.bounds
+        self.view.insertSubview(settingsView!, atIndex: self.view.subviews.count)
+        settingsView!.hidden = true
+        
+        let animation = CATransition()
+        animation.type = kCATransitionFade
+        animation.duration = 0.2
+        settingsView!.layer.addAnimation(animation, forKey: nil)
+        settingsView!.hidden = false
+        settingsView!.userInteractionEnabled = true
+        
+    }
+    
+    func openAbout(gestureRecognizer: UITapGestureRecognizer) {
+        aboutView?.frame = self.view.bounds
+        self.view.insertSubview(aboutView!, atIndex: self.view.subviews.count)
+        aboutView!.hidden = true
+        
+        let animation = CATransition()
+        animation.type = kCATransitionFade
+        animation.duration = 0.2
+        aboutView!.layer.addAnimation(animation, forKey: nil)
+        aboutView!.hidden = false
+        aboutView!.userInteractionEnabled = true
     }
     
     func loadTableData() {

@@ -64,7 +64,7 @@ class ProjectManagerViewController: UIViewController {
         print("OPEN SIDEBAR")
         // add bottom border to settings button
         let lowerBorder = CALayer()
-        lowerBorder.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.7).CGColor
+        lowerBorder.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
         lowerBorder.frame = CGRectMake(15, sideBarVC.settingsButton.frame.height - 0.5, sideBarVC.settingsButton.frame.width - 15, 0.5)
         sideBarVC.settingsButton.layer.addSublayer(lowerBorder)
 
@@ -96,6 +96,7 @@ class ProjectManagerViewController: UIViewController {
     
     func openProject(projectID: String, projectName: String) {
         print("opening project")
+        projVC.stopAudio(UIButton())
         let newProjVC = ProjectViewController(nibName: "ProjectViewController",bundle: nil)
         newProjVC.projectID = projectID
         newProjVC.projectName = projectName
@@ -214,5 +215,25 @@ class ProjectManagerViewController: UIViewController {
         } catch _ {
         }
     }
+    
+    func deleteProjectFromCoreData(projectID: String) {
+        // deleting project from core data
+        let appDel = UIApplication.sharedApplication().delegate as! AppDelegate
+        if let context = appDel.managedObjectContext {
+            let request = NSFetchRequest(entityName: "ProjectEntity")
+            request.returnsObjectsAsFaults = false
+            request.predicate = NSPredicate(format: "projectID = %@", argumentArray: [projectID])
+            let results: NSArray = try! context.executeFetchRequest(request)
+            if results.count == 1 {
+                let projectToDelete = results[0] as! ProjectEntity
+                context.deleteObject(projectToDelete)
+                do {
+                    try context.save()
+                } catch _ {
+                }
+            }
+        }
+    }
+
     
 }

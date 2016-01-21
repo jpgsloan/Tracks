@@ -67,13 +67,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessi
         
         // add background circle to addTrackButton
         addTrackButton.layer.cornerRadius = addTrackButton.frame.width / 2.0
-        let circleLayer = CAShapeLayer()
-        let path = UIBezierPath(roundedRect: addTrackButton.bounds, cornerRadius: addTrackButton.layer.cornerRadius)
-        circleLayer.path = path.CGPath
-        circleLayer.fillColor = modeSegmentedControl.backgroundColor?.CGColor
-        circleLayer.strokeColor = modeSegmentedControl.backgroundColor?.CGColor
-        circleLayer.frame = addTrackButton.layer.bounds
-        addTrackButton.layer.insertSublayer(circleLayer, below: addTrackButton.imageView!.layer)
+        addTrackButton.layer.backgroundColor = modeSegmentedControl.backgroundColor?.CGColor
         // add shadow
         addTrackButton.layer.masksToBounds = false
         addTrackButton.layer.shadowOffset = CGSizeMake(2, -2)
@@ -82,13 +76,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessi
         
         // add background circle to stopButton
         stopButton.layer.cornerRadius = stopButton.frame.width / 2.0
-        let circleStopLayer = CAShapeLayer()
-        let stopPath = UIBezierPath(roundedRect: stopButton.bounds, cornerRadius: stopButton.layer.cornerRadius)
-        circleStopLayer.path = stopPath.CGPath
-        circleStopLayer.fillColor = modeSegmentedControl.backgroundColor?.CGColor
-        circleStopLayer.strokeColor = modeSegmentedControl.backgroundColor?.CGColor
-        circleStopLayer.frame = stopButton.layer.bounds
-        stopButton.layer.insertSublayer(circleStopLayer, below: stopButton.imageView!.layer)
+        stopButton.layer.backgroundColor = modeSegmentedControl.backgroundColor?.CGColor
         // add shadow
         stopButton.layer.masksToBounds = false
         stopButton.layer.shadowOffset = CGSizeMake(-2, -2)
@@ -177,6 +165,10 @@ class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessi
     
     override func viewDidAppear(animated: Bool) {
         loadLinks()
+        
+        if tracks.count == 0 {
+           animateAddTrackButton()
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -194,6 +186,28 @@ class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessi
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func animateAddTrackButton() {
+        if tracks.count == 0 {
+            UIView.animateWithDuration(1.55, delay: 0.0, options: [UIViewAnimationOptions.CurveEaseInOut, UIViewAnimationOptions.AllowUserInteraction], animations: { () -> Void in
+                self.addTrackButton.layer.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5).CGColor
+                }) { (Bool) -> Void in
+                    self.reverseAnimateAddTrackButton()
+            }
+        } else {
+            reverseAnimateAddTrackButton()
+        }
+    }
+    
+    func reverseAnimateAddTrackButton() {
+        UIView.animateWithDuration(1.55, delay: 0.0, options: [UIViewAnimationOptions.CurveEaseInOut, UIViewAnimationOptions.AllowUserInteraction], animations: { () -> Void in
+            self.addTrackButton.layer.backgroundColor = self.modeSegmentedControl.backgroundColor?.CGColor
+            }) { (Bool) -> Void in
+                if self.tracks.count == 0 {
+                    self.animateAddTrackButton()
+                }
+        }
     }
     
     @IBAction func addTrack(sender: UIButton) {
@@ -486,8 +500,12 @@ class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessi
             for track in res.track {
                 let trackEntity = track as! TrackEntity
                 let trackToAdd = NSKeyedUnarchiver.unarchiveObjectWithData(trackEntity.track) as! Track
-                tracks.addObject(trackToAdd)
-                self.view.addSubview(trackToAdd)
+                if !trackToAdd.hasBeenDeleted {
+                    tracks.addObject(trackToAdd)
+                    self.view.addSubview(trackToAdd)
+                } else {
+                    context.deleteObject(trackEntity)
+                }
             }
         }
     }
@@ -525,5 +543,4 @@ class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessi
             }
         }
     }
-
 }

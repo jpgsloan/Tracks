@@ -159,45 +159,50 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         trackID = aDecoder.decodeObjectForKey("trackID") as! String
         self.projectDirectory = projectDirectory
         
-        // if trackName is empty string, then audio has yet to be recorded
-        let trackName = aDecoder.decodeObjectForKey("trackName") as! String
-        if trackName.isEmpty {
-            // init as unrecorded track
-            initUnrecordedTrack()
+        self.hasBeenDeleted = aDecoder.decodeBoolForKey("hasBeenDeleted")
+        if hasBeenDeleted {
+            deleteTrack()
         } else {
-            // init as track ready to play
-            self.view.backgroundColor = (aDecoder.decodeObjectForKey("color") as! UIColor)
-            
-            // using track name, create new audioPlayer
-            let audioFileUrl = NSString(string: projectDirectory).stringByAppendingPathComponent(trackName)
-            recordedAudio.filePathUrl = NSURL(fileURLWithPath: audioFileUrl)
-            recordedAudio.title = recordedAudio.filePathUrl!.lastPathComponent
-            hasStartedRecording = true
-            hasStoppedRecording = true
-            
-            if let player = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl!) {
-                audioPlayer = player
-                audioPlayer!.prepareToPlay()
-                audioPlayer!.delegate = self
-                audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
-                drawWaveform()
-                readyToPlay = true
+            // if trackName is empty string, then audio has yet to be recorded
+            let trackName = aDecoder.decodeObjectForKey("trackName") as! String
+            if trackName.isEmpty {
+                // init as unrecorded track
+                initUnrecordedTrack()
             } else {
-                print("Could not initialize audioPlayer at url: \(recordedAudio.filePathUrl)")
-                readyToPlay = false
+                // init as track ready to play
+                self.view.backgroundColor = (aDecoder.decodeObjectForKey("color") as! UIColor)
+                
+                // using track name, create new audioPlayer
+                let audioFileUrl = NSString(string: projectDirectory).stringByAppendingPathComponent(trackName)
+                recordedAudio.filePathUrl = NSURL(fileURLWithPath: audioFileUrl)
+                recordedAudio.title = recordedAudio.filePathUrl!.lastPathComponent
+                hasStartedRecording = true
+                hasStoppedRecording = true
+                
+                if let player = try? AVAudioPlayer(contentsOfURL: recordedAudio.filePathUrl!) {
+                    audioPlayer = player
+                    audioPlayer!.prepareToPlay()
+                    audioPlayer!.delegate = self
+                    audioFile = EZAudioFile(URL: recordedAudio.filePathUrl)
+                    drawWaveform()
+                    readyToPlay = true
+                } else {
+                    print("Could not initialize audioPlayer at url: \(recordedAudio.filePathUrl)")
+                    readyToPlay = false
+                }
+                
+                labelDate.text = aDecoder.decodeObjectForKey("labelDate") as! String
+                labelDuration.text = aDecoder.decodeObjectForKey("labelDuration") as! String
+                
+                //set volume and pan
+                volume = aDecoder.decodeFloatForKey("volume")
+                pan = aDecoder.decodeFloatForKey("pan")
             }
             
-            labelDate.text = aDecoder.decodeObjectForKey("labelDate") as! String
-            labelDuration.text = aDecoder.decodeObjectForKey("labelDuration") as! String
-            
-            //set volume and pan
-            volume = aDecoder.decodeFloatForKey("volume")
-            pan = aDecoder.decodeFloatForKey("pan")
+            //decode values for center and name label
+            self.center = aDecoder.decodeCGPointForKey("center")
+            labelName.text = aDecoder.decodeObjectForKey("labelName") as! String?
         }
-        
-        //decode values for center and name label
-        self.center = aDecoder.decodeCGPointForKey("center")
-        labelName.text = aDecoder.decodeObjectForKey("labelName") as! String?
     }
     
     override func encodeWithCoder(aCoder: NSCoder) {
@@ -212,6 +217,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         aCoder.encodeObject(trackID, forKey: "trackID")
         aCoder.encodeFloat(volume, forKey: "volume")
         aCoder.encodeFloat(pan, forKey: "pan")
+        aCoder.encodeBool(hasBeenDeleted, forKey: "hasBeenDeleted")
     }
     
     func setLabelNameText(name: String) {
@@ -251,7 +257,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
             if newCenterX < self.superview?.frame.width && newCenterX > 0 {
                 self.center.x = newCenterX
             }
-            if newCenterY < self.superview?.frame.height && newCenterY > 50 {
+            if newCenterY < self.superview?.frame.height && newCenterY > 100 {
                 self.center.y = newCenterY
             }
         }
@@ -356,7 +362,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     }
     
     func playAudio() {
-        if !isInEditMode && mode != .Trash && readyToPlay && audioPlayer != nil {
+        if !isInEditMode && mode == .Play && readyToPlay && audioPlayer != nil {
             print("playing")
             
             (superview as! LinkManager).showStopButton()
@@ -378,7 +384,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     }
     
     func playAudioAtTime(time: NSTimeInterval) {
-        if !isInEditMode && mode != .Trash && readyToPlay && audioPlayer != nil {
+        if !isInEditMode && mode == .Play && readyToPlay && audioPlayer != nil {
             print("playing")
             
             (superview as! LinkManager).showStopButton()
@@ -429,15 +435,23 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         self.audioPlot.updateBuffer(waveformData.buffers[0], withBufferSize: waveformData.bufferSize)
     }
     
-    func editMode(gestureRecognizer: UIGestureRecognizer) {
+    func editMode(gestureRecognizer: UIGestureRecognizer) -> TrackEditView? {
         if !self.isInEditMode {
             self.isInEditMode = true
+            
+            // stop audio
+            self.stopAudio()
+            
             let editView = TrackEditView(frame: self.frame, track: self)
             if let supervw = self.superview as? LinkManager {
                 supervw.mode = "NOTOUCHES"
                 supervw.addSubview(editView)
                 editView.animateOpen()
             }
+            
+            return editView
+        } else {
+            return nil
         }
         
     }
@@ -682,6 +696,19 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
             stopAudio()
         }
         
+        // delete audio from file system if exists
+        if let url = self.recordedAudio.filePathUrl where url != "" {
+            let filemgr = NSFileManager.defaultManager()
+            do {
+                try filemgr.removeItemAtURL(url)
+            } catch var error as NSError {
+                print("Remove failed: \(error.localizedDescription)")
+                // eventually try removing again or make user try again
+            } catch {
+                print("fatal error")
+            }
+        }
+        
         // animate track shrinking
         UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
             let curCenter = self.center
@@ -700,7 +727,6 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
                 self.removeFromSuperview()
                 self.hasBeenDeleted = true
         })
-        
     }
     
     func updateTrackCoreData() {
@@ -748,6 +774,10 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
             if results.count == 1 {
                 let trackToDelete = results[0] as! TrackEntity
                 context.deleteObject(trackToDelete)
+                do {
+                    try context.save()
+                } catch _ {
+                }
             }
         }
     }

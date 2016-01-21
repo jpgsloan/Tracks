@@ -178,7 +178,21 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
                 curTrackLinkAdd.dequeueTrackFromAdding()
                 if let curTrack = curTrackLinkAdd.trackAtPoint(location) {
                     if curTrack != curTrackLinkAdd.curTouchedTrack {
-                        curTrackLinkAdd.queueTrackForAdding(curTrack)
+                        // check that there is no link already between first touched and currently touched tracks.
+                        var node: TrackLinkNode?
+                        if curTrackLinkAdd.curTouchedTrack.audioPlayer != nil {
+                            node = curTrackLinkAdd.trackNodeIDs[curTrackLinkAdd.curTouchedTrack.audioPlayer!]
+                        } else {
+                            node = curTrackLinkAdd.unrecordedTracks[curTrackLinkAdd.curTouchedTrack]
+                        }
+                        
+                        if let node = node {
+                            if !node.childrenIDs.contains(curTrack.trackID) && !node.siblingIDs.contains(curTrack.trackID) {
+                                print("NO PREVIOUS LINKS")
+                                // since no link exists between these nodes, queue track for adding to link
+                                curTrackLinkAdd.queueTrackForAdding(curTrack)
+                            }
+                        }
                     }
                 }
             } else if curHitSubview is TrackLink {
@@ -370,6 +384,16 @@ class LinkManager: UIView, UIGestureRecognizerDelegate {
             animation.duration = 0.2
             stopButton!.layer.addAnimation(animation, forKey: nil)
             stopButton!.hidden = true
+        }
+    }
+    
+    func stopAudio() {
+        for subview in subviews {
+            if let track = subview as? Track {
+                if track.hasStoppedRecording {
+                    track.stopAudio()
+                }
+            }
         }
     }
     

@@ -29,6 +29,7 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     var pan: Float = 0.0
     var circle: CAShapeLayer?
     var spinner: UIActivityIndicatorView?
+    var wasTrimmed: Bool = false
     
     var cancelTrimButton: UIButton!
     var trimAudioButton: UIButton!
@@ -446,7 +447,7 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
     func trimAudio(sender: UIButton) {
         print("TRIM AUDIO")
         spinner = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
-        spinner?.center = audioPlot.center
+        spinner?.center = CGPointMake(self.view.center.x, audioPlot.center.y)
         self.view.addSubview(spinner!)
         
         for subview in self.view.subviews {
@@ -530,9 +531,13 @@ class WaveformEditView: UIView, UIScrollViewDelegate, EZAudioPlayerDelegate {
                         print("Move successful")
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
                             self.setAudio(oldFileURL)
+                            self.wasTrimmed = true
+                            
                             // update track
                             self.updateTrack(oldFileURL)
                             self.exitTrimMode()
+                            
+                            // remove spinner
                             if let _ = self.spinner {
                                 self.spinner!.stopAnimating()
                                 self.spinner!.removeFromSuperview()

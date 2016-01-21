@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		111302FE1AFC8421002EA4B1 /* LinkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111302FD1AFC8421002EA4B1 /* LinkManager.swift */; };
+		111E979F1C50551400848C64 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E979E1C50551400848C64 /* SettingsView.swift */; settings = {ASSET_TAGS = (); }; };
+		111E97A11C50552A00848C64 /* SettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 111E97A01C50552A00848C64 /* SettingsView.xib */; settings = {ASSET_TAGS = (); }; };
+		111E97A31C50AA8E00848C64 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E97A21C50AA8E00848C64 /* AboutView.swift */; settings = {ASSET_TAGS = (); }; };
+		111E97A51C50AA9E00848C64 /* AboutView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 111E97A41C50AA9E00848C64 /* AboutView.xib */; settings = {ASSET_TAGS = (); }; };
+		111E97A71C50D65200848C64 /* LineRuledTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E97A61C50D65200848C64 /* LineRuledTextView.swift */; settings = {ASSET_TAGS = (); }; };
 		11489EC51AE5C6C900FB4B62 /* LastOpenProjectEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */; };
 		11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AC61A9EB13900E09069 /* AppDelegate.swift */; };
 		11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACD1A9EB13900E09069 /* Images.xcassets */; };
@@ -62,6 +67,11 @@
 
 /* Begin PBXFileReference section */
 		111302FD1AFC8421002EA4B1 /* LinkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkManager.swift; sourceTree = "<group>"; };
+		111E979E1C50551400848C64 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		111E97A01C50552A00848C64 /* SettingsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SettingsView.xib; sourceTree = "<group>"; };
+		111E97A21C50AA8E00848C64 /* AboutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		111E97A41C50AA9E00848C64 /* AboutView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AboutView.xib; sourceTree = "<group>"; };
+		111E97A61C50D65200848C64 /* LineRuledTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineRuledTextView.swift; sourceTree = "<group>"; };
 		11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LastOpenProjectEntity.swift; sourceTree = "<group>"; };
 		11493AC11A9EB13900E09069 /* Tracks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11493AC61A9EB13900E09069 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -160,6 +170,10 @@
 				1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */,
 				11493AE71A9EB19800E09069 /* ProjectViewController.swift */,
 				116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */,
+				111E979E1C50551400848C64 /* SettingsView.swift */,
+				111E97A01C50552A00848C64 /* SettingsView.xib */,
+				111E97A21C50AA8E00848C64 /* AboutView.swift */,
+				111E97A41C50AA9E00848C64 /* AboutView.xib */,
 				11F952711BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift */,
 				111302FD1AFC8421002EA4B1 /* LinkManager.swift */,
 				11C8F5EE1B7406B100BDD37C /* TrackLink.swift */,
@@ -167,6 +181,7 @@
 				11DCE8C31AFD90750099BFEE /* LinkEdge.swift */,
 				11ABD8481B98D7B10048F1F9 /* NotesView.swift */,
 				11ABD84A1B98D9B70048F1F9 /* NotesView.xib */,
+				111E97A61C50D65200848C64 /* LineRuledTextView.swift */,
 				11493AF31A9EB1B000E09069 /* DrawView.swift */,
 				11493AE61A9EB19800E09069 /* Line.swift */,
 				11493AE91A9EB19800E09069 /* Track.swift */,
@@ -332,7 +347,9 @@
 				115854121B9F91F3007C0131 /* WaveformEditView.xib in Resources */,
 				1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */,
 				11F9526E1BFABEEB00F8586F /* Info.plist in Resources */,
+				111E97A11C50552A00848C64 /* SettingsView.xib in Resources */,
 				11ABD84B1B98D9B70048F1F9 /* NotesView.xib in Resources */,
+				111E97A51C50AA9E00848C64 /* AboutView.xib in Resources */,
 				1163B5601C40BD7F002183E5 /* Track.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -385,9 +402,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */,
+				111E97A71C50D65200848C64 /* LineRuledTextView.swift in Sources */,
 				115854141B9FB80C007C0131 /* WaveformEditView.swift in Sources */,
 				11CEDDD31AE843B30092AE87 /* ProjectTableViewCell.swift in Sources */,
 				1158542C1BAB9E7B007C0131 /* TimeSelectorView.swift in Sources */,
+				111E97A31C50AA8E00848C64 /* AboutView.swift in Sources */,
 				11C8F5F71B7C09FE00BDD37C /* LinkEntity.swift in Sources */,
 				11DCE8C41AFD90750099BFEE /* LinkEdge.swift in Sources */,
 				11493AF11A9EB19800E09069 /* TrackColors.swift in Sources */,
@@ -402,6 +421,7 @@
 				1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */,
 				11493AED1A9EB19800E09069 /* Line.swift in Sources */,
 				11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */,
+				111E979F1C50551400848C64 /* SettingsView.swift in Sources */,
 				11493AF41A9EB1B000E09069 /* DrawView.swift in Sources */,
 				11ABD84F1B9962BA0048F1F9 /* NotesEntity.swift in Sources */,
 				11493AEF1A9EB19800E09069 /* RecordedAudio.swift in Sources */,

@@ -13,6 +13,9 @@ class TrackEditView: UIView, UITextFieldDelegate {
     // contains code for all edit elements.
     var view: UIView!
     var track: Track!
+    var trackLink: TrackLink?
+    var oldAudioPlayer: AVAudioPlayer?
+    
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var exitButton: UIButton!
     @IBOutlet weak var waveformEditView: WaveformEditView!
@@ -29,6 +32,9 @@ class TrackEditView: UIView, UITextFieldDelegate {
         self.track = track
         self.view.backgroundColor = track.view.backgroundColor?.colorWithAlphaComponent(0.97)
         self.backgroundColor = UIColor.clearColor()
+        
+        // store old audioPlayer, incase new one is created from trimming. (used to access old track node in track links)
+        oldAudioPlayer = track.audioPlayer
         
         // set title text and delegate
         titleTextField.text = track.labelName.text
@@ -196,11 +202,15 @@ class TrackEditView: UIView, UITextFieldDelegate {
     
     @IBAction func exitEditMode(sender: UIButton) {
         // animates closing of edit view, updates edited info to track
-        (self.superview as! LinkManager).hideToolbars(false)
+        //(self.superview as! LinkManager).hideToolbars(false)
         track.exitEditMode(volSlider.value, pan: -1 + (panSlider.value * 2), color: waveformEditView.backgroundView.backgroundColor!.colorWithAlphaComponent(0.85), titleText: titleTextField.text!)
         animateClose()
         track.isInEditMode = false
-        
+        if let trackLink = trackLink, player = oldAudioPlayer {
+            if waveformEditView.wasTrimmed {
+                trackLink.updateTrackWithNewAudioPlayer(player, track: track)
+            }
+        }
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {

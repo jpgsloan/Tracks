@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SettingsView" customModule="Tracks" customModuleProvider="target">
+            <connections>
+                <outlet property="monitorLevelSlider" destination="236-s8-bPl" id="HKN-k0-hRn"/>
+                <outlet property="monitoringSwitch" destination="wbT-rV-p4G" id="dfO-DC-nJx"/>
+                <outlet property="topBarBackgroundView" destination="DOK-eV-VWc" id="reu-HB-MM0"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DOK-eV-VWc">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="60"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="99w-SO-G7w">
+                            <rect key="frame" x="15" y="18" width="24" height="24"/>
+                            <animations/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="99w-SO-G7w" secondAttribute="height" multiplier="1:1" id="FB4-K4-sV3"/>
+                            </constraints>
+                            <state key="normal" image="close-button"/>
+                            <connections>
+                                <action selector="exitSetting:" destination="-1" eventType="touchUpInside" id="zTH-NM-QIA"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SETTINGS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RP0-un-dsT">
+                            <rect key="frame" x="257" y="18" width="86" height="25"/>
+                            <animations/>
+                            <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="18"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <animations/>
+                    <color key="backgroundColor" red="0.12156862745098039" green="0.14117647058823529" blue="0.15294117647058825" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="99w-SO-G7w" firstAttribute="height" secondItem="DOK-eV-VWc" secondAttribute="height" multiplier="0.4" id="9jE-LQ-av1"/>
+                        <constraint firstItem="RP0-un-dsT" firstAttribute="centerX" secondItem="DOK-eV-VWc" secondAttribute="centerX" id="XkO-mC-7pK"/>
+                        <constraint firstAttribute="height" constant="60" id="Ytn-aL-MoS"/>
+                        <constraint firstItem="RP0-un-dsT" firstAttribute="centerY" secondItem="DOK-eV-VWc" secondAttribute="centerY" id="buV-t1-HVZ"/>
+                        <constraint firstItem="99w-SO-G7w" firstAttribute="centerY" secondItem="DOK-eV-VWc" secondAttribute="centerY" id="v70-NM-ffM"/>
+                        <constraint firstItem="99w-SO-G7w" firstAttribute="leading" secondItem="DOK-eV-VWc" secondAttribute="leading" constant="15" id="zZY-Pp-zpq"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Input Monitoring" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sNE-eI-6NW">
+                    <rect key="frame" x="15" y="80" width="127" height="21"/>
+                    <animations/>
+                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="wbT-rV-p4G">
+                    <rect key="frame" x="25" y="111" width="51" height="31"/>
+                    <animations/>
+                    <color key="onTintColor" red="0.043137254899999998" green="0.47450980390000003" blue="0.78823529410000004" alpha="1" colorSpace="calibratedRGB"/>
+                    <connections>
+                        <action selector="switchMonitoring:" destination="-1" eventType="valueChanged" id="HFb-E5-Kvb"/>
+                    </connections>
+                </switch>
+                <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" misplaced="YES" editable="NO" text="Monitoring will enable the live audio input to be heard through the headphones or audio output." textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R5B-Ro-kf8">
+                    <rect key="frame" x="25" y="226" width="550" height="67"/>
+                    <animations/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="67" id="Mxh-UT-Vm9"/>
+                    </constraints>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                </textView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Monitor Level" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="36v-gh-Ij8">
+                    <rect key="frame" x="15" y="157" width="127" height="21"/>
+                    <animations/>
+                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="236-s8-bPl">
+                    <rect key="frame" x="23" y="188" width="554" height="31"/>
+                    <animations/>
+                    <color key="minimumTrackTintColor" red="0.043137254899999998" green="0.47450980390000003" blue="0.78823529410000004" alpha="1" colorSpace="calibratedRGB"/>
+                    <connections>
+                        <action selector="changeMonitorLevel:" destination="-1" eventType="valueChanged" id="vod-DF-bjV"/>
+                    </connections>
+                </slider>
+            </subviews>
+            <animations/>
+            <color key="backgroundColor" red="0.24313725490196078" green="0.28627450980392155" blue="0.31372549019607843" alpha="0.96999999999999997" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="236-s8-bPl" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="25" id="3QP-iw-ASI"/>
+                <constraint firstAttribute="trailing" secondItem="236-s8-bPl" secondAttribute="trailing" constant="25" id="6FW-fB-kkd"/>
+                <constraint firstItem="R5B-Ro-kf8" firstAttribute="top" secondItem="236-s8-bPl" secondAttribute="bottom" constant="8" id="6lM-if-5Go"/>
+                <constraint firstItem="wbT-rV-p4G" firstAttribute="top" secondItem="sNE-eI-6NW" secondAttribute="bottom" constant="10" id="82f-zX-wQg"/>
+                <constraint firstItem="236-s8-bPl" firstAttribute="top" secondItem="36v-gh-Ij8" secondAttribute="bottom" constant="10" id="90b-hN-30o"/>
+                <constraint firstItem="DOK-eV-VWc" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="OU7-DZ-sZj"/>
+                <constraint firstAttribute="trailing" secondItem="R5B-Ro-kf8" secondAttribute="trailing" constant="25" id="PBO-bo-nCy"/>
+                <constraint firstItem="36v-gh-Ij8" firstAttribute="width" secondItem="sNE-eI-6NW" secondAttribute="width" id="RsP-am-n8r"/>
+                <constraint firstItem="DOK-eV-VWc" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="UgK-fz-y0B"/>
+                <constraint firstItem="sNE-eI-6NW" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="YGI-FO-TbK"/>
+                <constraint firstItem="R5B-Ro-kf8" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="25" id="Z6u-LE-R4F"/>
+                <constraint firstItem="36v-gh-Ij8" firstAttribute="top" secondItem="wbT-rV-p4G" secondAttribute="bottom" constant="15" id="f0c-SR-6dQ"/>
+                <constraint firstItem="sNE-eI-6NW" firstAttribute="top" secondItem="DOK-eV-VWc" secondAttribute="bottom" constant="20" id="kfJ-LS-MZK"/>
+                <constraint firstItem="36v-gh-Ij8" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="nTI-GT-oIh"/>
+                <constraint firstItem="wbT-rV-p4G" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="25" id="oDp-wh-IGN"/>
+                <constraint firstAttribute="trailing" secondItem="DOK-eV-VWc" secondAttribute="trailing" id="vQg-9f-zsF"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="close-button" width="59" height="59"/>
+    </resources>
+</document>

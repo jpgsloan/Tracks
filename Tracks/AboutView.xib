@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AboutView" customModule="Tracks" customModuleProvider="target">
+            <connections>
+                <outlet property="topBarBackgroundView" destination="Brn-0e-A7F" id="JGC-pO-oNT"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Brn-0e-A7F">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="60"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hri-z5-he6">
+                            <rect key="frame" x="15" y="18" width="24" height="24"/>
+                            <animations/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="hri-z5-he6" secondAttribute="height" multiplier="1:1" id="9ZY-3N-Mkc"/>
+                            </constraints>
+                            <state key="normal" image="close-button"/>
+                            <connections>
+                                <action selector="exitAbout:" destination="-1" eventType="touchUpInside" id="CLM-FG-p8M"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TRACKS" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nUo-S6-L3W">
+                            <rect key="frame" x="265" y="18" width="69" height="25"/>
+                            <animations/>
+                            <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="18"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <animations/>
+                    <color key="backgroundColor" red="0.12156862745098039" green="0.14117647058823529" blue="0.15294117647058825" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="nUo-S6-L3W" firstAttribute="centerY" secondItem="Brn-0e-A7F" secondAttribute="centerY" id="HjS-LU-jMm"/>
+                        <constraint firstAttribute="height" constant="60" id="bhh-Ag-eOP"/>
+                        <constraint firstItem="hri-z5-he6" firstAttribute="leading" secondItem="Brn-0e-A7F" secondAttribute="leading" constant="15" id="d5R-k1-hpf"/>
+                        <constraint firstItem="hri-z5-he6" firstAttribute="height" secondItem="Brn-0e-A7F" secondAttribute="height" multiplier="0.4" id="oTi-WD-8hx"/>
+                        <constraint firstItem="hri-z5-he6" firstAttribute="centerY" secondItem="Brn-0e-A7F" secondAttribute="centerY" id="rjd-fO-hSH"/>
+                        <constraint firstItem="nUo-S6-L3W" firstAttribute="centerX" secondItem="Brn-0e-A7F" secondAttribute="centerX" id="uYM-Qp-4SZ"/>
+                    </constraints>
+                </view>
+                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hSP-S1-I75">
+                    <rect key="frame" x="8" y="68" width="584" height="524"/>
+                    <animations/>
+                    <string key="text">version 0.1.0
+
+
+
+special thanks:
+
+designer 
+- Claire Tuna
+
+EZAudio visualization framework 
+- Syed Haris Ali
+
+ADVSegmentedControl.swift 
+- Tope Abayomi
+
+notes and sidebar icons 
+- Google Design, Material Icons</string>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="16"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                </textView>
+            </subviews>
+            <animations/>
+            <color key="backgroundColor" red="0.24313725490196078" green="0.28627450980392155" blue="0.31372549019607843" alpha="0.96999999999999997" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Brn-0e-A7F" secondAttribute="trailing" id="1bV-Ek-G91"/>
+                <constraint firstItem="hSP-S1-I75" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="BD0-0Y-e4r"/>
+                <constraint firstAttribute="trailing" secondItem="hSP-S1-I75" secondAttribute="trailing" constant="8" id="JWr-OW-lUg"/>
+                <constraint firstAttribute="bottom" secondItem="hSP-S1-I75" secondAttribute="bottom" constant="8" id="ToY-Bb-0zq"/>
+                <constraint firstItem="Brn-0e-A7F" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="aJ9-Fo-Ws7"/>
+                <constraint firstItem="hSP-S1-I75" firstAttribute="top" secondItem="Brn-0e-A7F" secondAttribute="bottom" constant="8" id="o76-jW-BdY"/>
+                <constraint firstItem="Brn-0e-A7F" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="vaL-fm-CfZ"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="close-button" width="59" height="59"/>
+    </resources>
+</document>
