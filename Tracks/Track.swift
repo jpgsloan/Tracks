@@ -11,14 +11,14 @@ import AVFoundation
 import CoreData
 import QuartzCore
 
-class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
+class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate, EZMicrophoneDelegate {
     
     var projectDirectory: String!
     var trackID: String = ""
     var recordedAudio: RecordedAudio = RecordedAudio()
     var audioRecorder:AVAudioRecorder!
     var audioPlayer:AVAudioPlayer?
-     
+    
     var wasDragged = false
     var startLoc: CGPoint!
     
@@ -30,7 +30,16 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     var isInEditMode: Bool = false
     var hasBeenDeleted: Bool = false
     var alertWindow: UIWindow?
-
+    
+    var microphone: EZMicrophone?
+    var recordingTimer: NSTimer?
+    var startTime: NSDate?
+    var recTimerLabel: UILabel?
+    var storedBackgroundColor: UIColor?
+    var recordButtonCircle: CAShapeLayer?
+    var recordButtonView: UIView?
+    var shouldAnimate = false
+    
     enum Mode {
         case Play
         case Link
@@ -49,6 +58,7 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     @IBOutlet weak var progressViewConstraint: NSLayoutConstraint!
     @IBOutlet weak var linkImageView: UIView!
     @IBOutlet weak var trashImageView: UIView!
+    @IBOutlet weak var microphoneBackgroundPlot: EZAudioPlotGL!
     
     // view for loading xib
     var view: UIView!
@@ -136,13 +146,30 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         progressView.hidden = true
         audioPlot.hidden = true
         
+        // set up audioplot for displaying mic input
+        microphoneBackgroundPlot.layer.cornerRadius = self.view.layer.cornerRadius
+        microphoneBackgroundPlot.plotType = EZPlotType.Buffer
+        microphoneBackgroundPlot.clipsToBounds = true
+        
         // add record button (as UIView)
-        recordButton = UIView(frame: CGRect(x: bounds.origin.x + bounds.width / 4, y: bounds.origin.y + bounds.height / 4, width: bounds.width / 2, height: bounds.height / 2))
+        recordButton = UIView(frame: CGRect(x: bounds.origin.x, y: bounds.origin.y, width: bounds.width / 2.4, height: bounds.height / 2.4))
+        recordButton.center = CGPointMake(bounds.width / 2.0, bounds.height / 2.0)
         recordButton.layer.cornerRadius = recordButton.bounds.width / 2
-        recordButton.layer.borderWidth = 2
+        recordButton.layer.borderWidth = 3
         recordButton.layer.borderColor = UIColor.whiteColor().CGColor
-        recordButton.backgroundColor = UIColor.lightGrayColor()
+        recordButton.backgroundColor = UIColor.clearColor()
+        
+        // add inner circle behind record button (separated for animation purposes)
+        recordButtonCircle = CAShapeLayer()
+        recordButtonCircle!.frame = recordButton.bounds
+        let path = UIBezierPath()
+        path.addArcWithCenter(CGPointMake(self.bounds.width / 2.0, self.bounds.height / 2.0), radius: (recordButton.frame.width / 2.0) - 5, startAngle: 0, endAngle: CGFloat(2.0 * M_PI), clockwise: true)
+        recordButtonCircle!.path = path.CGPath
+        recordButtonCircle!.fillColor = UIColor.whiteColor().colorWithAlphaComponent(0.6).CGColor
+        recordButtonView = UIView(frame: self.bounds)
+        recordButtonView!.layer.addSublayer(recordButtonCircle!)
         self.addSubview(recordButton)
+        self.insertSubview(recordButtonView!, belowSubview: recordButton)
     }
     
     required convenience init?(coder aDecoder: NSCoder){
@@ -283,19 +310,31 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
     }
     
     func startRecording() {
-        // animate record button corners into stop square
+        storedBackgroundColor = self.view.backgroundColor
+        self.view.backgroundColor = UIColor.clearColor()
+        
+        // animate record button corners to match track
         let animation = CABasicAnimation(keyPath: "cornerRadius")
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
         animation.fromValue = recordButton.bounds.width / 2
-        animation.toValue = 6.0
+        animation.toValue = self.view.layer.cornerRadius
         animation.duration = 0.4
-        recordButton.layer.cornerRadius = 6
+        recordButton.layer.cornerRadius = self.view.layer.cornerRadius
         recordButton.layer.addAnimation(animation, forKey: "cornerRadius")
         
-        // animate record button size, scaled to 85%
+        // animate record button frame to expand to match track
         Track.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
-            self.recordButton.transform = CGAffineTransformMakeScale(0.85, 0.85)
-            }, completion: nil )
+            self.recordButton.frame = self.bounds
+            self.recordButton.layer.borderWidth = 1.0
+            
+            // slightly dim the middle circle (which stays central)
+            self.recordButtonCircle?.fillColor = UIColor.whiteColor().colorWithAlphaComponent(0.4).CGColor
+
+            // change track color to red during recording and begin pulsing animation on completion
+            self.view.backgroundColor = UIColor(red: 183.0 / 255.0, green: 74.0 / 255.0, blue: 73.0 / 255.0, alpha: 0.9)
+            }, completion: { (Bool) -> Void in
+                self.animateFade()
+        })
         
         // begin recording and update bool values
         audioRecorder.prepareToRecord()
@@ -303,12 +342,83 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
         
         hasStartedRecording = true
         hasStoppedRecording = false
+    
+        // start background waveform during recording
+        microphone = EZMicrophone(delegate: self)
+        microphone!.startFetchingAudio()
+        self.view.insertSubview(microphoneBackgroundPlot, belowSubview: recordButton)
+        
+        // start recording timer and display time label
+        recordingTimer = NSTimer.scheduledTimerWithTimeInterval(0.02, target: self, selector: "updateRecordingTimer", userInfo: nil, repeats: true)
+        startTime = NSDate()
+        recTimerLabel = UILabel()
+        recTimerLabel!.text = "00:00:00"
+        recTimerLabel!.sizeToFit()
+        recTimerLabel!.frame.size.width = self.view.frame.width
+        recTimerLabel!.font = labelName.font.fontWithSize(16.0)
+        recTimerLabel!.textColor = UIColor.whiteColor()
+        recTimerLabel!.textAlignment = .Center
+        recTimerLabel!.center = CGPointMake(self.view.center.x, self.view.center.y + (self.view.frame.width / 2.8))
+        self.view.addSubview(recTimerLabel!)
+        
+        shouldAnimate = true
+    }
+    
+    func animateFade() {
+        // brightens red color during recording
+        if shouldAnimate {
+            UIView.animateWithDuration(0.8, delay: 0.0, options: [UIViewAnimationOptions.CurveEaseInOut, UIViewAnimationOptions.AllowUserInteraction], animations: { () -> Void in
+                self.view.backgroundColor = UIColor(red: 230.0 / 255.0, green: 74.0 / 255.0, blue: 73.0 / 255.0, alpha: 0.9)
+            }) { (Bool) -> Void in
+                self.animateUnfade()
+            }
+        }
+        
+    }
+    
+    func animateUnfade() {
+        // darkens red color during recording
+        if shouldAnimate {
+            UIView.animateWithDuration(0.8, delay: 0.0, options: [UIViewAnimationOptions.CurveEaseInOut, UIViewAnimationOptions.AllowUserInteraction], animations: { () -> Void in
+                self.view.backgroundColor = UIColor(red: 183.0 / 255.0, green: 74.0 / 255.0, blue: 73.0 / 255.0, alpha: 0.9)
+            }) { (Bool) -> Void in
+                self.animateFade()
+            }
+        }
+    }
+    
+    func updateRecordingTimer() {
+        print("lable")
+        if let startTime = startTime {
+            let interval = NSDate().timeIntervalSinceDate(startTime)
+            let milliseconds = Int(interval * 100) % 100
+            let seconds = Int(interval) % 60
+            let minutes = Int(interval / 60) % 60
+            let time = String(format: "%02d:%02d:%02d", minutes, seconds, milliseconds)
+            
+            if let recTimerLabel = recTimerLabel {
+                recTimerLabel.text = time
+            }
+        }
+    }
+    
+    func microphone(microphone: EZMicrophone!, hasAudioReceived buffer: UnsafeMutablePointer<UnsafeMutablePointer<Float>>, withBufferSize bufferSize: UInt32, withNumberOfChannels numberOfChannels: UInt32) {
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            if let _ = self.microphoneBackgroundPlot {
+                self.microphoneBackgroundPlot.updateBuffer(buffer[0], withBufferSize: bufferSize)
+            }
+        }
     }
     
     func stopRecording() {
+        
+        shouldAnimate = false
+        
         // animate removal of record button and unhide labels, audio plot, and progress view
         Track.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: { () -> Void in
             self.recordButton.transform = CGAffineTransformMakeScale(0.01, 0.01)
+            self.view.backgroundColor = self.storedBackgroundColor
+            self.recordButtonCircle?.fillColor = UIColor.clearColor().CGColor
             }, completion: { (Bool) -> Void in
                 self.recordButton.removeFromSuperview()
                 self.audioPlot.hidden = false
@@ -316,10 +426,21 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
                 self.labelDate.hidden = false
                 self.labelDuration.hidden = false
                 self.progressView.hidden = false
+                self.recordButtonView?.removeFromSuperview()
         })
         
         audioRecorder.stop()
         hasStoppedRecording = true
+        
+        // stop background waveform
+        microphone?.stopFetchingAudio()
+        microphone?.delegate = nil
+        microphoneBackgroundPlot.removeFromSuperview()
+        
+        // remove recording time label and stop timer
+        recTimerLabel?.removeFromSuperview()
+        recordingTimer?.invalidate()
+        recordingTimer = nil
     }
     
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder, successfully flag: Bool) {
@@ -427,8 +548,6 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
             (superview as! LinkManager).hideStopButton()
         }
     }
-    
-    
     
     func drawWaveform() {
         let waveformData = self.audioFile.getWaveformData()
@@ -696,12 +815,18 @@ class Track: UIView, AVAudioRecorderDelegate, AVAudioPlayerDelegate {
             stopAudio()
         }
         
+        // remove microphone used for displaying input during recording
+        microphone?.stopFetchingAudio()
+        microphone?.delegate = nil
+        if let _ = microphoneBackgroundPlot {
+            microphoneBackgroundPlot.removeFromSuperview()
+        }
         // delete audio from file system if exists
         if let url = self.recordedAudio.filePathUrl where url != "" {
             let filemgr = NSFileManager.defaultManager()
             do {
                 try filemgr.removeItemAtURL(url)
-            } catch var error as NSError {
+            } catch let error as NSError {
                 print("Remove failed: \(error.localizedDescription)")
                 // eventually try removing again or make user try again
             } catch {

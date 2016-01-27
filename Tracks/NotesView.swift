@@ -15,6 +15,7 @@ class NotesView: UIView, UITextViewDelegate {
     var appDel: AppDelegate!
     var context: NSManagedObjectContext!
     var projectEntity: ProjectEntity!
+    var storedMode: String = ""
     @IBOutlet weak var blurView: UIVisualEffectView!
     @IBOutlet weak var notesTextView: UITextView!
     
@@ -76,8 +77,11 @@ class NotesView: UIView, UITextViewDelegate {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillShow:"), name:UIKeyboardWillShowNotification, object: nil);
         NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("keyboardWillHide:"), name:UIKeyboardWillHideNotification, object: nil);
         
-        (self.superview as! LinkManager).mode = "NOTOUCHES"
-        (self.superview as! LinkManager).hideToolbars(true)
+        if let supervw = self.superview as? LinkManager {
+            storedMode = supervw.mode
+            supervw.mode = "NOTOUCHES"
+        }
+        //(self.superview as! LinkManager).hideToolbars(true)
         
         // animate notesTextView/blurView frames
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
@@ -97,8 +101,11 @@ class NotesView: UIView, UITextViewDelegate {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
         
-        (self.superview as! LinkManager).mode = ""
-        (self.superview as! LinkManager).hideToolbars(false)
+        if let supervw = self.superview as? LinkManager {
+            supervw.mode = storedMode
+            storedMode = ""
+        }
+        //(self.superview as! LinkManager).hideToolbars(false)
         
         // animate removal notes view
         UIView.animateWithDuration(0.3, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in

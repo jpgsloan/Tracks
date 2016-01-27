@@ -236,7 +236,7 @@ typedef NSRect EZRect;
  @param sampleRate A float representing the sample rate.
  @return A new AudioStreamBasicDescription with the specified format.
  */
-+ (AudioStreamBasicDescription)stereoFloatNonInterleavedFormatWithSampleRate:(float)sameRate;
++ (AudioStreamBasicDescription)stereoFloatNonInterleavedFormatWithSampleRate:(float)sampleRate;
 
 //------------------------------------------------------------------------------
 // @name AudioStreamBasicDescription Helper Functions
@@ -381,6 +381,13 @@ typedef NSRect EZRect;
 + (float)SGN:(float)value;
 
 //------------------------------------------------------------------------------
+#pragma mark - Music Utilities
+//------------------------------------------------------------------------------
+
++ (NSString *)noteNameStringForFrequency:(float)frequency
+                           includeOctave:(BOOL)includeOctave;
+
+//------------------------------------------------------------------------------
 #pragma mark - OSStatus Utility
 //------------------------------------------------------------------------------
 
@@ -470,8 +477,8 @@ typedef NSRect EZRect;
 
 /**
  Initializes the circular buffer (just a wrapper around the C method)
- *  @param circularBuffer Pointer to an instance of the TPCircularBuffer
- *  @param size           The length of the TPCircularBuffer (usually 1024)
+ @param circularBuffer Pointer to an instance of the TPCircularBuffer
+ @param size           The length of the TPCircularBuffer (usually 1024)
  */
 + (void)circularBuffer:(TPCircularBuffer*)circularBuffer
               withSize:(int)size;
@@ -490,6 +497,18 @@ typedef NSRect EZRect;
 
 /**
  Calculates the RMS of a float array containing audio data and appends it to the tail of a EZPlotHistoryInfo data structure. Thread-safe.
+ @param buffer      A float array containing the incoming audio buffer to append to the history buffer
+ @param bufferSize  A UInt32 representing the length of the incoming audio buffer
+ @param historyInfo A pointer to a EZPlotHistoryInfo structure to use for managing the history buffers
+ */
++ (void)appendBufferRMS:(float *)buffer
+         withBufferSize:(UInt32)bufferSize
+          toHistoryInfo:(EZPlotHistoryInfo *)historyInfo;
+
+//------------------------------------------------------------------------------
+
+/**
+ Appends a buffer of audio data to the tail of a EZPlotHistoryInfo data structure. Thread-safe.
  @param buffer      A float array containing the incoming audio buffer to append to the history buffer
  @param bufferSize  A UInt32 representing the length of the incoming audio buffer
  @param historyInfo A pointer to a EZPlotHistoryInfo structure to use for managing the history buffers

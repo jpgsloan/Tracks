@@ -577,7 +577,7 @@ class TrackLink: UIView, AVAudioPlayerDelegate {
         
         alertWindow = UIWindow(frame: UIScreen.mainScreen().bounds)
         
-        let actionSheetController: UIAlertController = UIAlertController(title: "Add Link", message: "Select link type.", preferredStyle: .Alert)
+        let actionSheetController: UIAlertController = UIAlertController(title: "Add Link", message: "Links tracks together to play them at the same time or in sequence.", preferredStyle: .Alert)
         
         let cancelAction: UIAlertAction = UIAlertAction(title: "Cancel", style: .Cancel) { action -> Void in
             self.alertWindow?.hidden = true

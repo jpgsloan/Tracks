@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BFB8C1897642EC1AF1F62C21"
+               BlueprintIdentifier = "8669AB494A674BFD68FE319B"
                BuildableName = "libPods-EZAudio.a"
                BlueprintName = "Pods-EZAudio"
                ReferencedContainer = "container:Pods.xcodeproj">

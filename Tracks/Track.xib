@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10102" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10080"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
@@ -15,6 +15,7 @@
                 <outlet property="labelDuration" destination="ZjK-Sq-Yh2" id="rWq-LL-c20"/>
                 <outlet property="labelName" destination="9dH-gT-crO" id="Qzo-3s-J7D"/>
                 <outlet property="linkImageView" destination="dkZ-yq-cqs" id="anc-RJ-5in"/>
+                <outlet property="microphoneBackgroundPlot" destination="8Nf-a1-d4T" id="W1d-xR-lhu"/>
                 <outlet property="progressView" destination="sup-Lx-r58" id="INE-id-U3e"/>
                 <outlet property="progressViewConstraint" destination="OvS-aq-PlC" id="rXb-Ng-Qpm"/>
                 <outlet property="trashImageView" destination="Svy-h0-8Az" id="B6h-Xn-S3E"/>
@@ -25,9 +26,22 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Nf-a1-d4T" customClass="EZAudioPlot">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
+                            <color key="value" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                            <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="shouldFill" value="NO"/>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="shouldMirror" value="YES"/>
+                    </userDefinedRuntimeAttributes>
+                </view>
                 <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GxP-JJ-Wfi" customClass="EZAudioPlot">
                     <rect key="frame" x="4" y="63" width="588" height="434"/>
-                    <animations/>
                     <color key="backgroundColor" red="0.86524873189999996" green="0.1966014791" blue="0.30831198370000001" alpha="1" colorSpace="calibratedRGB"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="color" keyPath="backgroundColor">
@@ -45,28 +59,24 @@
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="UNTITLED" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9dH-gT-crO">
                     <rect key="frame" x="10" y="494" width="580" height="49"/>
-                    <animations/>
                     <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="14"/>
                     <color key="textColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.94117647058823528" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="0:00:05" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZjK-Sq-Yh2">
                     <rect key="frame" x="10" y="545" width="171" height="49"/>
-                    <animations/>
                     <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="10"/>
                     <color key="textColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.94117647058823528" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="01/10/16" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TZF-u7-eq9">
                     <rect key="frame" x="419" y="8" width="173" height="47"/>
-                    <animations/>
                     <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="10"/>
                     <color key="textColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.94117647058823528" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sup-Lx-r58" userLabel="progressView">
                     <rect key="frame" x="5" y="0.0" width="2" height="600"/>
-                    <animations/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="2" id="5je-NI-VcS"/>
@@ -77,14 +87,12 @@
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="link-crosshairs" translatesAutoresizingMaskIntoConstraints="NO" id="zvo-4b-cI0">
                             <rect key="frame" x="41" y="41" width="99" height="99"/>
-                            <animations/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="zvo-4b-cI0" secondAttribute="height" id="uii-tc-r5o"/>
                             </constraints>
                             <edgeInsets key="layoutMargins" top="8" left="23" bottom="8" right="8"/>
                         </imageView>
                     </subviews>
-                    <animations/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="dkZ-yq-cqs" secondAttribute="height" multiplier="1:1" id="KqS-Lj-WgH"/>
@@ -98,14 +106,12 @@
                     <subviews>
                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="delete-x" translatesAutoresizingMaskIntoConstraints="NO" id="p8d-Yd-55N">
                             <rect key="frame" x="45" y="45" width="91" height="91"/>
-                            <animations/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="p8d-Yd-55N" secondAttribute="height" id="euR-r6-cCs"/>
                             </constraints>
                             <edgeInsets key="layoutMargins" top="8" left="23" bottom="8" right="8"/>
                         </imageView>
                     </subviews>
-                    <animations/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstItem="p8d-Yd-55N" firstAttribute="centerY" secondItem="Svy-h0-8Az" secondAttribute="centerY" id="E58-lj-QFU"/>
@@ -114,7 +120,6 @@
                     </constraints>
                 </view>
             </subviews>
-            <animations/>
             <color key="backgroundColor" red="0.027450980390000001" green="0.62745098040000002" blue="0.74509803919999995" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
                 <constraint firstItem="dkZ-yq-cqs" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="0Y9-z2-DI4"/>
@@ -125,20 +130,25 @@
                 <constraint firstItem="Svy-h0-8Az" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="leading" constant="7" id="Dhm-zv-TpZ"/>
                 <constraint firstItem="Svy-h0-8Az" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="top" constant="7" id="EfO-ew-rBa"/>
                 <constraint firstItem="9dH-gT-crO" firstAttribute="top" secondItem="GxP-JJ-Wfi" secondAttribute="bottom" constant="-2" id="HFL-HU-lcB"/>
+                <constraint firstItem="8Nf-a1-d4T" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="KKn-rf-ob6"/>
                 <constraint firstAttribute="bottom" secondItem="ZjK-Sq-Yh2" secondAttribute="bottom" constant="2" id="KnC-9G-RAP"/>
                 <constraint firstItem="dkZ-yq-cqs" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.3" id="MHJ-NH-4O8"/>
                 <constraint firstItem="sup-Lx-r58" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="5" id="OvS-aq-PlC"/>
                 <constraint firstItem="ZjK-Sq-Yh2" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="7" id="QKU-Qy-4M7"/>
                 <constraint firstItem="Svy-h0-8Az" firstAttribute="width" secondItem="Svy-h0-8Az" secondAttribute="height" multiplier="1:1" id="TuT-qF-G7Z"/>
+                <constraint firstAttribute="bottom" secondItem="8Nf-a1-d4T" secondAttribute="bottom" id="WDn-fJ-JqY"/>
                 <constraint firstAttribute="trailing" secondItem="GxP-JJ-Wfi" secondAttribute="trailing" constant="7" id="ZAp-xX-iRN"/>
+                <constraint firstItem="8Nf-a1-d4T" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="bbi-OG-tlv"/>
                 <constraint firstItem="TZF-u7-eq9" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="4" id="bmU-hw-wek"/>
                 <constraint firstItem="ZjK-Sq-Yh2" firstAttribute="top" secondItem="9dH-gT-crO" secondAttribute="bottom" constant="-6" id="gTv-0B-dA2"/>
                 <constraint firstItem="dkZ-yq-cqs" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="hXY-6y-T5a"/>
                 <constraint firstAttribute="trailing" secondItem="TZF-u7-eq9" secondAttribute="trailing" constant="7" id="mpF-5A-1IE"/>
+                <constraint firstAttribute="trailing" secondItem="8Nf-a1-d4T" secondAttribute="trailing" id="mrK-tr-Avy"/>
                 <constraint firstItem="Svy-h0-8Az" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.3" id="o6i-sR-09G"/>
                 <constraint firstAttribute="bottom" secondItem="sup-Lx-r58" secondAttribute="bottom" id="oXX-7Q-9kD"/>
                 <constraint firstItem="GxP-JJ-Wfi" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="7" id="t32-9o-5hZ"/>
             </constraints>
+            <point key="canvasLocation" x="196" y="329"/>
         </view>
     </objects>
     <resources>

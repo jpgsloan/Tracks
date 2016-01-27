@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		111302FE1AFC8421002EA4B1 /* LinkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111302FD1AFC8421002EA4B1 /* LinkManager.swift */; };
-		111E979F1C50551400848C64 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E979E1C50551400848C64 /* SettingsView.swift */; settings = {ASSET_TAGS = (); }; };
-		111E97A11C50552A00848C64 /* SettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 111E97A01C50552A00848C64 /* SettingsView.xib */; settings = {ASSET_TAGS = (); }; };
-		111E97A31C50AA8E00848C64 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E97A21C50AA8E00848C64 /* AboutView.swift */; settings = {ASSET_TAGS = (); }; };
-		111E97A51C50AA9E00848C64 /* AboutView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 111E97A41C50AA9E00848C64 /* AboutView.xib */; settings = {ASSET_TAGS = (); }; };
-		111E97A71C50D65200848C64 /* LineRuledTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E97A61C50D65200848C64 /* LineRuledTextView.swift */; settings = {ASSET_TAGS = (); }; };
+		111E979F1C50551400848C64 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E979E1C50551400848C64 /* SettingsView.swift */; };
+		111E97A11C50552A00848C64 /* SettingsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 111E97A01C50552A00848C64 /* SettingsView.xib */; };
+		111E97A31C50AA8E00848C64 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E97A21C50AA8E00848C64 /* AboutView.swift */; };
+		111E97A51C50AA9E00848C64 /* AboutView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 111E97A41C50AA9E00848C64 /* AboutView.xib */; };
+		111E97A71C50D65200848C64 /* LineRuledTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111E97A61C50D65200848C64 /* LineRuledTextView.swift */; };
 		11489EC51AE5C6C900FB4B62 /* LastOpenProjectEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11489EC41AE5C6C900FB4B62 /* LastOpenProjectEntity.swift */; };
 		11493AC71A9EB13900E09069 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11493AC61A9EB13900E09069 /* AppDelegate.swift */; };
 		11493ACE1A9EB13900E09069 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11493ACD1A9EB13900E09069 /* Images.xcassets */; };
@@ -33,7 +33,7 @@
 		1158542C1BAB9E7B007C0131 /* TimeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1158542B1BAB9E7B007C0131 /* TimeSelectorView.swift */; };
 		1162B37B1AA2C9E00066A52E /* TracksDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3791AA2C9E00066A52E /* TracksDataModel.xcdatamodeld */; };
 		1162B3811AA6EBB10066A52E /* TrackEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1162B3801AA6EBB10066A52E /* TrackEntity.swift */; };
-		1163B5601C40BD7F002183E5 /* Track.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1163B55F1C40BD7F002183E5 /* Track.xib */; settings = {ASSET_TAGS = (); }; };
+		1163B5601C40BD7F002183E5 /* Track.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1163B55F1C40BD7F002183E5 /* Track.xib */; };
 		116A71311AD8CDB6003CD4C7 /* ProjectManagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116A71301AD8CDB6003CD4C7 /* ProjectManagerViewController.swift */; };
 		116A71371AD8D5D9003CD4C7 /* ProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 116A71361AD8D5D9003CD4C7 /* ProjectViewController.xib */; };
 		1184716F1AE5D68F009DFAD4 /* SelectProjectViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1184716E1AE5D68F009DFAD4 /* SelectProjectViewController.xib */; };
@@ -50,8 +50,8 @@
 		11DCE8C41AFD90750099BFEE /* LinkEdge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11DCE8C31AFD90750099BFEE /* LinkEdge.swift */; };
 		11E167611AA152B900A4D5EA /* SelectProjectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E167601AA152B900A4D5EA /* SelectProjectTableViewController.swift */; };
 		11E3911D1AA80CE700257DE2 /* TableViewDataEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E3911C1AA80CE700257DE2 /* TableViewDataEntity.swift */; };
-		11F9526E1BFABEEB00F8586F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 11F9526D1BFABEEB00F8586F /* Info.plist */; settings = {ASSET_TAGS = (); }; };
-		11F952721BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F952711BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift */; settings = {ASSET_TAGS = (); }; };
+		11F9526E1BFABEEB00F8586F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 11F9526D1BFABEEB00F8586F /* Info.plist */; };
+		11F952721BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F952711BFBBF8C00F8586F /* ModeSelectSegmentedControl.swift */; };
 		B82C0A99A676B1A859871BB0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F0EFB2F40011E4A9B70B6F4 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -504,7 +504,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -539,7 +539,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -559,7 +559,7 @@
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Tracks/Tracks-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -575,9 +575,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "91afb304-86dc-4110-87c3-063f388cb0cc";
 				SWIFT_OBJC_BRIDGING_HEADER = "Tracks/Tracks-Bridging-Header.h";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

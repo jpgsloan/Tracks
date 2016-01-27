@@ -294,7 +294,7 @@ class ProjectViewController: UIViewController, UITextFieldDelegate, AVAudioSessi
     
     func sideBarOpened() {
         // called when project is opened in background with side bar already open.
-        let effect = UIBlurEffect(style: UIBlurEffectStyle.Light)
+        let effect = UIBlurEffect(style: UIBlurEffectStyle.Dark)
         sideBarOpenBackgroundView = UIVisualEffectView(frame: self.view.frame)
         sideBarOpenBackgroundView.effect = effect
         sideBarOpenBackgroundView.alpha = 1.0
