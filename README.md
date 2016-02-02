@@ -1,7 +1,9 @@
-# **Tracks**
+# **Tracks Music**
 iOS audio recording tool for quickly creating song demos.
 
-STILL UNDER DEVELOPMENT, CORE FEATURES ALMOST COMPLETE!
+Check out screenshots and video of the app on the [project webpage](jpgsloan.github.io/projects/tracks).
+
+Tracks Music is currently in beta testing on TestFlight. If you want to become a beta tester, send your Apple ID email address to jpgsloan@gmail.com.
 
 Tracks gives musicians the power to quickly create, organize, and arrange their music recordings into songs. 
   - Import or record live audio into "track" nodes. 
@@ -17,7 +19,6 @@ either trigger the next track when the current has completed or trigger several 
 Many more features to come! 
  - midi support
  - audiobus / inter-app audio
- - input monitoring
  - audio effects
  - group editing for linked tracks
  - export options
@@ -40,6 +41,6 @@ Many more features to come!
 
 **WaveformEditView** - used as subview within TrackEditView to handle the waveform and audio trim portion of edit mode. 
 
-**Design mock-ups:**
+**Original design mock-ups:**
 
 ![Alt text](/mockups.png?raw=true)
