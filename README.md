@@ -1,7 +1,7 @@
 # **Tracks Music**
 iOS audio recording tool for quickly creating song demos.
 
-Check out screenshots and video of the app on the [project webpage](jpgsloan.github.io/projects/tracks).
+Check out screenshots and video of the app on the [project webpage](http://jpgsloan.github.io/projects/tracks).
 
 Tracks Music is currently in beta testing on TestFlight. If you want to become a beta tester, send your Apple ID email address to jpgsloan@gmail.com.
 
